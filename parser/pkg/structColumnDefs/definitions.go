@@ -122,7 +122,7 @@ func getParser(lineType string) ParserBuilder {
 
 func ParseIt(f func(ColumnDef, string) (interface{}, error), lineType string, line string) (interface{}, error){
     // singleton pattern - these are pointers to the parser objects.
-    // getParsers() returns a pointer to a particular parser object mapped to the lineType.
+    // getParsers() returns a pointer to a particular parser implementation mapped to the lineType.
     // the parser object is a struct that implements the Parser interface by having a Parse method
     // and a Columns field that is a struct that implements the ColumnDef interface.
 
