@@ -5,112 +5,11 @@ import (
     "sync"
 )
 
-/*
-{
-    "lineType": "VL1L2",
-    "columns": [
-        {
-            "name": "TOTAL",
-            "type": "int"
-        },
-        {
-            "name": "UFBAR",
-            "type": float64
-        },
-        {
-            "name": "VFBAR",
-            "type": float64
-        },
-        {
-            "name": "UOBAR",
-            "type": float64
-        },
-        {
-            "name": "VOBAR",
-            "type": float64
-        },
-        {
-            "name": "UVFOBAR",
-            "type": float64
-        },
-        {
-            "name": "UVFFBAR",
-            "type": float64
-        },
-        {
-            "name": "UVOOBAR",
-            "type": float64
-        },
-        {
-            "name": "F_SPEED_BAR",
-            "type": float64
-        },
-        {
-            "name": "O_SPEED_BAR",
-            "type": float64
-        }
-    ]
-}
-
-{
-    "lineType": "VAL1L2",
-    "columns": [
-        {
-            "name": "TOTAL",
-            "type": "int"
-        },
-        {
-            "name": "UFABAR",
-            "type": float64
-        },
-        {
-            "name": "VFABAR",
-            "type": float64
-        },
-        {
-            "name": "UOABAR",
-            "type": float64
-        },
-        {
-            "name": "VOABAR",
-            "type": float64
-        },
-        {
-            "name": "UVFOABAR",
-            "type": float64
-        },
-        {
-            "name": "UVFFBAR",
-            "type": float64
-        },
-        {
-            "name": "UVOOABAR",
-            "type": float64
-        },
-        {
-            "name": "FA_SPEED_BAR",
-            "type": float64
-        },
-        {
-            "name": "OA_SPEED_BAR",
-            "type": float64
-        }
-    ]
-}
-
-*/
-
-type LField = struct {
-	name string
-	fieldType string
-}
-
 type ColumnDef struct {
 	Name string
     HeaderFields interface{}
 	DataFields interface{}
 }
-
 
 // column definitions - add to these all you like
 // Each column definition has a name, and a list of fields.
