@@ -107,7 +107,8 @@ type LField = struct {
 
 type ColumnDef struct {
 	Name string
-	Columns []LField
+    HeaderFields interface{}
+	DataFields interface{}
 }
 
 
@@ -116,38 +117,57 @@ type ColumnDef struct {
 // Each column definition is a struct that implements the Parser interface
 // Each new ColumnDef needs to be added to the parserMap
 
+type statHeaderL1 struct {
+    FcstLev string `json:"FCST_LEV"`
+    FcstUnits string `json:"FCST_UNITS"`
+    FcstValidBeg int `json:"FCST_VALID_BEG"`
+    FcstValidEnd int `json:"FCST_VALID_END"`
+    FcstVar string `json:"FCST_VAR"`
+    ID string `json:"ID"`
+    InterpMthd string `json:"INTERP_MTHD"`
+    InterpPnts int `json:"INTERP_PNTS"`
+    LineType string `json:"LINE_TYPE"`
+    Model string `json:"MODEL"`
+    ObsLev string `json:"OBS_LEV"`
+    ObsUnits string `json:"OBS_UNITS"`
+    ObsValidBeg int `json:"OBS_VALID_BEG"`
+    ObsValidEnd int `json:"OBS_VALID_END"`
+    ObsVar string `json:"OBS_VAR"`
+    Obtype string `json:"OBTYPE"`
+    Version string `json:"VERSION"`
+    VxMask string `json:"VX_MASK"`
+}
+
+type VL1L2Fields struct {
+        Fabar float64 `json:"FABAR"`
+        Ffabar float64 `json:"FFABAR"`
+        Foabar float64 `json:"FOABAR"`
+        Mae float64 `json:"MAE"`
+        Oabar float64 `json:"OABAR"`
+        Ooabar float64 `json:"OOABAR"`
+        Total int `json:"TOTAL"`
+}
+type VAL1L2Fields struct {
+        Fabar float64 `json:"FABAR"`
+        Ffabar float64 `json:"FFABAR"`
+        Foabar float64 `json:"FOABAR"`
+        Mae float64 `json:"MAE"`
+        Oabar float64 `json:"OABAR"`
+        Ooabar float64 `json:"OOABAR"`
+        Total int `json:"TOTAL"`
+}
+
 var VL1L2 = ColumnDef {
-	Name: "VL1L2",
-	Columns: []LField {
-		{name: "TOTAL", fieldType: "int"},
-		{name: "UFBAR", fieldType: "float"},
-		{name: "VFBAR", fieldType: "float"},
-		{name: "UOBAR", fieldType: "float"},
-		{name: "VOBAR", fieldType: "float"},
-		{name: "UVFOBAR", fieldType: "float"},
-		{name: "UVFFBAR", fieldType: "float"},
-		{name: "UVOOBAR", fieldType: "float"},
-		{name: "F_SPEED_BAR", fieldType: "float"},
-		{name: "O_SPEED_BAR", fieldType: "float"},
-	},
+	Name: "VAL1L2",
+    HeaderFields: statHeaderL1{},
+	DataFields: make(map[string]VL1L2Fields),
 }
 
 var VAL1L2 = ColumnDef {
-	Name: "VAL1L2",
-	Columns: []LField {
-		{name: "TOTAL", fieldType: "int"},
-		{name: "UFABAR", fieldType: "float"},
-		{name: "VFABAR", fieldType: "float"},
-		{name: "UOABAR", fieldType: "float"},
-		{name: "VOABAR", fieldType: "float"},
-		{name: "UVFOABAR", fieldType: "float"},
-		{name: "UVFFBAR", fieldType: "float"},
-		{name: "UVOOABAR", fieldType: "float"},
-		{name: "FA_SPEED_BAR", fieldType: "float"},
-		{name: "OA_SPEED_BAR", fieldType: "float"},
-	},
+    Name: "VAL1L2",
+    HeaderFields: statHeaderL1{},
+    DataFields: make(map[string]VAL1L2Fields),
 }
-
 
 var parserMap = map[string] ColumnDef{
     "VL1L2": VL1L2,
