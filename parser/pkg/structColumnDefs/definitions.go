@@ -139,13 +139,13 @@ type statHeaderL1 struct {
 }
 
 type VL1L2Fields struct {
-        Fabar float64 `json:"FABAR"`
-        Ffabar float64 `json:"FFABAR"`
-        Foabar float64 `json:"FOABAR"`
-        Mae float64 `json:"MAE"`
-        Oabar float64 `json:"OABAR"`
-        Ooabar float64 `json:"OOABAR"`
-        Total int `json:"TOTAL"`
+    Fabar float64 `json:"FABAR"`
+    Ffabar float64 `json:"FFABAR"`
+    Foabar float64 `json:"FOABAR"`
+    Mae float64 `json:"MAE"`
+    Oabar float64 `json:"OABAR"`
+    Ooabar float64 `json:"OOABAR"`
+    Total int `json:"TOTAL"`
 }
 
 type VAL1L2Fields struct {
@@ -161,21 +161,17 @@ type VAL1L2Fields struct {
     OA_SPEED_BAR float64 `json:"OA_SPEED_BAR"`
 }
 
-var VL1L2 = ColumnDef {
-	Name: "VL1L2",
-    HeaderFields: statHeaderL1{},
-	DataFields: make(map[string]VL1L2Fields),
-}
-
-var VAL1L2 = ColumnDef {
-    Name: "VAL1L2",
-    HeaderFields: statHeaderL1{},
-    DataFields: make(map[string]VAL1L2Fields),
-}
-
 var parserMap = map[string] ColumnDef{
-    "VL1L2": VL1L2,
-    "VAL1L2": VAL1L2,
+    "VL1L2": ColumnDef {
+        Name: "VL1L2",
+        HeaderFields: statHeaderL1{},
+        DataFields: make(map[string]VL1L2Fields),
+    },
+    "VAL1L2": ColumnDef {
+        Name: "VAL1L2",
+        HeaderFields: statHeaderL1{},
+        DataFields: make(map[string]VAL1L2Fields),
+    },
 }
 
 // Don't change below this line
