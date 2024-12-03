@@ -120,12 +120,16 @@ func getParser(lineType string) ParserBuilder {
 	return builderMap[lineType]
 }
 
-func ParseIt(f func(ColumnDef, string), lineType string, line string) string{
-    // singleton pattern - these are pointers to the parser objects
+func ParseIt(f func(ColumnDef, string) (interface{}, error), lineType string, line string) (interface{}, error){
+    // singleton pattern - these are pointers to the parser objects.
+    // getParsers() returns a pointer to a particular parser object mapped to the lineType.
+    // the parser object is a struct that implements the Parser interface by having a Parse method
+    // and a Columns field that is a struct that implements the ColumnDef interface.
+
     lock.Lock()
     parser := getParser(lineType).Columns(parserMap[lineType]).Build().(*parser)
     lock.Unlock()
-    f(parser.Columns, line)
-    return "parsed"
+    ret, error := f(parser.Columns, line)
+    return ret, error
 }
 
