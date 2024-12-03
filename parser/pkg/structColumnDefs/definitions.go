@@ -15,39 +15,39 @@ import (
         },
         {
             "name": "UFBAR",
-            "type": "float"
+            "type": float64
         },
         {
             "name": "VFBAR",
-            "type": "float"
+            "type": float64
         },
         {
             "name": "UOBAR",
-            "type": "float"
+            "type": float64
         },
         {
             "name": "VOBAR",
-            "type": "float"
+            "type": float64
         },
         {
             "name": "UVFOBAR",
-            "type": "float"
+            "type": float64
         },
         {
             "name": "UVFFBAR",
-            "type": "float"
+            "type": float64
         },
         {
             "name": "UVOOBAR",
-            "type": "float"
+            "type": float64
         },
         {
             "name": "F_SPEED_BAR",
-            "type": "float"
+            "type": float64
         },
         {
             "name": "O_SPEED_BAR",
-            "type": "float"
+            "type": float64
         }
     ]
 }
@@ -61,39 +61,39 @@ import (
         },
         {
             "name": "UFABAR",
-            "type": "float"
+            "type": float64
         },
         {
             "name": "VFABAR",
-            "type": "float"
+            "type": float64
         },
         {
             "name": "UOABAR",
-            "type": "float"
+            "type": float64
         },
         {
             "name": "VOABAR",
-            "type": "float"
+            "type": float64
         },
         {
             "name": "UVFOABAR",
-            "type": "float"
+            "type": float64
         },
         {
             "name": "UVFFBAR",
-            "type": "float"
+            "type": float64
         },
         {
             "name": "UVOOABAR",
-            "type": "float"
+            "type": float64
         },
         {
             "name": "FA_SPEED_BAR",
-            "type": "float"
+            "type": float64
         },
         {
             "name": "OA_SPEED_BAR",
-            "type": "float"
+            "type": float64
         }
     ]
 }
@@ -147,18 +147,22 @@ type VL1L2Fields struct {
         Ooabar float64 `json:"OOABAR"`
         Total int `json:"TOTAL"`
 }
+
 type VAL1L2Fields struct {
-        Fabar float64 `json:"FABAR"`
-        Ffabar float64 `json:"FFABAR"`
-        Foabar float64 `json:"FOABAR"`
-        Mae float64 `json:"MAE"`
-        Oabar float64 `json:"OABAR"`
-        Ooabar float64 `json:"OOABAR"`
-        Total int `json:"TOTAL"`
+    Total int `json:"TOTAL"`
+    UFABAR float64 `json:"UFABAR"`
+    VFABAR float64 `json:"VFABAR"`
+    UOABAR float64 `json:"UOABAR"`
+    VOABAR float64 `json:"VOABAR"`
+    UVFOABAR float64 `json:"UVFOABAR"`
+    UVFFBAR float64 `json:"UVFFBAR"`
+    UVOOABAR float64 `json:"UVOOABAR"`
+    FA_SPEED_BAR float64 `json:"FA_SPEED_BAR"`
+    OA_SPEED_BAR float64 `json:"OA_SPEED_BAR"`
 }
 
 var VL1L2 = ColumnDef {
-	Name: "VAL1L2",
+	Name: "VL1L2",
     HeaderFields: statHeaderL1{},
 	DataFields: make(map[string]VL1L2Fields),
 }
@@ -174,9 +178,9 @@ var parserMap = map[string] ColumnDef{
     "VAL1L2": VAL1L2,
 }
 
-var builderMap = map[string] ParserBuilder{}
-
 // Don't change below this line
+
+var builderMap = map[string] ParserBuilder{}
 
 type Parser interface {
 	Parse(string) string
