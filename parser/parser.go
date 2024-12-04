@@ -10,10 +10,19 @@ import "parser/pkg/structColumnDefs"
 // module parser
 // go run .
 
+type Ret struct {
+	name string
+	value string
+}
+
 func myStructParser(columnDef structColumnDefs.ColumnDef, line string) (interface{}, error) {
 	fmt.Printf("myStructParser %s is parsing`%s`\n", columnDef.Name, line)
-	return "parsed", nil
+	ret := Ret{}
+	ret.name = "fred"
+	ret.value = "something"
+	return ret, nil
 }
+
 
 func main() {
     fmt.Printf("\nstructColumnDefs\n")
