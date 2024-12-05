@@ -19,28 +19,32 @@ type ColumnDef struct {
 // Each new ColumnDef needs to be added to the parserMap
 //VERSION MODEL DESC FCST_LEAD FCST_VALID_BEG  FCST_VALID_END  OBS_LEAD OBS_VALID_BEG   OBS_VALID_END   FCST_VAR  FCST_UNITS FCST_LEV OBS_VAR   OBS_UNITS OBS_LEV OBTYPE VX_MASK INTERP_MTHD INTERP_PNTS FCST_THRESH OBS_THRESH COV_THRESH ALPHA LINE_TYPE
 
-type statHeaderL1 struct {
-    ID string `json:"ID"`
-    Version string `json:"VERSION"`
-    Model string `json:"MODEL"`
-    Desc string `json:"DESC"`
-    FcstLev string `json:"FCST_LEV"`
-    FcstValidBeg int `json:"FCST_VALID_BEG"`
-    FcstValidEnd int `json:"FCST_VALID_END"`
-    ObsLev string `json:"OBS_LEV"`
-    ObsValidBeg int `json:"OBS_VALID_BEG"`
-    ObsValidEnd int `json:"OBS_VALID_END"`
-    FcstVar string `json:"FCST_VAR"`
-    FcstUnits string `json:"FCST_UNITS"`
-    FcstLvl string `json:"FCST_LVL"`
-
-    InterpMthd string `json:"INTERP_MTHD"`
-    InterpPnts int `json:"INTERP_PNTS"`
-    LineType string `json:"LINE_TYPE"`
-    ObsUnits string `json:"OBS_UNITS"`
-    ObsVar string `json:"OBS_VAR"`
-    Obtype string `json:"OBTYPE"`
-    VxMask string `json:"VX_MASK"`
+type statHeader struct {
+      Version string `json:"VERSION"`
+      Model string `json:"MODEL"`
+      Desc string `json:"DESC"`
+      Fcst_lead string `json:"FCST_LEAD"`
+      Fcst_valid_beg string `json:"FCST_VALID_BEG"`
+      Fcst_valid_end string `json:"FCST_VALID_END"`
+      Obs_lead string `json:"OBS_LEAD"`
+      Obs_valid_beg string `json:"OBS_VALID_BEG"`
+      Obs_valid_end string `json:"OBS_VALID_END"`
+      Fcst_var string `json:"FCST_VAR"`
+      Fcst_units string `json:"FCST_UNITS"`
+      Fcst_lev string `json:"FCST_LEV"`
+      Obs_var string `json:"OBS_VAR"`
+      Obs_units string `json:"OBS_UNITS"`
+      Obs_lev string `json:"OBS_LEV"`
+      Obtype string `json:"OBTYPE"`
+      Vx_mask string `json:"VX_MASK"`
+      Interp_mthd string `json:"INTERP_MTHD"`
+      Interp_pnts string `json:"INTERP_PNTS"`
+      Fcst_thresh string `json:"FCST_THRESH"`
+      Obs_thresh string `json:"OBS_THRESH"`
+      Cov_thresh string `json:"COV_THRESH"`
+      Alpha string `json:"ALPHA"`
+      Line_type string `json:"LINE_TYPE"`
+      ID string `json:"ID"`
 }
 
 type SAL1L2doc struct {
