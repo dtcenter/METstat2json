@@ -44,25 +44,18 @@ type statHeader struct {
       Cov_thresh string `json:"COV_THRESH"`
       Alpha string `json:"ALPHA"`
       Line_type string `json:"LINE_TYPE"`
-      ID string `json:"ID"`
 }
 
-type SAL1L2doc struct {
-    HeaderFields statHeaderL1
-        Total int `json:"TOTAL"`
-        DataFields map[string]struct {
-            Fabar float64 `json:"FABAR"`
-            Oabar float64 `json:"OABAR"`
-            Foabar float64 `json:"FOABAR"`
-            Ffabar float64 `json:"FFABAR"`
-            Ooabar float64 `json:"OOABAR"`
-            Mae float64 `json:"MAE"`
-        }
+type vxMetadata struct {
+    ID string `json:"ID"`
+    //etc...
 }
+
 
 type VL1L2Doc struct {
-    HeaderFields statHeaderL1
-    DataFields map[string]struct {
+    vxMetadata
+    statHeader
+    Data map[string]struct {
         Fabar float64 `json:"FABAR"`
         Ffabar float64 `json:"FFABAR"`
         Foabar float64 `json:"FOABAR"`
@@ -73,8 +66,9 @@ type VL1L2Doc struct {
 }
 
 type VAL1L2Doc struct {
-    HeaderFields statHeaderL1
-    DataFields map[string]struct {
+    vxMetadata
+    statHeader
+    Data map[string]struct {
         Total int `json:"TOTAL"`
         UFABAR float64 `json:"UFABAR"`
         VFABAR float64 `json:"VFABAR"`
