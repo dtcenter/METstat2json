@@ -3,19 +3,19 @@ package main
 import (
 	"fmt"
 	"io"
-	"os"
-	"strings"
 	"net/http"
+	"os"
 	"regexp"
+	"strings"
 )
 
-func findType(name string, data []byte) (string, error){
+func findType(name string, data []byte) (string, error) {
 	r, _ := regexp.Compile("ato.*get_item.*" + name)
 	res := r.FindSubmatch(data)
 	if res == nil {
 		return "", fmt.Errorf("could not find type for %s", name)
 	}
-	dataType := strings.Split(string(res[0]),"(")[0]
+	dataType := strings.Split(string(res[0]), "(")[0]
 	switch dataType {
 	case "atoi":
 		dataType = "int"
@@ -26,6 +26,7 @@ func findType(name string, data []byte) (string, error){
 	}
 	return dataType, nil
 }
+
 // The output of this program is a series of structs that can be used to define the header
 // and data types in the buildHeaderTypes.go file
 func main() {
@@ -66,8 +67,8 @@ func main() {
 	}
 
 	// Use a map to keep track of unique headerStructs.
-	var dataStructs = make(DataStructs)
-	var headerStructs = make(HeaderStructs)
+	dataStructs := make(DataStructs)
+	headerStructs := make(HeaderStructs)
 
 	file_lines := strings.Split(string(rawBytes), "\n")
 	for _, line := range file_lines {
@@ -95,7 +96,7 @@ func main() {
 			parts = strings.Split(postfix, " OBTYPE ")
 			HeaderString = parts[0] + " OBTYPE"
 		} else {
-		// get the header fields from line
+			// get the header fields from line
 			parts = strings.Split(postfix, " LINE_TYPE ")
 			HeaderString = parts[0] + " LINE_TYPE"
 		}
@@ -134,13 +135,13 @@ func main() {
 		}
 		dataStruct += "}\n"
 		dataStruct += "\n"
-		//fmt.Println(dataStruct)
+		// fmt.Println(dataStruct)
 		dataStructs[dataStructName] = dataStruct
 	}
 
 	// We have to flesh this out with the vxMetaData struct
 	vxMetaDataStruct := "type vxMetadata struct {" +
-	    "    ID string `json:\"ID\"`\n" +
+		"    ID string `json:\"ID\"`\n" +
 		"    subset string `json:\"MET\"`\n" +
 		"    version string `json:\"version\"`\n" +
 		"    type string `json:\"type\"`\n" +
