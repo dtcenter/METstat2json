@@ -94,8 +94,9 @@ func (p *parser) Parse(line string) (string, error) {
 func getParser(lineType string, line string) Parser {
 	if builderMap[lineType] == nil {
 		pb := &parserBuilder{}
-		myParser := pb.Columns(structColumnTypes.ParserMap[lineType]).Build(line)
-		builderMap[lineType] = myParser
+		pMap := structColumnTypes.ParserMap[lineType]
+		myParser := pb.Columns(pMap)
+		builderMap[lineType] = myParser.Build(line)
 	}
 	return builderMap[lineType]
 }
