@@ -7,6 +7,9 @@ import (
 	"os"
 	"regexp"
 	"strings"
+
+	"golang.org/x/text/cases"
+	"golang.org/x/text/language"
 )
 
 func findType(name string, data []byte) (string, error) {
@@ -110,11 +113,15 @@ func main() {
 		headerStructName := HeaderStructName(fmt.Sprintf("%s_header_%s", fileType, version))
 		headerStructString := fmt.Sprintf("type %s struct {\n", headerStructName)
 		for _, term := range headerFields {
+			// change regex type terms
+			term = strings.Replace(term, "(", "", -1)
+			term = strings.Replace(term, ")", "", -1)
+			term = strings.Replace(term, "[0-9]*", "i", -1)
 			// get the dataType from the cc file
 			dataType := "string"
-			lowerName := strings.ToLower(term)
-			name := strings.ToUpper(lowerName[:1]) + lowerName[1:]
-			headerStructString += fmt.Sprintf("    %s %s `json:\"%s\"`\n", name, dataType, term)
+			name := strings.ToLower(term)
+			capName := cases.Title(language.English).String(name)
+			headerStructString += fmt.Sprintf("    %s %s `json:\"%s\"`\n", capName, dataType, name)
 		}
 		headerStructString += "}\n"
 		headerStructString += "\n"
@@ -122,16 +129,19 @@ func main() {
 		headerStructs[headerStructName] = headerStructString
 		// create the data struct for this line type
 		dataStructName := DataStructName(fmt.Sprintf("%s_%s_%s", fileType, lineType, version))
-		dataStruct := fmt.Sprintf("type %s struct {\n    vxMetadata\n    %s\n", dataStructName, headerStructName)
+		dataStruct := fmt.Sprintf("type %s struct {\n    VxMetadata `json:\"vx_metadata\"`\n    %s `json:\"met_header\"`\n", dataStructName, headerStructName)
 		for _, term := range dataFields {
-			lowerName := strings.ToLower(term)
-			name := strings.ToUpper(lowerName[:1]) + lowerName[1:]
+			term = strings.Replace(term, "(", "", -1)
+			term = strings.Replace(term, ")", "", -1)
+			term = strings.Replace(term, "[0-9]*", "i", -1)
+			name := strings.ToLower(term)
+			capName := cases.Title(language.English).String(name)
 			dataType := "string"
 			foundType, err := findType(term, rawStatBytes)
 			if err == nil {
 				dataType = foundType
 			}
-			dataStruct += fmt.Sprintf("    %s %s `json:\"%s\"`\n", name, dataType, term)
+			dataStruct += fmt.Sprintf("    %s %s `json:\"%s\"`\n", capName, dataType, name)
 		}
 		dataStruct += "}\n"
 		dataStruct += "\n"
@@ -140,17 +150,21 @@ func main() {
 	}
 
 	// We have to flesh this out with the vxMetadata struct
-	vxMetaDataStruct := "type vxMetadata struct {" +
-		"    ID string `json:\"ID\"`\n" +
-		"    subset string `json:\"MET\"`\n" +
-		"    version string `json:\"version\"`\n" +
-		"    typ string `json:\"type\"`  // like \"DD\"" +
-		"    subType string `json:\"subtype\"`  // like STAT, MODE, etc." +
+	vxMetaDataStruct := "type VxMetadata struct {\n" +
+		"    ID string `json:\"id\"`\n" +
+		"    Subset string `json:\"met\"`\n" +
+		"    Version string `json:\"version\"`\n" +
+		"    Type string `json:\"type\"`\n" +
+		"    SubType string `json:\"subtype\"`\n" +
 		"}\n"
 
 	fmt.Println("package structColumnTypes")
 	fmt.Println("")
-
+	fmt.Println(`type ColumnDef struct {
+	    Name string
+	    Doc interface{}
+	}`)
+	fmt.Println("")
 	// print the vxMetadata struct
 	fmt.Println(vxMetaDataStruct)
 
@@ -164,11 +178,11 @@ func main() {
 	}
 
 	// print the parserMap
-	fmt.Println("var parserMap = map[string]ColumnDef{")
+	fmt.Println("var ParserMap = map[string]ColumnDef{")
 	for _, dataStruct := range dataStructs {
 		fmt.Println("    \"" + strings.Split(dataStruct, " ")[1] + "\": {")
 		fmt.Println("		Name: \"" + strings.Split(dataStruct, " ")[1] + "\",")
-		fmt.Println("		doc:  " + strings.Split(dataStruct, " ")[1] + "{},")
+		fmt.Println("		Doc:  " + strings.Split(dataStruct, " ")[1] + "{},")
 		fmt.Println("	},")
 	}
 	fmt.Println("}")
