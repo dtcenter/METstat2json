@@ -122,7 +122,7 @@ func main() {
 		headerStructs[headerStructName] = headerStructString
 		// create the data struct for this line type
 		dataStructName := DataStructName(fmt.Sprintf("%s_%s_%s", fileType, lineType, version))
-		dataStruct := fmt.Sprintf("%s struct {\n    vxMetaData\n    %s\n", dataStructName, headerStructName)
+		dataStruct := fmt.Sprintf("type %s struct {\n    vxMetadata\n    %s\n", dataStructName, headerStructName)
 		for _, term := range dataFields {
 			lowerName := strings.ToLower(term)
 			name := strings.ToUpper(lowerName[:1]) + lowerName[1:]
@@ -139,15 +139,19 @@ func main() {
 		dataStructs[dataStructName] = dataStruct
 	}
 
-	// We have to flesh this out with the vxMetaData struct
+	// We have to flesh this out with the vxMetadata struct
 	vxMetaDataStruct := "type vxMetadata struct {" +
 		"    ID string `json:\"ID\"`\n" +
 		"    subset string `json:\"MET\"`\n" +
 		"    version string `json:\"version\"`\n" +
-		"    type string `json:\"type\"`\n" +
+		"    typ string `json:\"type\"`  // like \"DD\"" +
+		"    subType string `json:\"subtype\"`  // like STAT, MODE, etc." +
 		"}\n"
 
-	// print the vxMetaData struct
+	fmt.Println("package structColumnTypes")
+	fmt.Println("")
+
+	// print the vxMetadata struct
 	fmt.Println(vxMetaDataStruct)
 
 	// print the header structs
@@ -158,4 +162,14 @@ func main() {
 	for _, dataStruct := range dataStructs {
 		fmt.Println(dataStruct)
 	}
+
+	// print the parserMap
+	fmt.Println("var parserMap = map[string]ColumnDef{")
+	for _, dataStruct := range dataStructs {
+		fmt.Println("    \"" + strings.Split(dataStruct, " ")[1] + "\": {")
+		fmt.Println("		Name: \"" + strings.Split(dataStruct, " ")[1] + "\",")
+		fmt.Println("		doc:  " + strings.Split(dataStruct, " ")[1] + "{},")
+		fmt.Println("	},")
+	}
+	fmt.Println("}")
 }
