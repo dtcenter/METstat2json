@@ -101,7 +101,6 @@ var lock = &sync.Mutex{}
 
 func (p *parser) Parse(line string) (string, error) {
 	fmt.Printf("Parsing the string: %s from %s\n", line, p.Columns.Name)
-	
 	return "parsed", nil
 }
 
