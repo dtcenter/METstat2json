@@ -2242,6 +2242,7 @@ type STAT_NBRCNT_doc struct {
 	STAT_NBRCNT_header `json:"met_header"`
 	Data               map[string]STAT_NBRCNT `json:"data"`
 }
+
 // type STAT_VAL1L2_doc struct {
 // 	VxMetadata         `json:"vx_metadata"`
 // 	STAT_VAL1L2_header `json:"met_header"`
@@ -2249,10 +2250,10 @@ type STAT_NBRCNT_doc struct {
 // }
 
 func (s *STAT_VAL1L2) fillHeader(metaData VxMetadata, fields []string, doc *map[string]interface{}) {
-    // fill the metadata
-    metaData.fillMetadata(metaData, doc)
-    // fill the met fields
-    (*doc)["ID"] = metaData.ID
+	// fill the metadata
+	metaData.fillMetadata(metaData, doc)
+	// fill the met fields
+	(*doc)["ID"] = metaData.ID
 	(*doc)["Subset"] = metaData.Subset
 	(*doc)["Type"] = metaData.Type
 	(*doc)["SubType"] = metaData.SubType
@@ -2353,7 +2354,7 @@ func GetDocForId(fileLineType string, metaData VxMetadata, headerData []string, 
 			doc := make(map[string]interface{})
 			//lineDoc := STAT_VAL1L2_doc{VxMetadata: metaData, STAT_VAL1L2_header: STAT_VAL1L2_header{}, Data: make(map[string]STAT_VAL1L2)}
 			dataDoc := STAT_VAL1L2{}
-            dataDoc.fillHeader(metaData, headerData, &doc)
+			dataDoc.fillHeader(metaData, headerData, &doc)
 			err := AddDataElement(dataKey, fileLineType, dataData, &doc)
 			return doc, err
 		}
@@ -2365,15 +2366,15 @@ func GetDocForId(fileLineType string, metaData VxMetadata, headerData []string, 
 /*
 Adds a data element to an existing document Data map based on the line type.
 */
-func AddDataElement(dataKey string, fileLineType string, data []string, doc *map[string]interface{} ) error {
+func AddDataElement(dataKey string, fileLineType string, data []string, doc *map[string]interface{}) error {
 	switch fileLineType {
 	case "STAT_VAL1L2":
 		{
 			elem := STAT_VAL1L2{}
 			elem.fillStructure(data)
-            if exists := (*doc)["data"]; exists == nil {
-                (*doc)["data"] = make(map[string]STAT_VAL1L2)
-            }
+			if exists := (*doc)["data"]; exists == nil {
+				(*doc)["data"] = make(map[string]STAT_VAL1L2)
+			}
 			if val, ok := (*doc)["data"].(map[string]STAT_VAL1L2); ok {
 				val[dataKey] = elem
 				(*doc)["data"] = val
