@@ -49,7 +49,7 @@ linters:
     - errorlint
 
     # Checks for pointers to enclosing loop variables.
-    - copyloopvar 
+    - copyloopvar
 
     # TODO - enable
     # - gocritic
@@ -63,7 +63,7 @@ linters:
     - gofumpt
     - goimports
 
-    # Handle replace, retract, exclude directives in go.mod 
+    # Handle replace, retract, exclude directives in go.mod
     - gomoddirectives
 
     # Security-oriented linter
@@ -198,7 +198,7 @@ linters-settings:
   tagliatelle:
     case:
       rules:
-        json: snake
+        json: goCamel
         yaml: snake
         xml: camel
         bson: camel

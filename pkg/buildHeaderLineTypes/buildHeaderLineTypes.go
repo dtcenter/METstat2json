@@ -12,7 +12,8 @@ import (
 )
 
 func getKeyDataFieldsForLineType(lineType string) []string {
-	switch lineType {
+	lineTypeUpper := strings.ToUpper(lineType)
+	switch lineTypeUpper {
 	case "MODE":
 		// I have no idea if this is the correct key for MODE!
 		return []string{"Fcst_lead", "Fcst_lev"}
@@ -47,8 +48,8 @@ func main() {
 	// using the src/tools/core/stat_analysis/parse_stat_line.cc to get the stat field types.
 	type HeaderStructName string
 	type HeaderStructs map[HeaderStructName]string
+	type DocStructs map[string]string
 	type DataStructs map[string]string
-	type DataKeyFields map[string][]string
 
 	// read the header columns file
 	headerColumnsFileUrl := "https://raw.githubusercontent.com/dtcenter/MET/refs/heads/main_v12.0/data/table_files/met_header_columns_V12.0.txt"
@@ -81,7 +82,9 @@ func main() {
 	// Use a map to keep track of unique headerStructs.
 	dataStructs := make(DataStructs)
 	headerStructs := make(HeaderStructs)
-	dataKeys := make(DataKeyFields)
+	docStructs := make(DocStructs)
+
+	var dataKeyMapString = "var dataKeyMap = map[string][]string{\n"
 
 	file_lines := strings.Split(string(rawColumnsBytes), "\n")
 	for _, line := range file_lines {
@@ -101,8 +104,8 @@ func main() {
 			fmt.Println("error parsing line: " + line)
 			continue
 		}
-		fileType := strings.TrimSpace(parts[1])
-		lineType := strings.TrimSpace(parts[2])
+		fileType := strings.ToUpper(strings.TrimSpace(parts[1]))
+		lineType := strings.ToUpper(strings.TrimSpace(parts[2]))
 		// MODE files are apparently parsed differently than other files by separating the header and data sections with OBTYPE
 		var HeaderString string
 		if fileType == "MODE" {
@@ -120,15 +123,13 @@ func main() {
 		dataFields := strings.Fields(dataString)
 		// squeeze the spaces out of the data string
 		// create the header struct
-		headerStructName := HeaderStructName(fmt.Sprintf("%s_header", lineType))
-		dataKeyFields := getKeyDataFieldsForLineType(string(lineType))
-		dataKeyStruct := fmt.Sprintf("type %s struct {\n")
-		for _, keyField := range dataKeyFields {
-			dataKeyStruct += fmt.Sprintf("    %s  %s\n", lineType, keyField)
-		}
-		dataKeyStruct += "}\n"
+		docStructName := fmt.Sprintf("%s_%s", fileType, lineType)
+		headerStructName := HeaderStructName(fmt.Sprintf("%s_header", docStructName))
 
-		dataKeys[string(headerStructName)] = dataKeyFields
+		keyFields := getKeyDataFieldsForLineType(fileType)
+		dataKeyFieldsString := strings.Join(keyFields, ", ")
+		dataKeyMapString += fmt.Sprintf("    \"%s\":  {\"%s\"},\n", docStructName, dataKeyFieldsString)
+
 		headerStructString := fmt.Sprintf("type %s struct {\n", headerStructName)
 		for _, term := range headerFields {
 			// change regex type terms
@@ -142,12 +143,14 @@ func main() {
 			headerStructString += fmt.Sprintf("    %s %s `json:\"%s\"`\n", capName, dataType, name)
 		}
 		headerStructString += "}\n"
-		headerStructString += "\n"
 		// add the header struct to the map for printing later
 		headerStructs[headerStructName] = headerStructString
+		// add the docStruct to the map for printing later
+		docStructString := fmt.Sprintf("type %s_doc struct {\n    VxMetadata      `json:\"vx_metadata\"`\n    %s_header `json:\"met_header\"`\n    Data map[string]%s `json:\"data\"`\n}", docStructName, docStructName, docStructName)
+		docStructs[docStructName] = docStructString
 		// create the key type for this data struct
 		// create the data struct for this line type
-		dataStruct := fmt.Sprintf("type %s struct {\n    VxMetadata `json:\"vx_metadata\"`\n    %s `json:\"met_header\"`\n", lineType, headerStructName)
+		dataStruct := fmt.Sprintf("type %s struct {\n", docStructName)
 		for _, term := range dataFields {
 			term = strings.Replace(term, "(", "", -1)
 			term = strings.Replace(term, ")", "", -1)
@@ -162,9 +165,7 @@ func main() {
 			dataStruct += fmt.Sprintf("    %s %s `json:\"%s\"`\n", capName, dataType, name)
 		}
 		dataStruct += "}\n"
-		dataStruct += "\n"
-		// fmt.Println(dataStruct)
-		dataStructs[lineType] = dataStruct
+		dataStructs[docStructName] = dataStruct
 	}
 
 	// We have to flesh this out with the vxMetadata struct
@@ -178,6 +179,9 @@ func main() {
 
 	fmt.Println("package structColumnTypes")
 	fmt.Println("")
+	fmt.Println("import \"strconv\"")
+	fmt.Println("")
+
 	fmt.Println(`type ColumnDef struct {
 	    Name string
 	    Doc interface{}
@@ -203,11 +207,18 @@ func main() {
 		fmt.Println(dataStruct)
 	}
 
+	// print the doc structs
+	fmt.Println("")
+	fmt.Println("//doc struct definitions")
+	for _, docStruct := range docStructs {
+		fmt.Println(docStruct)
+	}
+
 	// print the dataKeys
 	fmt.Println("")
 	fmt.Println("//data key definitions")
-	fmt.Println(dataKeyStruct)
-	fmt.Println("")
+	fmt.Println(dataKeyMapString)
+	fmt.Println("}")
 
 	// print the parserMap
 	fmt.Println("")
@@ -217,7 +228,7 @@ func main() {
 	for _, dataStruct := range dataStructs {
 		fmt.Println("    \"" + strings.Split(dataStruct, " ")[1] + "\": {")
 		fmt.Println("		Name: \"" + strings.Split(dataStruct, " ")[1] + "\",")
-		fmt.Println("		Doc:  " + strings.Split(dataStruct, " ")[1] + "{},")
+		fmt.Println("		Doc:  " + strings.Split(dataStruct, " ")[1] + "_doc{},")
 		fmt.Println("	},")
 	}
 	fmt.Println("}")
