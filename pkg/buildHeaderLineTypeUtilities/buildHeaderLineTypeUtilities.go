@@ -125,19 +125,26 @@ func SplitColumnDefLine(fileType string, fieldStr string) ([]string, []string) {
 	switch fileType {
 	case "MODE", "MTD":
 		parts = strings.Split(fieldStr, " OBS_LEV ")
-		headerString = parts[0] + " OBS_LEV"
-		// get the data fields from line
+		headerString = parts[0]
+		if len(parts) > 1 {
+			dataString = parts[1]
+		} else {
+			dataString = ""
+		}
 		dataString = parts[1]
 	default:
 		// get the header fields from line
 		parts = strings.Split(fieldStr, " LINE_TYPE ")
-		headerString = parts[0] + " LINE_TYPE"
-		// get the data fields from line
-		dataString = parts[1]
+		headerString = parts[0]
+		if len(parts) > 1 {
+			dataString = parts[1]
+		} else {
+			dataString = ""
+		}
 	}
 	// squeeze the spaces out of the header string
 	headerFields := strings.Fields(headerString)
-	// get the data fields from line
+	// get the data fields from the line
 	dataFields := strings.Fields(dataString)
 	return headerFields, dataFields
 }
