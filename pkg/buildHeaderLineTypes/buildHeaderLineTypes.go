@@ -2,82 +2,14 @@ package main
 
 import (
 	"fmt"
+	"golang.org/x/text/cases"
+	"golang.org/x/text/language"
 	"io"
 	"net/http"
 	"os"
-	"regexp"
+	"parser/pkg/buildHeaderLineTypeUtilities"
 	"strings"
-
-	"golang.org/x/text/cases"
-	"golang.org/x/text/language"
 )
-
-/*
-Given a line from the ColumnDefinitions file this function will return the header fields and the data fields
-for the line. The header fields are the fields that are used to identify the document. The data fields
-are the fields that are used to populate the data section of the document. The parts are
-delimited by specific fields for each file type.
-*/
-func SplitColumnDefLine(fileType string, fieldStr string) ([]string, []string) {
-	var headerString string
-	var dataString string
-	var parts []string
-	switch fileType {
-	case "MODE", "MTD":
-		parts = strings.Split(fieldStr, " OBS_LEV ")
-		headerString = parts[0] + " OBS_LEV"
-		// get the data fields from line
-		dataString = parts[1]
-	default:
-		// get the header fields from line
-		parts = strings.Split(fieldStr, " LINE_TYPE ")
-		headerString = parts[0] + " LINE_TYPE"
-		// get the data fields from line
-		dataString = parts[1]
-	}
-	// squeeze the spaces out of the header string
-	headerFields := strings.Fields(headerString)
-	// get the data fields from line
-	dataFields := strings.Fields(dataString)
-	return headerFields, dataFields
-}
-
-/*
-This routine is used to get the key data fields for a given line type. These fields are used to
-essentially merge documents. All the documents with the same header field values excluding the key data fields
-are merged into a single document. The key data fields are used to index the data section of the document.
-*/
-func getKeyDataFieldsForLineType(lineType string) []string {
-	lineTypeUpper := strings.ToUpper(lineType)
-	switch lineTypeUpper {
-	case "MODE":
-		// I have no idea if this is the correct key for MODE!
-		return []string{"FCST_LEAD", "FCST_LEV"}
-	case "MTD":
-		// I have no idea if this is the correct key for MTD!
-		return []string{"FCST_LEAD", "FCST_LEV"}
-	default:
-		return []string{"FCST_LEAD"}
-	}
-}
-
-func findType(name string, data []byte) (string, error) {
-	r, _ := regexp.Compile("ato.*get_item.*" + name)
-	res := r.FindSubmatch(data)
-	if res == nil {
-		return "", fmt.Errorf("could not find type for %s", name)
-	}
-	dataType := strings.Split(string(res[0]), "(")[0]
-	switch dataType {
-	case "atoi":
-		dataType = "int"
-	case "atof":
-		dataType = "float64"
-	default:
-		dataType = "string"
-	}
-	return dataType, nil
-}
 
 // The output of this program is a series of structs that can be used to define the header
 // and data types in the buildHeaderTypes.go file
@@ -128,8 +60,8 @@ func main() {
 
 	dataKeyMapString := "var DataKeyMap = map[string][]string{\n"
 	// create the getDocFoID function
-	getDocIDString := fmt.Sprintf("func GetDocForId(fileLineType string, metaData VxMetadata, headerData []string, dataData []string, dataKey string) (interface{}, error) {\n\tswitch fileLineType {\n")
-
+	getDocIDString := "func GetDocForId(fileLineType string, metaData VxMetadata, headerData []string, dataData []string, dataKey string) (interface{}, error) {\n\tvar doc map[string] interface{}\n\tswitch fileLineType {\n"
+	addDataElementString := "func AddDataElement(dataKey string, fileLineType string, dataData []string, doc *map[string]interface{}) error {\n\tswitch fileLineType {\n"
 	file_lines := strings.Split(string(rawColumnsBytes), "\n")
 	for _, line := range file_lines {
 		// get the prefix from the line
@@ -151,34 +83,30 @@ func main() {
 		fileType := strings.ToUpper(strings.TrimSpace(parts[1]))
 		lineType := strings.ToUpper(strings.TrimSpace(parts[2]))
 		lineTypePadding := 10 - len(lineType)
-		headerFields, dataFields := SplitColumnDefLine(fileType, fieldStr)
+		headerFields, dataFields := buildHeaderLineTypeUtilities.SplitColumnDefLine(fileType, fieldStr)
 
 		// create the header struct
 		docStructName := fmt.Sprintf("%s_%s", fileType, lineType)
 		headerStructName := HeaderStructName(fmt.Sprintf("%s_header", docStructName))
 
-		keyFields := getKeyDataFieldsForLineType(fileType)
+		keyFields := buildHeaderLineTypeUtilities.GetKeyDataFieldsForLineType(fileType)
 		dataKeyFieldsString := strings.Join(keyFields, ", ")
 		dataKeyMapString += fmt.Sprintf("    \"%s\": %*s\"%s\"},\n", docStructName, lineTypePadding, "{", dataKeyFieldsString)
 
 		headerStructString := fmt.Sprintf("type %s struct {\n", headerStructName)
-		fillHeaderString := fmt.Sprintf("func (s *%s) fill_%s_Header(metaData VxMetadata, fields []string, doc *map[string]interface{}) {\n", docStructName, docStructName)
-		fillHeaderString += "// fill the met fields\n" +
-			"(*doc)[\"ID\"] = metaData.ID\n" +
-			"(*doc)[\"Subset\"] = metaData.Subset\n" +
-			"(*doc)[\"Type\"] = metaData.Type\n" +
-			"(*doc)[\"SubType\"] = metaData.SubType\n"
+		fillHeaderString := fmt.Sprintf("func (s *%s) fill_%s_Header(fields []string, doc *map[string]interface{}){\n", docStructName, docStructName)
+		fillHeaderString += "// fill the met fields\n"
 		getDocIDString += fmt.Sprintf("\tcase \"%s\":\n", docStructName)
-		getDocIDString += fmt.Sprintf("\t{\n")
-		getDocIDString += fmt.Sprintf("\t\telem := %s{}\n", docStructName)
-		getDocIDString += fmt.Sprintf("\t\telem.fill_%s_Header(data)\n", docStructName)
-		getDocIDString += fmt.Sprintf("\t\tif exists := (*doc)[\"data\"]; exists == nil {\n")
-		getDocIDString += fmt.Sprintf("\t\t\t(*doc)[\"data\"] = make(map[string]%s)\n", docStructName)
-		getDocIDString += fmt.Sprintf("\t\t}\n")
-		getDocIDString += fmt.Sprintf("\t\tif val, ok := (*doc)[\"data\"].(map[string]%s); ok {\n", docStructName)
-		getDocIDString += fmt.Sprintf("\t\t\tval[dataKey] = elem\n")
-		getDocIDString += fmt.Sprintf("\t\t\t(*doc)[\"data\"] = val\n")
-		getDocIDString += fmt.Sprintf("\t\t}\n}\n")
+		getDocIDString += fmt.Sprintf("\t\telem := %s{}\n\t\tdoc[\"ID\"] = metaData.ID\n\t\tdoc[\"Subset\"] = metaData.Subset\n\t\tdoc[\"Type\"] = metaData.Type\n\t\tdoc[\"SubType\"] = metaData.SubType\n", docStructName)
+
+		getDocIDString += fmt.Sprintf("\t\telem.fill_%s_Header(headerData, &doc)\n", docStructName)
+		getDocIDString += fmt.Sprintf("\t\telem.fill_%s(dataData)\n\t\tif exists := (doc)[\"data\"]; exists == nil {\n", docStructName)
+		getDocIDString += fmt.Sprintf("\t\t\t(doc)[\"data\"] = make(map[string]%s)\n\t\t}\n\t\tif val, ok := (doc)[\"data\"].(map[string]%s); ok {\n\t\t\tval[dataKey] = elem\n\t\t\t(doc)[\"data\"] = val\n\t\t}\n", docStructName, docStructName)
+		addDataElementString += fmt.Sprintf("\tcase \"%s\":\n", docStructName)
+		addDataElementString += fmt.Sprintf("\t\telem := %s{}\n", docStructName)
+		addDataElementString += fmt.Sprintf("\t\telem.fill_%s(dataData)\n", docStructName)
+		addDataElementString += fmt.Sprintf("\t\tif val, ok := (*doc)[\"data\"].(map[string]%s); ok {\n", docStructName)
+		addDataElementString += "\t\t\tval[dataKey] = elem\n\t\t\t(*doc)[\"data\"] = val\n\t\t}\n"
 
 		// find the maximum length of the header fields for formatting (padding)
 		padding := 0
@@ -238,18 +166,18 @@ func main() {
 			name := strings.ToLower(term)
 			capName := cases.Title(language.English).String(name)
 			dataType := "string"
-			foundType, err := findType(term, rawStatBytes)
+			foundType, err := buildHeaderLineTypeUtilities.FindType(term, rawStatBytes)
 			if err == nil {
 				dataType = foundType
 			}
 			dataStruct += fmt.Sprintf("    %-*s %-*s `json:\"%s\"`\n", padding, capName, 7, dataType, name)
 			switch dataType {
 			case "int":
-				fillStructureString += fmt.Sprintf("s.%s, _ = strconv.Atoi(fields[%d])\n", capName, index)
+				fillStructureString += fmt.Sprintf("\ts.%s, _ = strconv.Atoi(fields[%d])\n", capName, index)
 			case "float64":
-				fillStructureString += fmt.Sprintf("s.%s, _ = strconv.ParseFloat(fields[%d], 64)\n", capName, index)
+				fillStructureString += fmt.Sprintf("\ts.%s, _ = strconv.ParseFloat(fields[%d], 64)\n", capName, index)
 			default:
-				fillStructureString += fmt.Sprintf("s.%s = fields[%d]\n", capName, index)
+				fillStructureString += fmt.Sprintf("\ts.%s = fields[%d]\n", capName, index)
 			}
 		}
 		dataStruct += "}\n"
@@ -257,11 +185,8 @@ func main() {
 		dataStructs[docStructName] = dataStruct
 		fillDataFuncs[docStructName] = fillStructureString
 	}
-	getDocIDString += fmt.Sprintf("\tdefault:\n")
-	getDocIDString += fmt.Sprintf("return errors.New(\"Unknonwn file_line type:\" + fileLineType)\n")
-	getDocIDString += fmt.Sprintf("\t}\n")
-	getDocIDString += fmt.Sprintf("\t\treturn nil")
-	getDocIDString += fmt.Sprintf("}\n")
+	getDocIDString += "\tdefault:\n\t\treturn nil, errors.New(\"Unknown file_line type:\" + fileLineType)\n\t}\n\treturn doc, nil\n}\n"
+	addDataElementString += "\tdefault:\n\t\treturn errors.New(\"Unknown file_line type:\" + fileLineType)\n\t}\n\treturn nil\n}\n"
 
 	// We have to flesh this out with the vxMetadata struct
 	vxMetaDataStruct := fmt.Sprintf("type VxMetadata struct {\n"+
@@ -313,9 +238,22 @@ func main() {
 	fmt.Println("//getDocForId functions")
 	fmt.Println(getDocIDString)
 
+	// print the addDataElement functions
+	fmt.Println("")
+	fmt.Println("//addDataElement functions")
+	fmt.Println(addDataElementString)
+
 	// print the dataKeys
 	fmt.Println("")
-	fmt.Println("//data key definitions")
+	fmt.Println (`	// data key definitions -  these may need to be changed based on the data and how we want to associate records into a single document
+	// All of the records with the same header values will be grouped into a single document
+	// The key is used to group the data records into the single document data map and it will be indexed by these values as a key.`)
 	fmt.Println(dataKeyMapString)
 	fmt.Println("}")
+
+	// print the DateFieldNames
+	fmt.Println("")
+	fmt.Println("	// DateFieldNames is a list of the date fields that need to be converted to epochs")
+	fmt.Println("var DateFieldNames = []string{\"FCST_VALID_BEG\", \"FCST_VALID_END\", \"OBS_VALID_BEG\", \"OBS_VALID_END\"}")
+	fmt.Println("")
 }

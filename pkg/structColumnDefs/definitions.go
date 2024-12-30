@@ -3,10 +3,9 @@ package structColumnDefs
 import (
 	"encoding/json"
 	"os"
+	"parser/pkg/buildHeaderLineTypeUtilities"
 	"parser/pkg/structColumnTypes"
-	"strconv"
 	"strings"
-	"time"
 )
 
 /*
@@ -35,76 +34,10 @@ If the data section of of the document[id] is nil, a new data section is created
 with the data fields from the data line. If the data section is not nil, the data fields are added to the existing data map.
 */
 
-func dateToEpoch(date string) string {
-	// convert the date to an epoch from YYYYMMDD_HHMMSS
-	// the date is in the format YYYYMMDD_HHMMSS - time zone defaults to UTC
-	theTime, _ := time.Parse(`20060102_150405`, date)
-	return strconv.FormatInt(theTime.Unix(), 10)
-}
-
-/* returns the lineType of the data line, and the headerFields and dataFields of the data line as []string.
-   The lineType is the last field in the header section of the header line, which is the first line of the file.
-   Since this function has to split the line into a header and a data section those fields are returned as well.
-   The dataKeyFields are removed from the headerFields and the headerData. The dataFields are returned as is.
-   The headerData is converted to epochs if the field is a dateField.
-*/
-
-func getLineType(headerLine string, dataLine string, fileType string) (string, []string, []string, string) {
-	var HeaderString string
-	if fileType == "MODE" {
-		parts := strings.Split(headerLine, " OBTYPE ")
-		HeaderString = parts[0]
-	} else {
-		// get the header fields from line
-		parts := strings.Split(headerLine, " LINE_TYPE ")
-		HeaderString = parts[0]
-	}
-	headerStringFields := strings.Fields(HeaderString)
-	allData := strings.Fields(dataLine)
-	lineTypeIndex := len(headerStringFields) - 1
-	lineType := allData[lineTypeIndex]
-	dataData := strings.Fields(dataLine)[lineTypeIndex+1:]
-
-	// have to remove the dataKeyFields from the headerFields and the headerData (dataData AND dataFields won't change)
-	headerData := []string{}
-	dataKeyFields := []string{}
-	for hIndex, h := range headerStringFields {
-		isDataKey := false
-		for _, d := range structColumnTypes.DataKeyMap[fileType+"_"+lineType] {
-			if h == d {
-				isDataKey = true
-				dataKeyFields = append(dataKeyFields, allData[hIndex])
-				break
-			} // skip the dataKeyFields
-		}
-		if !isDataKey {
-			// keep these fields
-			isDateField := false
-			for _, d := range structColumnTypes.DateFieldNames {
-				if h == d {
-					isDateField = true
-					break
-				}
-			}
-			if isDateField {
-				// convert the date to an epoch
-				headerData = append(headerData, dateToEpoch(allData[hIndex]))
-			} else {
-				// keep the field as is
-				headerData = append(headerData, allData[hIndex])
-			}
-		}
-	}
-	dataKey := strings.Join(dataKeyFields, "_")
-	return lineType, headerData, dataData, dataKey
-}
-
-/* construct an id from the headerData which now has no dataKeyFields */
-
 func ParseLine(headerLine string, dataLine string, fileType string, doc map[string]interface{}) (map[string]interface{}, error) {
 	_err := error(nil)
 	// get the lineType
-	lineType, headerData, dataData, dataKey := getLineType(headerLine, dataLine, fileType)
+	lineType, headerData, dataData, dataKey := buildHeaderLineTypeUtilities.GetLineType(headerLine, dataLine, fileType)
 	if doc == nil {
 		newDoc := make(map[string]interface{})
 		doc = newDoc
@@ -121,7 +54,6 @@ func ParseLine(headerLine string, dataLine string, fileType string, doc map[stri
 	} else {
 		tempDoc := doc[id].(map[string]interface{})
 		_err := structColumnTypes.AddDataElement(dataKey, fileLineType, dataData, &tempDoc)
-		doc[id] = tempDoc
 		if _err != nil {
 			return doc, _err
 		}

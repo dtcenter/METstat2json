@@ -198,7 +198,7 @@ linters-settings:
   tagliatelle:
     case:
       rules:
-        json: goCamel
+        json: snake
         yaml: snake
         xml: camel
         bson: camel
