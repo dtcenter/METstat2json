@@ -131,7 +131,6 @@ func SplitColumnDefLine(fileType string, fieldStr string) ([]string, []string) {
 		} else {
 			dataString = ""
 		}
-		dataString = parts[1]
 	default:
 		// get the header fields from line
 		parts = strings.Split(fieldStr, " LINE_TYPE ")

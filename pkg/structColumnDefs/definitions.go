@@ -38,11 +38,25 @@ func ParseLine(headerLine string, dataLine string, fileType string, doc map[stri
 	_err := error(nil)
 	// get the lineType
 	lineType, headerData, dataData, dataKey := buildHeaderLineTypeUtilities.GetLineType(headerLine, dataLine, fileType)
+	// create a tmpHeaderData and remove the NA values fromm the headerData - we also have to do this in the GetDocFoId function
+	tmpHeaderData := []string{}
+	for _, h := range headerData {
+		if h != "NA" {
+			tmpHeaderData = append(tmpHeaderData, h)
+		}
+	}
+	// make the headerData NA values into "" so that the fillXXXX_Header functions make those values empty
+	for i, h := range headerData {
+		if h == "NA" {
+			headerData[i] = ""
+		}
+	}
+
 	if doc == nil {
 		newDoc := make(map[string]interface{})
 		doc = newDoc
 	}
-	id := strings.Join(headerData, ":")
+	id := strings.Join(tmpHeaderData, ":")
 	_, exists := doc[id]
 	fileLineType := fileType + "_" + lineType
 	if !exists {
