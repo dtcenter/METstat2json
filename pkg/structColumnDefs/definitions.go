@@ -36,6 +36,9 @@ with the data fields from the data line. If the data section is not nil, the dat
 
 func ParseLine(headerLine string, dataLine string, fileType string, doc map[string]interface{}) (map[string]interface{}, error) {
 	_err := error(nil)
+	if headerLine == "" || dataLine == "" {
+		return doc, _err
+	}
 	// get the lineType
 	lineType, headerData, dataData, dataKey := buildHeaderLineTypeUtilities.GetLineType(headerLine, dataLine, fileType)
 	// create a tmpHeaderData and remove the NA values fromm the headerData - we also have to do this in the GetDocFoId function
