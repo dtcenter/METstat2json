@@ -50,7 +50,7 @@ func ParseLine(headerLine string, dataLine string, fileType string, doc map[stri
 	// create a tmpHeaderData and remove the NA values fromm the headerData - we also have to do this in the GetDocFoId function
 	tmpHeaderData := []string{}
 	for _, h := range headerData {
-		if h != "NA" {
+		if h != "NA" && h != "" {
 			tmpHeaderData = append(tmpHeaderData, h)
 		}
 	}

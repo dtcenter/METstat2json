@@ -137,7 +137,7 @@ func main() {
 			name := strings.ToLower(term)
 			capName := cases.Title(language.English).String(name)
 			headerStructString += fmt.Sprintf("    %-*s %s `json:\"%s\"`\n", padding, capName, dataType, name)
-			fillHeaderString += fmt.Sprintf("(*doc)[\"%s\"] = fields[%d]\n", name, index)
+			fillHeaderString += fmt.Sprintf("\t(*doc)[\"%s\"] = fields[%d]\n", name, index)
 		}
 		headerStructString += "}\n"
 		fillHeaderString += "}\n"
@@ -197,8 +197,14 @@ func main() {
 
 	fmt.Println("package structColumnTypes")
 	fmt.Println("")
-	fmt.Println("import\n(\n\"strconv\"\n\"errors\"\n)")
+	fmt.Println("import\n(\n\t\"strconv\"\n\t\"errors\"\n)")
 	fmt.Println("//vxMetadata struct definition")
+	fmt.Println("\n/*\nTHIS CODE IS AUTOMATICALLY GENERATED - DO NOT EDIT THIS CODE")
+	fmt.Println("To modify this code - modify the buildHeaderLineTypes.go file and run the buildHeaderLineTypes.go program")
+	fmt.Println("cd  <repo path>/metlinetypes/pkg/buildHeaderLineTypes")
+	fmt.Println("go run . > /tmp/types.go")
+	fmt.Println("cp /tmp/types.go ../structColumnTypes/structColumnTypes.go\n*/")
+	fmt.Println("")
 	// print the vxMetadata struct
 	fmt.Println(vxMetaDataStruct)
 

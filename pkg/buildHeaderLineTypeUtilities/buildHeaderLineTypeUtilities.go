@@ -92,7 +92,7 @@ func GetLineType(headerLine string, dataLine string, fileType string) (string, [
 				break
 			}
 		}
-		// skip the dataKeyFields
+		// skip the dataKeyFields - blank them out
 		if !isDataKey {
 			// keep these fields
 			isDateField := false
@@ -109,6 +109,9 @@ func GetLineType(headerLine string, dataLine string, fileType string) (string, [
 				// keep the field as is
 				headerData = append(headerData, allData[hIndex])
 			}
+		} else {
+			// blank out the dataKeyFields
+			headerData = append(headerData, "")
 		}
 	}
 	dataKey := strings.Join(dataKeyFields, "_")
