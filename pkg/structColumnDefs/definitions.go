@@ -2,6 +2,7 @@ package structColumnDefs
 
 import (
 	"encoding/json"
+	"fmt"
 	"os"
 	"parser/pkg/buildHeaderLineTypeUtilities"
 	"parser/pkg/structColumnTypes"
@@ -40,7 +41,12 @@ func ParseLine(headerLine string, dataLine string, fileType string, doc map[stri
 		return doc, _err
 	}
 	// get the lineType
-	lineType, headerData, dataData, dataKey := buildHeaderLineTypeUtilities.GetLineType(headerLine, dataLine, fileType)
+	lineType, headerData, dataData, dataKey, err := buildHeaderLineTypeUtilities.GetLineType(headerLine, dataLine, fileType)
+	if err != nil {
+		// cannot process this line so return the doc as is - it is probably a truncated line
+		fmt.Println("Error getting line type: ", err)
+		return doc, nil
+	}
 	// create a tmpHeaderData and remove the NA values fromm the headerData - we also have to do this in the GetDocFoId function
 	tmpHeaderData := []string{}
 	for _, h := range headerData {

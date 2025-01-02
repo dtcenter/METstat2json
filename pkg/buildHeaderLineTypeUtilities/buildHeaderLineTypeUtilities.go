@@ -70,10 +70,13 @@ func dateToEpoch(date string) string {
    The headerData is converted to epochs if the field is a dateField.
 */
 
-func GetLineType(headerLine string, dataLine string, fileType string) (string, []string, []string, string) {
+func GetLineType(headerLine string, dataLine string, fileType string) (string, []string, []string, string, error) {
 	headerStringFields, _ := SplitColumnDefLine(fileType, headerLine)
 	allData := strings.Fields(dataLine)
 	lineTypeIndex := len(headerStringFields) - 1
+	if lineTypeIndex > len(allData) {
+		return "", nil, nil, "", fmt.Errorf("lineTypeIndex is greater than the length of the data line")
+	}
 	lineType := allData[lineTypeIndex]
 	dataData := strings.Fields(dataLine)[lineTypeIndex+1:]
 
@@ -109,7 +112,7 @@ func GetLineType(headerLine string, dataLine string, fileType string) (string, [
 		}
 	}
 	dataKey := strings.Join(dataKeyFields, "_")
-	return lineType, headerData, dataData, dataKey
+	return lineType, headerData, dataData, dataKey, nil
 }
 
 /*

@@ -2,7 +2,7 @@ package structColumnDefs
 
 import (
 	"encoding/json"
-	//"fmt"
+	"fmt"
 	"io"
 	"os"
 	"path/filepath"
@@ -53,13 +53,13 @@ func TestParseVAL1L2(t *testing.T) {
 	if doc == nil {
 		t.Fatalf("Expected parsed document, got nil")
 	}
-	err = WriteJsonToFile(doc, "test_output.json")
+	err = WriteJsonToFile(doc, "/tmp/test_output.json")
 	if err != nil {
 		t.Fatalf("Expected no error, got %v", err)
 	}
 
 	// read the file back in
-	parsedDoc, err := ReadJsonFromFile("test_output.json")
+	parsedDoc, err := ReadJsonFromFile("/tmp/test_output.json")
 	if err != nil {
 		t.Fatalf("Expected no error, got %v", err)
 	}
@@ -103,7 +103,7 @@ func TestParseRegressionSuite(t *testing.T) {
 		}
 		defer file.Close()
 		fName := fileInfos.Name()
-		//fmt.Println("Parsing file:", fName)
+		// fmt.Println("Parsing file:", fName)
 		ext := filepath.Ext(fName)
 		fileType := strings.ToUpper(strings.Split(ext, ".")[1])
 		rawData, err := io.ReadAll(file)
@@ -126,13 +126,99 @@ func TestParseRegressionSuite(t *testing.T) {
 	if doc == nil {
 		t.Fatalf("Expected parsed document, got nil")
 	}
-	err = WriteJsonToFile(doc, "test_output.json")
+	err = WriteJsonToFile(doc, "/tmp/test_output.json")
 	if err != nil {
 		t.Fatalf("Expected no error, got %v", err)
 	}
 
 	// read the file back in
-	parsedDoc, err := ReadJsonFromFile("test_output.json")
+	parsedDoc, err := ReadJsonFromFile("/tmp/test_output.json")
+	if err != nil {
+		t.Fatalf("Expected no error, got %v", err)
+	}
+
+	assert.NotNil(t, parsedDoc)
+	// assert.Equal(t, 2, len(parsedDoc), "expected 2 but got %d", len(parsedDoc)) // two top level elements
+	// doc0 := doc["V12.0.0:FCST:1333972800:1333972800:000000:1333971000:1333974600:UGRD_VGRD:m/s:Z10:UGRD_VGRD:Z10:ADPSFC:LAND_L0:NEAREST:1:VAL1L2"].(map[string]interface{})
+	// doc0Data := doc0["data"].(map[string]structColumnTypes.STAT_VAL1L2)
+	// doc0Data120000 := doc0Data["120000"]
+	// doc0DataTotal := doc0Data120000.Total
+	// parsedDoc0 := parsedDoc[0].(map[string]interface{})
+	// parsedDoc0Data := parsedDoc0["data"].(map[string]interface{})
+	// // Don't know why the parsedDoc (what we read back in) came back as a float and not an int
+	// parsedDoc0DataTotal := int(parsedDoc0Data["120000"].(map[string]interface{})["total"].(float64))
+	// assert.Equal(t, doc0DataTotal, parsedDoc0DataTotal, "expected doc and parsedDoc to have equal values")
+	// Add more assertions based on the expected structure of parsedDoc
+}
+
+func TestParseG2G_v12_Suite(t *testing.T) {
+	var doc map[string]interface{}
+	var err error
+	var path string
+
+	path, err = os.Getwd()
+	if err != nil {
+		t.Fatal("error getting working directory:", err)
+	}
+	directory := path + "/../../test_data/G2G_v12" // The G2G_v12 top level directory
+
+	err = filepath.Walk(directory,
+		func(path string, fileInfo os.FileInfo, err error) error {
+			if err != nil {
+				return err
+			}
+			if fileInfo.IsDir() {
+				// this is a directory
+				fmt.Println(path, fileInfo.Size())
+			} else {
+				// this is a file so process it
+				file, err := os.Open(path) // open the file
+				if err != nil {
+					t.Fatal("error opening file", err)
+				}
+				defer file.Close()
+				fName := fileInfo.Name()
+				// uncomment the following for debugging
+				// fmt.Println("Parsing file:", fName)
+				ext := filepath.Ext(fName)
+				fileType := strings.ToUpper(strings.Split(ext, ".")[1])
+				if fileType == "SWP" {
+					// skip the swp files - might be editing a file and don't want to parse the .swp file
+					return nil
+				}
+				rawData, err := io.ReadAll(file)
+				if err != nil {
+					t.Fatal("error reading file", err)
+				}
+				lines := strings.Split(string(rawData), "\n")
+				headerLine := lines[0]
+				for line := range lines {
+					if line == 0 {
+						continue
+					}
+					dataLine := lines[line]
+					doc, err = ParseLine(headerLine, dataLine, fileType, doc)
+					if err != nil {
+						t.Fatalf("Expected no error, got %v", err)
+					}
+				}
+			}
+			return nil
+		})
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if doc == nil {
+		t.Fatalf("Expected parsed document, got nil")
+	}
+	err = WriteJsonToFile(doc, "/tmp/test_output.json")
+	if err != nil {
+		t.Fatalf("Expected no error, got %v", err)
+	}
+
+	// read the file back in
+	parsedDoc, err := ReadJsonFromFile("/tmp/test_output.json")
 	if err != nil {
 		t.Fatalf("Expected no error, got %v", err)
 	}

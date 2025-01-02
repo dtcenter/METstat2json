@@ -19,7 +19,6 @@ func main() {
 	// using the src/tools/core/stat_analysis/parse_stat_line.cc to get the stat field types.
 	type HeaderStructName string
 	type HeaderStructs map[HeaderStructName]string
-	type DocStructs map[string]string
 	type DataStructs map[string]string
 
 	// read the header columns file
@@ -245,7 +244,7 @@ func main() {
 
 	// print the dataKeys
 	fmt.Println("")
-	fmt.Println (`	// data key definitions -  these may need to be changed based on the data and how we want to associate records into a single document
+	fmt.Println(`	// data key definitions -  these may need to be changed based on the data and how we want to associate records into a single document
 	// All of the records with the same header values will be grouped into a single document
 	// The key is used to group the data records into the single document data map and it will be indexed by these values as a key.`)
 	fmt.Println(dataKeyMapString)
