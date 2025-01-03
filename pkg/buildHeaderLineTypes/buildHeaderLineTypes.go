@@ -139,7 +139,7 @@ func main() {
 			name := strings.ToLower(term)
 			capName := cases.Title(language.English).String(name)
 			headerStructString += fmt.Sprintf("    %-*s %s `json:\"%s\"`\n", padding, capName, dataType, name)
-			fillHeaderString += fmt.Sprintf("\t(*doc)[\"%s\"] = fields[%d]\n", name, index)
+			fillHeaderString += fmt.Sprintf("\tif fields[%d] != \"\" {\n\t\t(*doc)[\"%s\"] = fields[%d]\n\t}\n", index, name, index)
 		}
 		headerStructString += "}\n"
 		fillHeaderString += "}\n"

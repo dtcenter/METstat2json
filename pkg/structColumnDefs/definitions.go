@@ -46,7 +46,7 @@ func ParseLine(headerLine string, dataLine string, fileType string, docPtr *map[
 	if err != nil {
 		// cannot process this line so return the docPtr as is - it is probably a truncated line
 		fmt.Println("Error getting line type: ", err)
-		return *docPtr, nil
+		return *docPtr, err
 	}
 	tmpHeaderData := getTmpHeaderSanNA(headerData, descIndex)
 	if *docPtr == nil {

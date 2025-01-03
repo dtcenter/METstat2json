@@ -1,5 +1,12 @@
 package structColumnDefs
 
+/*
+For profiling -
+brew install --cask approf
+cd .../pkg/structColumnDefs
+go test -cpuprofile cpu.prof -memprofile mem.prof -bench .
+
+*/
 import (
 	"compress/gzip"
 	"encoding/json"
@@ -222,7 +229,12 @@ func TestParseG2G_v12_Suite(t *testing.T) {
 					dataLine := lines[line]
 					doc, err = ParseLine(headerLine, dataLine, fileType, &doc)
 					if err != nil {
-						t.Fatalf("Expected no error, got %v", err)
+						if strings.Contains(err.Error(), "UNPARSABLE_LINE") {
+							// skip the line
+							fmt.Printf("Skipping line: %s because it isn't parsable from file %s\n", dataLine, fName)
+						} else {
+							t.Fatalf("Expected no error, got %v", err)
+						}
 					}
 				}
 			}

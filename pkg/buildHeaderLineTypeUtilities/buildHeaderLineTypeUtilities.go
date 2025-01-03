@@ -91,7 +91,7 @@ func GetLineType(headerLine string, dataLine string, fileType string) (string, [
 	allData := strings.Fields(dataLine)
 	lineTypeIndex := len(headerStringFields) - 1
 	if lineTypeIndex > len(allData) {
-		return "", nil, nil, "", desc_index, fmt.Errorf("lineTypeIndex is greater than the length of the data line")
+		return "", nil, nil, "", desc_index, fmt.Errorf("UNPARSABLE_LINE: lineTypeIndex is greater than the length of the data line")
 	}
 	lineType := allData[lineTypeIndex]
 	dataData := strings.Fields(dataLine)[lineTypeIndex+1:]
