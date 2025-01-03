@@ -59,7 +59,9 @@ func main() {
 
 	dataKeyMapString := "var DataKeyMap = map[string][]string{\n"
 	// create the getDocFoID function
-	getDocIDString := "func GetDocForId(fileLineType string, metaData VxMetadata, headerData []string, dataData []string, dataKey string) (interface{}, error) {\n\tdoc := make(map[string] interface{})\n\tswitch fileLineType {\n"
+	getDocIDString := "func GetDocForId(fileLineType string, metaDataMap map[string]interface{}, headerData []string, dataData []string, dataKey string) (interface{}, error) {\n\tdoc := make(map[string] interface{})\n\t" +
+		"// add the metadata to the doc\n\tfor key, value := range metaDataMap {\n\t\tdoc[key] = value\n\t}\n\tswitch fileLineType {\n"
+
 	addDataElementString := "func AddDataElement(dataKey string, fileLineType string, dataData []string, doc *map[string]interface{}) error {\n\tswitch fileLineType {\n"
 	file_lines := strings.Split(string(rawColumnsBytes), "\n")
 	for _, line := range file_lines {

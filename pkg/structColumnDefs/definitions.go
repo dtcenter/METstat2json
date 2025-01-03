@@ -1,6 +1,8 @@
 package structColumnDefs
 
 import (
+	"bytes"
+	"compress/gzip"
 	"encoding/json"
 	"fmt"
 	"os"
@@ -9,9 +11,9 @@ import (
 )
 
 /*
-This package is used to define the structs that are used to parse the data for MET output files.
+This package is used to parse the data for MET output files.
 The entry point to this package is the ParseLine function that takes a header line, a data line, a fileType,
-and a pointer to a map of data structures indexed by a string representation of a dataKey. The header line
+and a map of documents indexed by the document id. The document pointer can be an empty document. The header line
 is the first line of the file and contains the header field names. The data field names are optional and therefore
 not used. The data line is any subsequent line of the file that contains the header and the data fields.
 The fileType is a string that represents the type of file being parsed. The doc is a pointer to a map of
@@ -34,22 +36,81 @@ If the data section of of the document[id] is nil, a new data section is created
 with the data fields from the data line. If the data section is not nil, the data fields are added to the existing data map.
 */
 
-func ParseLine(headerLine string, dataLine string, fileType string, doc map[string]interface{}) (map[string]interface{}, error) {
+func ParseLine(headerLine string, dataLine string, fileType string, docPtr *map[string]interface{}) (map[string]interface{}, error) {
 	_err := error(nil)
 	if headerLine == "" || dataLine == "" {
-		return doc, _err
+		return *docPtr, _err
 	}
 	// get the lineType
-	lineType, headerData, dataData, dataKey, err := buildHeaderLineTypeUtilities.GetLineType(headerLine, dataLine, fileType)
+	lineType, headerData, dataData, dataKey, descIndex, err := buildHeaderLineTypeUtilities.GetLineType(headerLine, dataLine, fileType)
 	if err != nil {
-		// cannot process this line so return the doc as is - it is probably a truncated line
+		// cannot process this line so return the docPtr as is - it is probably a truncated line
 		fmt.Println("Error getting line type: ", err)
-		return doc, nil
+		return *docPtr, nil
 	}
-	// create a tmpHeaderData and remove the NA values fromm the headerData - we also have to do this in the GetDocFoId function
+	tmpHeaderData := getTmpHeaderSanNA(headerData, descIndex)
+	if *docPtr == nil {
+		newDoc := make(map[string]interface{})
+		docPtr = &newDoc
+	}
+	// GetId will fill in the id field of the metaData struct with the constructed id
+	metaData := buildHeaderLineTypeUtilities.GetId(tmpHeaderData, &buildHeaderLineTypeUtilities.VxMetadata{Subset: "MET", Type: "DD", SubType: "MET"})
+	fileLineType := fileType + "_" + lineType
+	_, exists := (*docPtr)[metaData.ID]
+	if !exists {
+		// TODO: check if the id exists in the database (has already been processed)
+		// if it does, then we need to add the data from the database to the existing document here
+		// need to do a fetch from the database to get the data
+		// and then add the data to the existing document here doc[id] = data_from_the_db
+
+		metaDataMap, _err := getMetaDataMap(metaData)
+		if _err != nil {
+			return *docPtr, _err
+		}
+		// create a new document for the new metaData.ID
+		(*docPtr)[metaData.ID], _err = structColumnTypes.GetDocForId(fileLineType, metaDataMap, headerData, dataData, dataKey)
+		if _err != nil {
+			return *docPtr, _err
+		}
+	} else {
+		tempDoc := (*docPtr)[metaData.ID].(map[string]interface{})
+		_err := structColumnTypes.AddDataElement(dataKey, fileLineType, dataData, &tempDoc)
+		if _err != nil {
+			return *docPtr, _err
+		}
+	}
+	return *docPtr, _err
+}
+
+/*
+convert the fields of the metaData to a map[string]interface{} so it can be added to the doc without needing the VxMetadata struct type definition
+*/
+func getMetaDataMap(metaData buildHeaderLineTypeUtilities.VxMetadata) (map[string]interface{}, error) {
+	var metaDataMap map[string]interface{}
+	jsonBytes, err := json.Marshal(metaData)
+	if err != nil {
+		return nil, err
+	}
+	err = json.Unmarshal(jsonBytes, &metaDataMap)
+	if err != nil {
+		return nil, err
+	}
+	return metaDataMap, nil
+}
+
+/*
+create a tmpHeaderData and remove the NA values fromm the headerData - we also have to do this in the GetDocFoId function
+trim the desc field data to 10 chars, if it isn't empty ("")
+*/
+func getTmpHeaderSanNA(headerData []string, descIndex int) []string {
 	tmpHeaderData := []string{}
-	for _, h := range headerData {
+	for i, h := range headerData {
 		if h != "NA" && h != "" {
+			if i == descIndex {
+				if len(h) > 10 {
+					h = h[:10]
+				}
+			}
 			tmpHeaderData = append(tmpHeaderData, h)
 		}
 	}
@@ -59,50 +120,10 @@ func ParseLine(headerLine string, dataLine string, fileType string, doc map[stri
 			headerData[i] = ""
 		}
 	}
-
-	if doc == nil {
-		newDoc := make(map[string]interface{})
-		doc = newDoc
-	}
-	metaData := buildHeaderLineTypeUtilities.VxMetadata{}
-	metaData.Subset = "MET"
-	metaData.Type = "DD"
-	metaData.SubType = "MET"
-	// GetId will fill in the id field of the metaData struct with the constructed id
-	metaData = buildHeaderLineTypeUtilities.GetId(tmpHeaderData, &metaData)
-	fileLineType := fileType + "_" + lineType
-	_, exists := doc[metaData.ID]
-	if !exists {
-		// TODO: check if the id exists in the database
-		// if it does, then we need to add the data from the database to the existing document here
-		// need to do a fetch from the database to get the data
-		// and then add the data to the existing document here doc[id] = data_from_the_db
-		// convert the fields of the metaData to a map[string]interface{} so it can be added to the doc
-		var metaDataMap map[string]interface{}
-		jsonBytes, err := json.Marshal(metaData)
-		if err != nil {
-			return nil, err
-		}
-		err = json.Unmarshal(jsonBytes, &metaDataMap)
-		if err != nil {
-			return nil, err
-		}
-		// create a new document for the new metaData.ID
-		doc[metaData.ID], _err = structColumnTypes.GetDocForId(fileLineType, headerData, dataData, dataKey)
-		if _err != nil {
-			return doc, _err
-		}
-	} else {
-		tempDoc := doc[metaData.ID].(map[string]interface{})
-		_err := structColumnTypes.AddDataElement(dataKey, fileLineType, dataData, &tempDoc)
-		if _err != nil {
-			return doc, _err
-		}
-	}
-	return doc, _err
+	return tmpHeaderData
 }
 
-func WriteJsonToFile(doc map[string]interface{}, filename string) error {
+func WriteJsonToGzipFile(doc map[string]interface{}, filename string) error {
 	// get the documents as a list
 	// Defines the Slice capacity to match the Map elements count
 	docList := make([]interface{}, 0, len(doc))
@@ -116,5 +137,20 @@ func WriteJsonToFile(doc map[string]interface{}, filename string) error {
 		return err
 	}
 	// Write the JSON bytes to a file
-	return os.WriteFile(filename, jsonBytes, 0644)
+	var b bytes.Buffer
+	w := gzip.NewWriter(&b)
+	_, err = w.Write(jsonBytes)
+	if err != nil {
+		return err
+	}
+	err = w.Close()
+	if err != nil {
+		return err
+	}
+	// Write the compressed data to a file
+	err = os.WriteFile(filename, b.Bytes(), 0644)
+	if err != nil {
+		fmt.Printf("Failed to write file: %v", err)
+	}
+	return nil
 }
