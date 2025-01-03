@@ -66,7 +66,7 @@ func TestParseVAL1L2(t *testing.T) {
 
 	assert.NotNil(t, parsedDoc)
 	assert.Equal(t, 2, len(parsedDoc), "expected 3 but got %d", len(parsedDoc)) // two top level elements
-	doc0 := doc["V12.0.0:FCST:1333972800:1333972800:000000:1333971000:1333974600:UGRD_VGRD:m/s:Z10:UGRD_VGRD:Z10:ADPSFC:LAND_L0:NEAREST:1:VAL1L2"].(map[string]interface{})
+	doc0 := doc["MET:DD:MET:V12.0.0:FCST:1333972800:1333972800:000000:1333971000:1333974600:UGRD_VGRD:m/s:Z10:UGRD_VGRD:Z10:ADPSFC:LAND_L0:NEAREST:1:VAL1L2"].(map[string]interface{})
 	doc0Data := doc0["data"].(map[string]structColumnTypes.STAT_VAL1L2)
 	doc0Data120000 := doc0Data["120000"]
 	doc0DataTotal := doc0Data120000.Total

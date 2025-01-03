@@ -96,7 +96,7 @@ func main() {
 		fillHeaderString := fmt.Sprintf("func (s *%s) fill_%s_Header(fields []string, doc *map[string]interface{}){\n", docStructName, docStructName)
 		fillHeaderString += "// fill the met fields\n"
 		getDocIDString += fmt.Sprintf("\tcase \"%s\":\n", docStructName)
-		getDocIDString += fmt.Sprintf("\t\telem := %s{}\n\t\tdoc[\"ID\"] = metaData.ID\n\t\tdoc[\"Subset\"] = metaData.Subset\n\t\tdoc[\"Type\"] = metaData.Type\n\t\tdoc[\"SubType\"] = metaData.SubType\n", docStructName)
+		getDocIDString += fmt.Sprintf("\t\telem := %s{}\n", docStructName)
 
 		getDocIDString += fmt.Sprintf("\t\telem.fill_%s_Header(headerData, &doc)\n", docStructName)
 		getDocIDString += fmt.Sprintf("\t\telem.fill_%s(dataData)\n\t\tif exists := (doc)[\"data\"]; exists == nil {\n", docStructName)

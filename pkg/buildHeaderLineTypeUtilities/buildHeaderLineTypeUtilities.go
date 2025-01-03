@@ -8,6 +8,14 @@ import (
 	"time"
 )
 
+// vxMetadata struct definition
+type VxMetadata struct {
+	ID      string `json:"id"`
+	Subset  string `json:"subset"`
+	Type    string `json:"type"`
+	SubType string `json:"subtype"`
+}
+
 // data key definitions
 var DataKeyMap = map[string][]string{
 	"STAT_CNT":       {"FCST_LEAD"},
@@ -191,4 +199,12 @@ func FindType(name string, data []byte) (string, error) {
 		dataType = "string"
 	}
 	return dataType, nil
+}
+
+func GetId(tmpHeaderData []string, metaData *VxMetadata) VxMetadata {
+	idElems := []string{metaData.Subset, metaData.Type, metaData.SubType}
+	idElems = append(idElems, tmpHeaderData...)
+	id := strings.Join(idElems, ":")
+	metaData.ID = id
+	return *metaData
 }

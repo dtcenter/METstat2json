@@ -6,7 +6,6 @@ import (
 	"os"
 	"parser/pkg/buildHeaderLineTypeUtilities"
 	"parser/pkg/structColumnTypes"
-	"strings"
 )
 
 /*
@@ -65,17 +64,36 @@ func ParseLine(headerLine string, dataLine string, fileType string, doc map[stri
 		newDoc := make(map[string]interface{})
 		doc = newDoc
 	}
-	id := strings.Join(tmpHeaderData, ":")
-	_, exists := doc[id]
+	metaData := buildHeaderLineTypeUtilities.VxMetadata{}
+	metaData.Subset = "MET"
+	metaData.Type = "DD"
+	metaData.SubType = "MET"
+	// GetId will fill in the id field of the metaData struct with the constructed id
+	metaData = buildHeaderLineTypeUtilities.GetId(tmpHeaderData, &metaData)
 	fileLineType := fileType + "_" + lineType
+	_, exists := doc[metaData.ID]
 	if !exists {
-		metaData := structColumnTypes.VxMetadata{ID: id, Subset: "MET", Type: "DD", SubType: "MET"}
-		doc[id], _err = structColumnTypes.GetDocForId(fileLineType, metaData, headerData, dataData, dataKey)
+		// TODO: check if the id exists in the database
+		// if it does, then we need to add the data from the database to the existing document here
+		// need to do a fetch from the database to get the data
+		// and then add the data to the existing document here doc[id] = data_from_the_db
+		// convert the fields of the metaData to a map[string]interface{} so it can be added to the doc
+		var metaDataMap map[string]interface{}
+		jsonBytes, err := json.Marshal(metaData)
+		if err != nil {
+			return nil, err
+		}
+		err = json.Unmarshal(jsonBytes, &metaDataMap)
+		if err != nil {
+			return nil, err
+		}
+		// create a new document for the new metaData.ID
+		doc[metaData.ID], _err = structColumnTypes.GetDocForId(fileLineType, headerData, dataData, dataKey)
 		if _err != nil {
 			return doc, _err
 		}
 	} else {
-		tempDoc := doc[id].(map[string]interface{})
+		tempDoc := doc[metaData.ID].(map[string]interface{})
 		_err := structColumnTypes.AddDataElement(dataKey, fileLineType, dataData, &tempDoc)
 		if _err != nil {
 			return doc, _err
