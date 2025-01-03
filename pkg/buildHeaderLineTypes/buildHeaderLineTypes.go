@@ -197,15 +197,16 @@ func main() {
 
 	fmt.Println("package structColumnTypes")
 	fmt.Println("")
-	fmt.Println("import\n(\n\t\"strconv\"\n\t\"errors\"\n)")
-	fmt.Println("//vxMetadata struct definition")
+	fmt.Println("import (\n\t\"strconv\"\n\t\"errors\"\n)")
 	fmt.Println("\n/*\nTHIS CODE IS AUTOMATICALLY GENERATED - DO NOT EDIT THIS CODE")
 	fmt.Println("To modify this code - modify the buildHeaderLineTypes.go file and run the buildHeaderLineTypes.go program")
 	fmt.Println("cd  <repo path>/metlinetypes/pkg/buildHeaderLineTypes")
 	fmt.Println("go run . > /tmp/types.go")
 	fmt.Println("cp /tmp/types.go ../structColumnTypes/structColumnTypes.go\n*/")
 	fmt.Println("")
+
 	// print the vxMetadata struct
+	fmt.Println("//vxMetadata struct definition")
 	fmt.Println(vxMetaDataStruct)
 
 	// print the header structs
