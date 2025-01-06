@@ -1,5 +1,20 @@
 package buildHeaderLineTypeUtilities
 
+/*
+This package contains the utilities for building the header and line type for the data files. The data files are
+MET output files that contain a header section and a data section. The header section contains the header fields that
+are used to identify the document. The data section contains the data fields that are used to populate the document.
+This package is separate from the structColumnTypes package because the structColumnTypes package is automatically
+generated from the buildHeaderLineTypes.go program and there is a desire to avoid a circular dependency.
+This package defines a VxMetaData struct that is used to store the metadata for the mapped documents.
+The metadata is used to uniquely identify each document and is used to merge documents with the same metadata.
+
+This package also defines the DataKeyMap that is used to determine the key data fields for a given line type.
+The key data fields are used to merge documents with the same header field values excluding the key data fields.
+Other utilities exist to convert the date fields to epochs, to get the line type of the data line, to get the key
+data fields for a given line type, and to find the data type of a given field in addition to some other utility functions.
+*/
+
 import (
 	"fmt"
 	"regexp"

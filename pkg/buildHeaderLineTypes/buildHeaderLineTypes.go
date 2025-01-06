@@ -11,8 +11,12 @@ import (
 	"strings"
 )
 
-// The output of this program is a series of structs that can be used to define the header
-// and data types in the buildHeaderTypes.go file
+/*
+The output of this program is a series of structs that can be used to define the header
+and data types in the buildHeaderTypes.go file and some parsing routines that are aware of the
+header and data types.
+*/
+
 func main() {
 	// Using the header definitions in the appropriate version of data/table_files/met_header_columns_X.X.txt
 	// currently 12.0 to get the header column definitions and then using

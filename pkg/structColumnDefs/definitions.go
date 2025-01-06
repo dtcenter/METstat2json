@@ -14,22 +14,29 @@ import (
 This package is used to parse the data for MET output files.
 The entry point to this package is the ParseLine function that takes a header line, a data line, a fileType,
 and a map of documents indexed by the document id. The document pointer can be an empty document. The header line
-is the first line of the file and contains the header field names. The data field names are optional and therefore
-not used. The data line is any subsequent line of the file that contains the header and the data fields.
-The fileType is a string that represents the type of file being parsed. The doc is a pointer to a map of
-documents that are indexed by an id that is derived from the header fields without the dataKey fields.
+is the first line of the file and contains the header field names.  The data line is any subsequent line of the file
+that contains the header and the data fields.
+The fileType is a string that represents the type of file being parsed. The docPtr is a pointer to a map of
+documents that are indexed by an id that is derived from the header fields minus the dataKey fields.
 
-A dataKey is an array of header field values, for example most line types have a dataKey of {"Fcst_lead"}
+A dataKey is an array of header field values. For example most line types have a dataKey of {"Fcst_lead"}
 which would have a string representation of the value of the "Fcst_lead" element in the header string.
 The dataKey fields are disallowed from the header id and are not included in the headerData. These keys serve
 the purpose of actually merging line data with the same dataKey values into a single document. The dataKey is used
 to index the data section of the document, which is a map[string]interface{}, where the interface is a specific concrete
 data type.
 
-The ParseLine function uses the getLineType function to determine the lineType of the data line. It also uses the
-getId function to determine the id of the data line. The headerData and dataData are then extracted from the header
-and data lines respectively. The metaData must be provided as a structColumnTypes.VxMetadata struct.
+The ParseLine function uses the GetLineType function to determine the lineType of the data line, the headerData,
+dataKey, and descIndex. headerData are the ordered data fields for the header section of the line, the dataKey is the actual
+dataKey i.e the concatenated dataKey values, and the descIndex is the ordinal index of the desc field.
+The descIndex is used to trim the desc field to 10 characters.
 
+The parseLine function also uses the
+getId function to determine the id of the data line. The id is derived from the headerData minus the dataKey fields and
+is returned in the form of a VxMetaData struct. The VxMetaData struct is then converted to a map[string]interface{}
+so that it can be passed to the GetDocForId function without the GetDocForId function needing to know the VxMetaData struct type.
+
+There are a couple of utility functions that are used to get the headerData without the NA values and to convert the VxMetaData struct.
 A document pointer is required as a place to store the parsed data. If the document is nil, a new document is created.
 The header line values (minus the dataKey fields) are used to derive the id, with date fields converted to epochs.
 If the data section of of the document[id] is nil, a new data section is created. The data section is then populated
