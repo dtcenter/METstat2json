@@ -76,6 +76,17 @@ The output of this program is a series of structs that can be used to define the
 and data types in the buildHeaderTypes.go file and some parsing routines that are aware of the
 header and data types. The outout is the structColumnTypes.go file which is the sole content of the structColumnTypes package and should never be directly edited.
 
+This is how to build the structColumnTypes package. It is suggested redirect the output (which is the go program)
+to a temporary file and then after looking at it copy it to its proper destination.
+You may have to create the ...pkg/structColumnTypes/ directory, but it probably comes with the repo clone.
+
+```text
+ranpierce-mac1:buildHeaderLineTypes randy.pierce$ cd /Users/randy.pierce/metlinetypes/pkg/buildHeaderLineTypes
+ranpierce-mac1:buildHeaderLineTypes randy.pierce$ go run . > /tmp/types.go
+ranpierce-mac1:buildHeaderLineTypes randy.pierce$ cp /tmp/types.go ../structColumnTypes/structColumnTypes.go
+```
+
+
 ## Usage
 
 This package is used to parse the data for MET output files.
@@ -108,3 +119,146 @@ A document pointer is required as a place to store the parsed data. If the docum
 The header line values (minus the dataKey fields) are used to derive the id, with date fields converted to epochs.
 If the data section of of the document[id] is nil, a new data section is created. The data section is then populated
 with the data fields from the data line. If the data section is not nil, the data fields are added to the existing data map.
+
+## Testing
+
+There are unit tests in the buildHeaderLineTypeUtilities package in the file buildHeaderLineTypeUtilities_test.go. You can run these in vscode or on the command line.
+In vscode there is usually a link above the test case function name that allows you to run or debug the test case.
+For the command line this is how I do it
+
+```text
+ranpierce-mac1:buildHeaderLineTypeUtilities randy.pierce$ cd /Users/randy.pierce/metlinetypes/pkg/buildHeaderLineTypeUtilities/
+ranpierce-mac1:buildHeaderLineTypeUtilities randy.pierce$ go clean --testcache
+ranpierce-mac1:buildHeaderLineTypeUtilities randy.pierce$ go test ./...
+ok  	parser/pkg/buildHeaderLineTypeUtilities	0.185s
+```
+
+or if I want more log output....
+
+```text
+ranpierce-mac1:buildHeaderLineTypeUtilities randy.pierce$ cd /Users/randy.pierce/metlinetypes/pkg/buildHeaderLineTypeUtilities/
+ranpierce-mac1:buildHeaderLineTypeUtilities randy.pierce$ go clean --testcache
+ranpierce-mac1:buildHeaderLineTypeUtilities randy.pierce$ go test -v ./...
+=== RUN   TestGetLineType
+=== RUN   TestGetLineType/VERSION_MODEL_DESC_FCST_LEAD_FCST_VALID_BEG__FCST_VALID_END__OBS_LEAD_OBS_VALID_BEG___OBS_VALID_END___FCST_VAR__FCST_UNITS_FCST_LEV_OBS_VAR___OBS_UNITS_OBS_LEV_OBTYPE_VX_MASK_INTERP_MTHD_INTERP_PNTS_FCST_THRESH_OBS_THRESH_COV_THRESH_ALPHA_LINE_TYPE
+=== RUN   TestGetLineType/VERSION_MODEL_DESC_FCST_LEAD_FCST_VALID_BEG__FCST_VALID_END__OBS_LEAD_OBS_VALID_BEG___OBS_VALID_END___FCST_VAR__FCST_UNITS_FCST_LEV_OBS_VAR___OBS_UNITS_OBS_LEV_OBTYPE_VX_MASK_INTERP_MTHD_INTERP_PNTS_FCST_THRESH_OBS_THRESH_COV_THRESH_ALPHA_LINE_TYPE#01
+=== RUN   TestGetLineType/VERSION_MODEL_DESC_FCST_LEAD_FCST_VALID_BEG__FCST_VALID_END__OBS_LEAD_OBS_VALID_BEG___OBS_VALID_END___FCST_VAR__FCST_UNITS_FCST_LEV_OBS_VAR___OBS_UNITS_OBS_LEV_OBTYPE_VX_MASK_INTERP_MTHD_INTERP_PNTS_FCST_THRESH_OBS_THRESH_COV_THRESH_ALPHA_LINE_TYPE#02
+--- PASS: TestGetLineType (0.00s)
+    --- PASS: TestGetLineType/VERSION_MODEL_DESC_FCST_LEAD_FCST_VALID_BEG__FCST_VALID_END__OBS_LEAD_OBS_VALID_BEG___OBS_VALID_END___FCST_VAR__FCST_UNITS_FCST_LEV_OBS_VAR___OBS_UNITS_OBS_LEV_OBTYPE_VX_MASK_INTERP_MTHD_INTERP_PNTS_FCST_THRESH_OBS_THRESH_COV_THRESH_ALPHA_LINE_TYPE (0.00s)
+    --- PASS: TestGetLineType/VERSION_MODEL_DESC_FCST_LEAD_FCST_VALID_BEG__FCST_VALID_END__OBS_LEAD_OBS_VALID_BEG___OBS_VALID_END___FCST_VAR__FCST_UNITS_FCST_LEV_OBS_VAR___OBS_UNITS_OBS_LEV_OBTYPE_VX_MASK_INTERP_MTHD_INTERP_PNTS_FCST_THRESH_OBS_THRESH_COV_THRESH_ALPHA_LINE_TYPE#01 (0.00s)
+    --- PASS: TestGetLineType/VERSION_MODEL_DESC_FCST_LEAD_FCST_VALID_BEG__FCST_VALID_END__OBS_LEAD_OBS_VALID_BEG___OBS_VALID_END___FCST_VAR__FCST_UNITS_FCST_LEV_OBS_VAR___OBS_UNITS_OBS_LEV_OBTYPE_VX_MASK_INTERP_MTHD_INTERP_PNTS_FCST_THRESH_OBS_THRESH_COV_THRESH_ALPHA_LINE_TYPE#02 (0.00s)
+=== RUN   TestSplitColumnDefLine
+=== RUN   TestSplitColumnDefLine/MODE
+=== RUN   TestSplitColumnDefLine/MTD
+=== RUN   TestSplitColumnDefLine/STAT
+=== RUN   TestSplitColumnDefLine/STAT#01
+--- PASS: TestSplitColumnDefLine (0.00s)
+    --- PASS: TestSplitColumnDefLine/MODE (0.00s)
+    --- PASS: TestSplitColumnDefLine/MTD (0.00s)
+    --- PASS: TestSplitColumnDefLine/STAT (0.00s)
+    --- PASS: TestSplitColumnDefLine/STAT#01 (0.00s)
+=== RUN   TestGetKeyDataFieldsForLineType
+=== RUN   TestGetKeyDataFieldsForLineType/MODE
+=== RUN   TestGetKeyDataFieldsForLineType/MTD
+=== RUN   TestGetKeyDataFieldsForLineType/STAT
+=== RUN   TestGetKeyDataFieldsForLineType/unknown
+--- PASS: TestGetKeyDataFieldsForLineType (0.00s)
+    --- PASS: TestGetKeyDataFieldsForLineType/MODE (0.00s)
+    --- PASS: TestGetKeyDataFieldsForLineType/MTD (0.00s)
+    --- PASS: TestGetKeyDataFieldsForLineType/STAT (0.00s)
+    --- PASS: TestGetKeyDataFieldsForLineType/unknown (0.00s)
+=== RUN   TestFindType
+=== RUN   TestFindType/item1
+=== RUN   TestFindType/item2
+=== RUN   TestFindType/item3
+=== RUN   TestFindType/item4
+--- PASS: TestFindType (0.00s)
+    --- PASS: TestFindType/item1 (0.00s)
+    --- PASS: TestFindType/item2 (0.00s)
+    --- PASS: TestFindType/item3 (0.00s)
+    --- PASS: TestFindType/item4 (0.00s)
+PASS
+ok  	parser/pkg/buildHeaderLineTypeUtilities	0.184s
+```
+
+There are more comprehensive tests in the structColumnDefs pkg.
+
+```text
+cd /Users/randy.pierce/metlinetypes/pkg/structColumnDefs/
+go clean --testcache
+ranpierce-mac1:structColumnDefs randy.pierce$ go test -v ./...
+=== RUN   TestParseVAL1L2
+--- FAIL: TestParseVAL1L2 (0.00s)
+panic: interface conversion: interface {} is nil, not map[string]interface {} [recovered]
+	panic: interface conversion: interface {} is nil, not map[string]interface {}
+
+goroutine 4 [running]:
+testing.tRunner.func1.2({0x1047a0500, 0x14000073800})
+	/opt/homebrew/Cellar/go/1.23.3/libexec/src/testing/testing.go:1632 +0x1bc
+testing.tRunner.func1()
+	/opt/homebrew/Cellar/go/1.23.3/libexec/src/testing/testing.go:1635 +0x334
+panic({0x1047a0500?, 0x14000073800?})
+	/opt/homebrew/Cellar/go/1.23.3/libexec/src/runtime/panic.go:785 +0x124
+parser/pkg/structColumnDefs.TestParseVAL1L2(0x1400007a9c0)
+	/Users/randy.pierce/metlinetypes/pkg/structColumnDefs/definitions_test.go:100 +0x754
+testing.tRunner(0x1400007a9c0, 0x1047e20b8)
+	/opt/homebrew/Cellar/go/1.23.3/libexec/src/testing/testing.go:1690 +0xe4
+created by testing.(*T).Run in goroutine 1
+	/opt/homebrew/Cellar/go/1.23.3/libexec/src/testing/testing.go:1743 +0x314
+FAIL	parser/pkg/structColumnDefs	0.208s
+FAIL
+ranpierce-mac1:structColumnDefs randy.pierce$ go test -v ./...
+=== RUN   TestParseVAL1L2
+--- PASS: TestParseVAL1L2 (0.00s)
+=== RUN   TestParseRegressionSuite
+--- PASS: TestParseRegressionSuite (3.29s)
+=== RUN   TestParseG2G_v12_Suite
+/Users/randy.pierce/metlinetypes/pkg/structColumnDefs/../../test_data/G2G_v12 672
+/Users/randy.pierce/metlinetypes/test_data/G2G_v12/20241031-00z 96
+/Users/randy.pierce/metlinetypes/test_data/G2G_v12/20241031-00z/grid_stat 1280
+/Users/randy.pierce/metlinetypes/test_data/G2G_v12/20241031-06z 96
+/Users/randy.pierce/metlinetypes/test_data/G2G_v12/20241031-06z/grid_stat 1248
+/Users/randy.pierce/metlinetypes/test_data/G2G_v12/20241031-12z 96
+/Users/randy.pierce/metlinetypes/test_data/G2G_v12/20241031-12z/grid_stat 1280
+/Users/randy.pierce/metlinetypes/test_data/G2G_v12/20241031-18z 96
+/Users/randy.pierce/metlinetypes/test_data/G2G_v12/20241031-18z/grid_stat 1248
+/Users/randy.pierce/metlinetypes/test_data/G2G_v12/20241101-00z 96
+/Users/randy.pierce/metlinetypes/test_data/G2G_v12/20241101-00z/grid_stat 1280
+/Users/randy.pierce/metlinetypes/test_data/G2G_v12/20241101-06z 96
+/Users/randy.pierce/metlinetypes/test_data/G2G_v12/20241101-06z/grid_stat 1248
+/Users/randy.pierce/metlinetypes/test_data/G2G_v12/20241101-12z 96
+/Users/randy.pierce/metlinetypes/test_data/G2G_v12/20241101-12z/grid_stat 1280
+/Users/randy.pierce/metlinetypes/test_data/G2G_v12/20241101-18z 96
+/Users/randy.pierce/metlinetypes/test_data/G2G_v12/20241101-18z/grid_stat 1248
+Error getting line type:  UNPARSABLE_LINE: lineTypeIndex is greater than the length of the data line
+Skipping line: V12.0.0 GFS   NA   1080000   20241101_180000 20241101_180000 000000   20241101_180000 20241101_180000 RH   because it isn't parsable from file grid_stat_GFS_TMP_vs_ANLYS_TMP_Z2_1080000L_20241101_180000V.stat
+/Users/randy.pierce/metlinetypes/test_data/G2G_v12/20241102-00z 96
+/Users/randy.pierce/metlinetypes/test_data/G2G_v12/20241102-00z/grid_stat 1280
+/Users/randy.pierce/metlinetypes/test_data/G2G_v12/20241102-06z 96
+/Users/randy.pierce/metlinetypes/test_data/G2G_v12/20241102-06z/grid_stat 1248
+/Users/randy.pierce/metlinetypes/test_data/G2G_v12/20241102-12z 96
+/Users/randy.pierce/metlinetypes/test_data/G2G_v12/20241102-12z/grid_stat 1280
+/Users/randy.pierce/metlinetypes/test_data/G2G_v12/20241102-18z 96
+/Users/randy.pierce/metlinetypes/test_data/G2G_v12/20241102-18z/grid_stat 1248
+/Users/randy.pierce/metlinetypes/test_data/G2G_v12/20241103-00z 96
+/Users/randy.pierce/metlinetypes/test_data/G2G_v12/20241103-00z/grid_stat 1280
+/Users/randy.pierce/metlinetypes/test_data/G2G_v12/20241103-06z 96
+/Users/randy.pierce/metlinetypes/test_data/G2G_v12/20241103-06z/grid_stat 1248
+/Users/randy.pierce/metlinetypes/test_data/G2G_v12/20241103-12z 96
+/Users/randy.pierce/metlinetypes/test_data/G2G_v12/20241103-12z/grid_stat 1280
+/Users/randy.pierce/metlinetypes/test_data/G2G_v12/20241103-18z 96
+/Users/randy.pierce/metlinetypes/test_data/G2G_v12/20241103-18z/grid_stat 1248
+/Users/randy.pierce/metlinetypes/test_data/G2G_v12/20241104-00z 96
+/Users/randy.pierce/metlinetypes/test_data/G2G_v12/20241104-00z/grid_stat 1280
+/Users/randy.pierce/metlinetypes/test_data/G2G_v12/20241104-06z 96
+/Users/randy.pierce/metlinetypes/test_data/G2G_v12/20241104-06z/grid_stat 1248
+/Users/randy.pierce/metlinetypes/test_data/G2G_v12/20241104-18z 96
+/Users/randy.pierce/metlinetypes/test_data/G2G_v12/20241104-18z/grid_stat 1120
+--- PASS: TestParseG2G_v12_Suite (11.22s)
+PASS
+ok  	parser/pkg/structColumnDefs	14.742s
+
+```
+
+NOTE: There is a current problem that requires running the test case twice.
+
