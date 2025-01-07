@@ -183,6 +183,14 @@ ok  	parser/pkg/buildHeaderLineTypeUtilities	0.184s
 
 There are more comprehensive tests in the structColumnDefs pkg.
 
+**NOTE: There is an error in one of the data files.** This error is expected.
+
+```text
+Error getting line type:  UNPARSABLE_LINE: lineTypeIndex is greater than the length of the data line
+Skipping line: V12.0.0 GFS   NA   1080000   20241101_180000 20241101_180000 000000   20241101_180000 20241101_180000 RH   because it isn't parsable from file grid_stat_GFS_TMP_vs_ANLYS_TMP_Z2_1080000L_20241101_180000V.stat
+/Users/randy.pierce/metlinetypes/test_data/G2G_v12/20241102-00z 96
+```
+
 ```text
 cd /Users/randy.pierce/metlinetypes/pkg/structColumnDefs/
 go clean --testcache
