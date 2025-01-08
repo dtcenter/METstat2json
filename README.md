@@ -67,10 +67,24 @@ The metadata is used to uniquely identify each document and is used to merge doc
 
 This package also defines the DataKeyMap that is used to determine the key data fields for a given line type.
 The key data fields are used to merge documents with the same header field values excluding the key data fields.
+The key data fields can be either from the header or the data section of a record line.
+
+### header key data field
+
+If the key data field is type header then the associated array of fields must be from the header section. The fields will be concatenated in the order that they are defined and separated by "_". The fields will be excluded from the header and the resultant key string will be used to index the data map. Each data map entry will represent a different data record from the source file resulting in the merging of all the records that have the same header keys minus the key data fields.
+
+### data key data field
+
+If the key data field is type data then the associated array of fields must all be from the data section of the record. The fields will be concatenated in the order that they are defined and separated by an "_". Those fields wont be excluded from the data section but the data section will be partitioned into a map that is indexed by the values from the OBECT_ID field.
+
+When the dataKeyFields above is applied to this document the lines with identical headers will be merged into a single document (as well as the lines with matching headers from other processed files) but because of the dataKeyMap type data definition the data records with the same OBJECT_ID will be mapped into a data map in that single document and that map will be indexed by the OBJECT_ID field.
+
+### other utilities
+
 Other utilities exist to convert the date fields to epochs, to get the line type of the data line, to get the key
 data fields for a given line type, and to find the data type of a given field in addition to some other utility functions.
 
-### buildHeaderLineTypes
+## buildHeaderLineTypes
 
 The output of this program is a series of structs that can be used to define the header
 and data types in the buildHeaderTypes.go file and some parsing routines that are aware of the
@@ -97,12 +111,14 @@ that contains the header and the data fields.
 The fileType is a string that represents the type of file being parsed. The docPtr is a pointer to a map of
 documents that are indexed by an id that is derived from the header fields minus the dataKey fields.
 
-A dataKey is an array of header field values. For example most line types have a dataKey of {"Fcst_lead"}
-which would have a string representation of the value of the "Fcst_lead" element in the header string.
+A dataKey is an array of either header or data field values. For example most line types have a dataKey of {"Fcst_lead"}
+from the header section which would have a string representation of the value of the "Fcst_lead" element in the header string.
 The dataKey fields are disallowed from the header id and are not included in the headerData. These keys serve
 the purpose of actually merging line data with the same dataKey values into a single document. The dataKey is used
 to index the data section of the document, which is a map[string]interface{}, where the interface is a specific concrete
 data type.
+
+A dataKey can also be a data field name. In that case the data section of a single document will be divided into a map based on that dataKey.
 
 The ParseLine function uses the GetLineType function to determine the lineType of the data line, the headerData,
 dataKey, and descIndex. headerData are the ordered data fields for the header section of the line, the dataKey is the actual
