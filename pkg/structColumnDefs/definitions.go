@@ -8,6 +8,7 @@ import (
 	"os"
 	"parser/pkg/buildHeaderLineTypeUtilities"
 	"parser/pkg/structColumnTypes"
+	"strings"
 )
 
 /*
@@ -41,9 +42,13 @@ A document pointer is required as a place to store the parsed data. If the docum
 The header line values (minus the dataKey fields) are used to derive the id, with date fields converted to epochs.
 If the data section of of the document[id] is nil, a new data section is created. The data section is then populated
 with the data fields from the data line. If the data section is not nil, the data fields are added to the existing data map.
+
+The parameter getExternalDocForId is a function pointer that is used to get an external document for a given id. This function
+is used to get a document from an external source, such as a database, that is indexed by the id. If the external document
+is not nil, it is added to the document map. If the external document is nil, a new document is created for the id.
 */
 
-func ParseLine(headerLine string, dataLine string, fileType string, docPtr *map[string]interface{}) (map[string]interface{}, error) {
+func ParseLine(headerLine string, dataLine string, fileType string, docPtr *map[string]interface{}, getExternalDocForId func(id string) (map[string]interface{}, error)) (map[string]interface{}, error) {
 	_err := error(nil)
 	if headerLine == "" || dataLine == "" {
 		return *docPtr, _err
@@ -62,29 +67,40 @@ func ParseLine(headerLine string, dataLine string, fileType string, docPtr *map[
 	}
 	// GetId will fill in the id field of the metaData struct with the constructed id
 	metaData := buildHeaderLineTypeUtilities.GetId(tmpHeaderData, &buildHeaderLineTypeUtilities.VxMetadata{Subset: "MET", Type: "DD", SubType: "MET"})
-	fileLineType := fileType + "_" + lineType
+	var fileLineType string
+	if strings.HasPrefix(fileType, "MODE") {
+		fileLineType = fileType
+	} else {
+		fileLineType = fileType + "_" + lineType
+	}
 	_, exists := (*docPtr)[metaData.ID]
 	if !exists {
-		// TODO: check if the id exists in the database (has already been processed)
-		// if it does, then we need to add the data from the database to the existing document here
-		// need to do a fetch from the database to get the data
-		// and then add the data to the existing document here doc[id] = data_from_the_db
-
-		metaDataMap, _err := getMetaDataMap(metaData)
-		if _err != nil {
+		// check to see if there is an existing external document for this id
+		externalExistingDoc, err := (getExternalDocForId)(metaData.ID)
+		if err != nil && !strings.HasPrefix(err.Error(), structColumnTypes.DOC_NOT_FOUND) {
 			return *docPtr, _err
 		}
-		// create a new document for the new metaData.ID
-		(*docPtr)[metaData.ID], _err = structColumnTypes.GetDocForId(fileLineType, metaDataMap, headerData, dataData, dataKey)
-		if _err != nil {
-			return *docPtr, _err
+		if externalExistingDoc != nil {
+			(*docPtr)[metaData.ID] = externalExistingDoc
+		} else {
+			// have to create a new document for this id
+			metaDataMap, _err := getMetaDataMap(metaData)
+			if _err != nil {
+				return *docPtr, _err
+			}
+			// create a new document for the new metaData.ID
+			// This function will also fill in the headerData fields
+			// indexed by dataKey value in the document
+			(*docPtr)[metaData.ID], _err = structColumnTypes.GetDocForId(fileLineType, metaDataMap, headerData, dataData, dataKey)
+			if _err != nil {
+				return *docPtr, _err
+			}
 		}
-	} else {
-		tempDoc := (*docPtr)[metaData.ID].(map[string]interface{})
-		_err := structColumnTypes.AddDataElement(dataKey, fileLineType, dataData, &tempDoc)
-		if _err != nil {
-			return *docPtr, _err
-		}
+	}
+	tempDoc := (*docPtr)[metaData.ID].(map[string]interface{})
+	_err = structColumnTypes.AddDataElement(dataKey, fileLineType, dataData, &tempDoc)
+	if _err != nil {
+		return *docPtr, _err
 	}
 	return *docPtr, _err
 }
@@ -106,8 +122,9 @@ func getMetaDataMap(metaData buildHeaderLineTypeUtilities.VxMetadata) (map[strin
 }
 
 /*
-create a tmpHeaderData and remove the NA values fromm the headerData - we also have to do this in the GetDocFoId function
-trim the desc field data to 10 chars, if it isn't empty ("")
+create a tmpHeaderData and remove the "" and the NA values fromm the headerData.
+This also has to be done in the GetDocForId i.e. (fill_XXXX_Header) functions,
+and trim the desc field data to 10 chars, if it isn't empty ("")
 */
 func getTmpHeaderSanNA(headerData []string, descIndex int) []string {
 	tmpHeaderData := []string{}

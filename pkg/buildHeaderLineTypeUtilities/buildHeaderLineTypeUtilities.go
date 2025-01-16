@@ -67,11 +67,11 @@ var DataKeyMap = map[string][]string{
 	"STAT_VCNT":      {"FCST_LEAD"},
 	"STAT_GENMPR":    {"FCST_LEAD"},
 	"STAT_SSIDX":     {"FCST_LEAD"},
-	"MODE_OBJ":       {"FCST_LEAD, FCST_LEV"},
-	"MODE_CTS":       {"FCST_LEAD, FCST_LEV"},
-	"MTD_2DSINGLE":   {"FCST_LEAD, FCST_LEV"},
-	"MTD_3DSINGLE":   {"FCST_LEAD, FCST_LEV"},
-	"MTD_3DPAIR":     {"FCST_LEAD, FCST_LEV"},
+	"MODE_OBJ":       {"OBJECT_ID"}, // this one is a datafield key
+	"MODE_CTS":       {"OBJECT_ID"},
+	"MTD_2DSINGLE":   {"FCST_LEAD"},
+	"MTD_3DSINGLE":   {"FCST_LEAD"},
+	"MTD_3DPAIR":     {"FCST_LEAD"},
 	"TCST_TCMPR":     {"FCST_LEAD"},
 	"TCST_TCDIAG":    {"FCST_LEAD"},
 	"TCST_PROBRIRW":  {"FCST_LEAD"},
@@ -86,15 +86,24 @@ func dateToEpoch(date string) string {
 	return strconv.FormatInt(theTime.Unix(), 10)
 }
 
-/* returns the lineType of the data line, and the headerFields and dataFields of the data line as []string.
-   The lineType is the last field in the header section of the header line, which is the first line of the file.
-   Since this function has to split the line into a header and a data section those fields are returned as well.
-   The dataKeyFields are removed from the headerFields and the headerData. The dataFields are returned as is.
-   The headerData is converted to epochs if the field is a dateField.
-*/
+/*
+returns the lineType of the data line, and the headerFields and dataFields of the data line as []string.
 
+	The lineType is the last field in the header section of the header line, which is the first line of the file.
+	Since this function has to split the line into a header and a data section those fields are returned as well.
+	The dataKey is the concatenation of the dataKeyFields. The desc_index is the index of the DESC field in the headerFields.
+	The dataKeyFields are used to merge documents. A dataKey field may be derived from either header fields or data fields.
+	If the dataKey is derived from header fields they will be removed from the headerFields and the headerData.
+	If the dataKey is derived from data fields they will not be removed from the data element.
+	Any headerData is converted to epochs if the field is a dateField.
+
+	NOTE: Often a stat file will not have a header line that contains data fields, i.e. it will end with the LINE_TYPE.
+	In this case the dataFields cannot be determined and if the dataKeyMap spefiies a dataKeyField that is not in the
+	headerFields then the dataKey will be "" and the entire header will be used to generate the id.
+*/
 func GetLineType(headerLine string, dataLine string, fileType string) (string, []string, []string, string, int, error) {
 	desc_index := -1
+	allHeaderFields := strings.Fields(headerLine)
 	headerStringFields, _ := SplitColumnDefLine(fileType, headerLine)
 	// get the desc_index
 	for i, h := range headerStringFields {
@@ -114,35 +123,48 @@ func GetLineType(headerLine string, dataLine string, fileType string) (string, [
 	// have to remove the dataKeyFields from the headerFields and the headerData (dataData AND dataFields won't change)
 	headerData := []string{}
 	dataKeyFields := []string{}
-	for hIndex, h := range headerStringFields {
+	// look for dataKey fields in allData - remove the dataKeyFields from the headerData if the key is in the header
+	for fIndex, field := range allHeaderFields {
 		isDataKey := false
-		for _, d := range DataKeyMap[fileType+"_"+lineType] {
-			if h == d {
+		var fileLineType string
+		if strings.HasPrefix(fileType, "MODE") {
+			fileLineType = fileType
+		} else {
+			fileLineType = fileType + "_" + lineType
+		}
+		for _, dk := range DataKeyMap[fileLineType] {
+			if field == dk {
 				isDataKey = true
-				dataKeyFields = append(dataKeyFields, allData[hIndex])
+				dataKeyFields = append(dataKeyFields, allData[fIndex])
 				break
 			}
 		}
-		// skip the dataKeyFields - blank them out
-		if !isDataKey {
-			// keep these fields
-			isDateField := false
-			for _, d := range DateFieldNames {
-				if h == d {
-					isDateField = true
-					break
+
+		isHeaderField := fIndex <= lineTypeIndex
+		// iterate through the header fields and
+		// if the field is a header field and a dataKeyField then blank it out
+		// convert header DATE fields that are not dataKeys to epochs
+		if isHeaderField {
+			if !isDataKey {
+				// keep these header fields but convert them
+				isDateField := false
+				for _, d := range DateFieldNames {
+					if field == d {
+						isDateField = true
+						break
+					}
 				}
-			}
-			if isDateField {
-				// convert the date to an epoch
-				headerData = append(headerData, dateToEpoch(allData[hIndex]))
+				if isDateField {
+					// convert the date to an epoch
+					headerData = append(headerData, dateToEpoch(allData[fIndex]))
+				} else {
+					// keep the field as is
+					headerData = append(headerData, allData[fIndex])
+				}
 			} else {
-				// keep the field as is
-				headerData = append(headerData, allData[hIndex])
+				// blank out the dataKeyFields
+				headerData = append(headerData, "")
 			}
-		} else {
-			// blank out the dataKeyFields
-			headerData = append(headerData, "")
 		}
 	}
 	dataKey := strings.Join(dataKeyFields, "_")
@@ -154,16 +176,28 @@ Given a line from the ColumnDefinitions file this function will return the heade
 for the line. The header fields are the fields that are used to identify the document. The data fields
 are the fields that are used to populate the data section of the document. The parts are
 delimited by specific fields for each file type.
+
+NOTE: This is different than the dataKeyFields. The dataKeyFields are used to merge documents. This
+function is used to split the header and data fields from the line.
 */
 func SplitColumnDefLine(fileType string, fieldStr string) ([]string, []string) {
 	var headerString string
 	var dataString string
 	var parts []string
 	switch fileType {
-	case "MODE", "MTD":
+	case "MTD", "MTD_2DSINGLE", "MTD_3DSINGLE", "MTD_3DPAIR":
 		parts = strings.Split(fieldStr, " OBS_LEV ")
 		if len(parts) > 1 {
 			headerString = parts[0] + " OBS_LEV"
+			dataString = parts[1]
+		} else {
+			headerString = parts[0]
+			dataString = ""
+		}
+	case "MODE_OBJ", "MODE_CTS":
+		parts = strings.Split(fieldStr, " OBTYPE ")
+		if len(parts) > 1 {
+			headerString = parts[0] + " OBTYPE"
 			dataString = parts[1]
 		} else {
 			headerString = parts[0]

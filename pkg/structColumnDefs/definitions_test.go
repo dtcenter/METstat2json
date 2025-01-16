@@ -22,6 +22,35 @@ import (
 	"parser/pkg/structColumnTypes"
 )
 
+// dummy function to satisfy the function signature of getExternalDocForId
+func getMissingExternalDocForId(id string) (map[string]interface{}, error) {
+	// fmt.Println("getExternalDocForId called with id:", id)
+	// Put your own code here in this method but always return this exact error if the document is not found
+	return nil, fmt.Errorf("%s: %s", structColumnTypes.DOC_NOT_FOUND, id)
+}
+
+// dummy function to satisfy the function signature of getExternalDocForId
+func getExistingExternalDocForId(id string) (map[string]interface{}, error) {
+	// fmt.Println("getExternalDocForId called with id:", id)
+	fileLineType := "STAT_VAL1L2"
+	metaDataMap := map[string]interface{}{"id": "MET:DD:MET:V12.0.0:FCST:1333972800:1333972800:000000:1333971000:1333974600:UGRD_VGRD:m/s:Z10:UGRD_VGRD:Z10:ADPSFC:LAND_L0:NEAREST:1:VAL1L2", "subset": "MET", "type": "DD", "subtype": "MET"}
+	headerData := []string{"V12.0.0", "FCST", "", "", "1333972800", "1333972800", "000000", "1333971000", "1333974600", "UGRD_VGRD", "m/s", "Z10", "UGRD_VGRD", "", "Z10", "ADPSFC", "LAND_L0", "NEAREST", "1", "", "", "", "", "VAL1L2"}
+	dataData := []string{"4114", "0.022881", "-0.055846", "-0.23975", "0.11316", "1.40894", "2.39774", "6.07755", "1.35071", "2.1488", "4114", "12.11241", "65.18733", "6744.28012"}
+	dataKey := "120000"
+	var _err error
+
+	doc, _err := structColumnTypes.GetDocForId(fileLineType, metaDataMap, headerData, dataData, dataKey)
+	if _err != nil {
+		return nil, _err
+	}
+	if _err != nil {
+		return doc.(map[string]interface{}), _err
+	}
+
+	// Put your own code here in this method but always return this exact error if the document is not found
+	return doc.(map[string]interface{}), nil
+}
+
 func ReadJsonFromGzipFile(filename string) ([]interface{}, error) {
 	file, err := os.Open(filename)
 	if err != nil {
@@ -42,6 +71,28 @@ func ReadJsonFromGzipFile(filename string) ([]interface{}, error) {
 	return parsedDoc, nil
 }
 
+func TestGetMissingExternalDocForId(t *testing.T) {
+	headerLine := "VERSION MODEL DESC FCST_LEAD FCST_VALID_BEG  FCST_VALID_END  OBS_LEAD OBS_VALID_BEG   OBS_VALID_END   FCST_VAR  FCST_UNITS FCST_LEV OBS_VAR   OBS_UNITS OBS_LEV  OBTYPE VX_MASK INTERP_MTHD INTERP_PNTS FCST_THRESH OBS_THRESH COV_THRESH ALPHA LINE_TYPE"
+	dataLine := "V12.0.0 FCST  NA   120000    20120409_120000 20120409_120000 000000   20120409_113000 20120409_123000 UGRD_VGRD m/s        Z10      UGRD_VGRD NA        Z10      ADPSFC LAND_L0 NEAREST     1           NA          NA         NA         NA    VAL1L2    4114    0.022881     -0.055846      -0.23975       0.11316       1.40894     2.39774     6.07755      1.35071    2.1488    4114           12.11241   65.18733  6744.28012"
+	fileType := "STAT"
+	var doc map[string]interface{}
+	doc, err := ParseLine(headerLine, dataLine, fileType, &doc, getMissingExternalDocForId)
+	if err != nil {
+		t.Fatalf("Expected no error, got %v", err)
+	}
+}
+
+func TestGetExistingExternalDocForId(t *testing.T) {
+	headerLine := "VERSION MODEL DESC FCST_LEAD FCST_VALID_BEG  FCST_VALID_END  OBS_LEAD OBS_VALID_BEG   OBS_VALID_END   FCST_VAR  FCST_UNITS FCST_LEV OBS_VAR   OBS_UNITS OBS_LEV  OBTYPE VX_MASK INTERP_MTHD INTERP_PNTS FCST_THRESH OBS_THRESH COV_THRESH ALPHA LINE_TYPE"
+	dataLine := "V12.0.0 FCST  NA   120000    20120409_120000 20120409_120000 000000   20120409_113000 20120409_123000 UGRD_VGRD m/s        Z10      UGRD_VGRD NA        Z10      ADPSFC LAND_L0 NEAREST     1           NA          NA         NA         NA    VAL1L2    4114    0.022881     -0.055846      -0.23975       0.11316       1.40894     2.39774     6.07755      1.35071    2.1488    4114           12.11241   65.18733  6744.28012"
+	fileType := "STAT"
+	var doc map[string]interface{}
+	doc, err := ParseLine(headerLine, dataLine, fileType, &doc, getExistingExternalDocForId)
+	if err != nil {
+		t.Fatalf("Expected no error, got %v", err)
+	}
+}
+
 func TestParseVAL1L2(t *testing.T) {
 	headerLine := "VERSION MODEL DESC FCST_LEAD FCST_VALID_BEG  FCST_VALID_END  OBS_LEAD OBS_VALID_BEG   OBS_VALID_END   FCST_VAR  FCST_UNITS FCST_LEV OBS_VAR   OBS_UNITS OBS_LEV  OBTYPE VX_MASK INTERP_MTHD INTERP_PNTS FCST_THRESH OBS_THRESH COV_THRESH ALPHA LINE_TYPE"
 	dataLine := "V12.0.0 FCST  NA   120000    20120409_120000 20120409_120000 000000   20120409_113000 20120409_123000 UGRD_VGRD m/s        Z10      UGRD_VGRD NA        Z10      ADPSFC LAND_L0 NEAREST     1           NA          NA         NA         NA    VAL1L2    4114    0.022881     -0.055846      -0.23975       0.11316       1.40894     2.39774     6.07755      1.35071    2.1488    4114           12.11241   65.18733  6744.28012"
@@ -51,23 +102,82 @@ func TestParseVAL1L2(t *testing.T) {
 
 	fileType := "STAT"
 	var doc map[string]interface{}
-	doc, err := ParseLine(headerLine, dataLine, fileType, &doc)
+	doc, err := ParseLine(headerLine, dataLine, fileType, &doc, getMissingExternalDocForId)
 	if err != nil {
 		t.Fatalf("Expected no error, got %v", err)
 	}
-	doc, err = ParseLine(headerLine, dataLine2, fileType, &doc)
+	doc, err = ParseLine(headerLine, dataLine2, fileType, &doc, getMissingExternalDocForId)
 	if err != nil {
 		t.Fatalf("Expected no error, got %v", err)
 	}
-	doc, err = ParseLine(headerLine, dataLine3, fileType, &doc)
+	doc, err = ParseLine(headerLine, dataLine3, fileType, &doc, getMissingExternalDocForId)
 	if err != nil {
 		t.Fatalf("Expected no error, got %v", err)
 	}
-	doc, err = ParseLine(headerLine, dataLine4, fileType, &doc)
+	doc, err = ParseLine(headerLine, dataLine4, fileType, &doc, getMissingExternalDocForId)
 	if err != nil {
 		t.Fatalf("Expected no error, got %v", err)
 	}
 
+	if doc == nil {
+		t.Fatalf("Expected parsed document, got nil")
+	}
+	err = WriteJsonToGzipFile(doc, "/tmp/test_output.json.gz")
+	if err != nil {
+		t.Fatalf("Expected no error, got %v", err)
+	}
+
+	// read the file back in
+	parsedDoc, err := ReadJsonFromGzipFile("/tmp/test_output.json.gz")
+	if err != nil {
+		t.Fatalf("Expected no error, got %v", err)
+	}
+
+	assert.NotNil(t, parsedDoc)
+	assert.Equal(t, 3, len(parsedDoc), "expected 3 but got %d", len(parsedDoc)) // two top level elements
+	doc0 := doc["MET:DD:MET:V12.0.0:FCST:1333972800:1333972800:000000:1333971000:1333974600:UGRD_VGRD:m/s:Z10:UGRD_VGRD:Z10:ADPSFC:LAND_L0:NEAREST:1:VAL1L2"].(map[string]interface{})
+	doc2 := doc["MET:DD:MET:V12.0.0:FCST:this_is_a_:1333972800:1333972800:000000:1333971000:1333974600:UGRD_VGRD:m/s:Z10:UGRD_VGRD:Z10:ADPSFC:LMV:NEAREST:1:VAL1L2"].(map[string]interface{})
+	doc0Data := doc0["data"].(map[string]structColumnTypes.STAT_VAL1L2)
+	doc2Data := doc2["data"].(map[string]structColumnTypes.STAT_VAL1L2)
+	doc0Data120000 := doc0Data["120000"]
+	doc2Data180000 := doc2Data["180000"]
+	doc0DataTotal := doc0Data120000.Total
+	doc2DataTotal := doc2Data180000.Total
+	parsedDoc0 := parsedDoc[0].(map[string]interface{})
+	parsedDoc0Data := parsedDoc0["data"].(map[string]interface{})
+	parsedDoc2 := parsedDoc[2].(map[string]interface{})
+	parsedDoc2Data := parsedDoc2["data"].(map[string]interface{})
+	// Don't know why the parsedDoc (what we read back in) came back as a float and not an int
+	parsedDoc0DataTotal := int(parsedDoc0Data["120000"].(map[string]interface{})["total"].(float64))
+	parsedDoc2DataTotal := int(parsedDoc2Data["180000"].(map[string]interface{})["total"].(float64))
+	assert.Equal(t, doc0DataTotal, parsedDoc0DataTotal, "expected doc and parsedDoc to have equal values")
+	assert.Equal(t, doc2DataTotal, parsedDoc2DataTotal, "expected doc and parsedDoc to have equal values")
+	// Add more assertions based on the expected structure of parsedDoc
+}
+
+/*
+This test tests a data field dataKey.
+*/
+func TestParseMODE_OBJ(t *testing.T) {
+	headerLine := "VERSION MODEL N_VALID GRID_RES DESC FCST_LEAD FCST_VALID FCST_ACCUM OBS_LEAD OBS_VALID OBS_ACCUM FCST_RAD FCST_THR OBS_RAD OBS_THR FCST_VAR FCST_UNITS FCST_LEV OBS_VAR OBS_UNITS OBS_LEV OBTYPE OBJECT_ID OBJECT_CAT CENTROID_X CENTROID_Y CENTROID_LAT CENTROID_LON AXIS_ANG LENGTH WIDTH AREA AREA_THRESH CURVATURE CURVATURE_X CURVATURE_Y COMPLEXITY INTENSITY_10 INTENSITY_25 INTENSITY_50 INTENSITY_75 INTENSITY_90 INTENSITY_95 INTENSITY_SUM CENTROID_DIST BOUNDARY_DIST CONVEX_HULL_DIST ANGLE_DIFF ASPECT_DIFF AREA_RATIO INTERSECTION_AREA UNION_AREA SYMMETRIC_DIFF INTERSECTION_OVER_AREA CURVATURE_RATIO COMPLEXITY_RATIO PERCENTILE_INTENSITY_RATIO INTEREST"
+	dataLine := "V11.1.0 HRRR_OPS 656523 3 E_CONUS 080000 20241201_190000 000000 000000 20241201_185837 000000 1 >=35 1 >=35 REFC dB L0 REFC dB R1 MRMS F001 CF000 1179.05714 847.2 46.60621 -86.59767 -42.90968 9.89291 4.18823 20 18 1627.71082 1838.91188 1172.93246 0.32203 36.85 39.375 40.59375 42.5 44.95 45.0625 810.3125 NA NA NA NA NA NA NA NA NA NA NA NA NA NA"
+	dataLine2 := "V11.1.0 HRRR_OPS 656523 3 E_CONUS 080000 20241201_190000 000000 000000 20241201_185837 000000 1 >=35 1 >=35 REFC dB L0 REFC dB R1 MRMS F002 CF000 1460.47059 790.02941 43.79098 -76.43034 37.76469 8.59583 4.38697 20 20 1907.78256 1981.5673 1571.67157 0.24528 37.36875 40.04688 41.125 42.20312 43.5875 43.81562 815.5 NA NA NA NA NA NA NA NA NA NA NA NA NA NA"
+	dataLine3 := "V11.1.0 HRRR_OPS 656523 3 E_CONUS 080000 20241201_190000 000000 000000 20241201_185837 000000 1 >=35 1 >=35 REFC dB L0 REFC dB R1 MRMS F003 CF000 1414.91176 532 37.24534 -79.91852 25.39649 11.60689 2.80129 17 16 1941.15256 1786.31378 1691.79385 0.38182 36.2625 37 37.25 38.25 38.9 39.15 637.4375 NA NA NA NA NA NA NA NA NA NA NA NA NA NA"
+
+	fileType := "MODE_OBJ"
+	var doc map[string]interface{}
+	doc, err := ParseLine(headerLine, dataLine, fileType, &doc, getMissingExternalDocForId)
+	if err != nil {
+		t.Fatalf("Expected no error, got %v", err)
+	}
+	doc, err = ParseLine(headerLine, dataLine2, fileType, &doc, getMissingExternalDocForId)
+	if err != nil {
+		t.Fatalf("Expected no error, got %v", err)
+	}
+	doc, err = ParseLine(headerLine, dataLine3, fileType, &doc, getMissingExternalDocForId)
+	if err != nil {
+		t.Fatalf("Expected no error, got %v", err)
+	}
 	if doc == nil {
 		t.Fatalf("Expected parsed document, got nil")
 	}
@@ -147,7 +257,7 @@ func TestParseRegressionSuite(t *testing.T) {
 				continue
 			}
 			dataLine := lines[line]
-			doc, err = ParseLine(headerLine, dataLine, fileType, &doc)
+			doc, err = ParseLine(headerLine, dataLine, fileType, &doc, getMissingExternalDocForId)
 			if err != nil {
 				t.Fatalf("Expected no error, got %v", err)
 			}
@@ -227,7 +337,7 @@ func TestParseG2G_v12_Suite(t *testing.T) {
 						continue
 					}
 					dataLine := lines[line]
-					doc, err = ParseLine(headerLine, dataLine, fileType, &doc)
+					doc, err = ParseLine(headerLine, dataLine, fileType, &doc, getMissingExternalDocForId)
 					if err != nil {
 						if strings.Contains(err.Error(), "UNPARSABLE_LINE") {
 							// skip the line
