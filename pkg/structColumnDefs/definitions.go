@@ -49,7 +49,7 @@ is used to get a document from an external source, such as a database, that is i
 is not nil, it is added to the document map. If the external document is nil, a new document is created for the id.
 */
 
-func ParseLine(headerLine string, dataLine string, docPtr *map[string]interface{}, fileName string, getExternalDocForId func(id string)(map[string]interface{}, error)) (map[string]interface{}, error) {
+func ParseLine(headerLine string, dataLine string, docPtr *map[string]interface{}, fileName string, getExternalDocForId func(id string) (map[string]interface{}, error)) (map[string]interface{}, error) {
 	_err := error(nil)
 	if headerLine == "" || dataLine == "" {
 		return *docPtr, fmt.Errorf("empty line")
@@ -180,7 +180,7 @@ func WriteJsonToGzipFile(doc map[string]interface{}, filename string) error {
 		return err
 	}
 	// Write the compressed data to a file
-	err = os.WriteFile(filename, b.Bytes(), 0644)
+	err = os.WriteFile(filename, b.Bytes(), 0o644)
 	if err != nil {
 		fmt.Printf("Failed to write file: %v", err)
 	}

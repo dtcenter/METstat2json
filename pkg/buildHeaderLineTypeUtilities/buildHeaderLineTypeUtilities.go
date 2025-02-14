@@ -165,8 +165,11 @@ func GetLineType(headerLine string, dataLine string, fileName string) (string, [
 		separatorField = "LINE_TYPE"
 		// don't know the fileLineType for stat files yet.
 	}
-	headerStringFields, _ := SplitColumnDefLine(separatorField, headerLine)
+	headerStringFields, _ := SplitColumnDefLine(fileLineType, headerLine)
 	dataStartIndex := len(headerStringFields)
+	if len(allData) < dataStartIndex {
+		return "", nil, nil, "", desc_index, fmt.Errorf("UNPARSABLE_LINE: data line is shorter than the header line")
+	}
 	dataData := allData[dataStartIndex:]
 	lineTypeIndex := len(headerStringFields) - 1
 	if lineTypeIndex > len(allData) {
@@ -237,13 +240,13 @@ delimited by specific fields for each file type.
 NOTE: This is different than the dataKeyFields. The dataKeyFields are used to merge documents. This
 function is used to split the header and data fields from the line.
 */
-func SplitColumnDefLine(fileType string, fieldStr string) ([]string, []string) {
+func SplitColumnDefLine(fileLineType string, headerLine string) ([]string, []string) {
 	var headerString string
 	var dataString string
 	var parts []string
-	switch fileType {
+	switch fileLineType {
 	case "MTD", "MTD_2DSINGLE", "MTD_3DSINGLE", "MTD_3DPAIR":
-		parts = strings.Split(fieldStr, " OBS_LEV ")
+		parts = strings.Split(headerLine, " OBS_LEV ")
 		if len(parts) > 1 {
 			headerString = parts[0] + " OBS_LEV"
 			dataString = parts[1]
@@ -252,7 +255,7 @@ func SplitColumnDefLine(fileType string, fieldStr string) ([]string, []string) {
 			dataString = ""
 		}
 	case "MODE_OBJ", "MODE_CTS":
-		parts = strings.Split(fieldStr, " OBTYPE ")
+		parts = strings.Split(headerLine, " OBTYPE ")
 		if len(parts) > 1 {
 			headerString = parts[0] + " OBTYPE"
 			dataString = parts[1]
@@ -262,7 +265,7 @@ func SplitColumnDefLine(fileType string, fieldStr string) ([]string, []string) {
 		}
 	default:
 		// get the header fields from line
-		parts = strings.Split(fieldStr, " LINE_TYPE ")
+		parts = strings.Split(headerLine, " LINE_TYPE ")
 		if len(parts) > 1 {
 			headerString = parts[0] + " LINE_TYPE"
 			dataString = parts[1]

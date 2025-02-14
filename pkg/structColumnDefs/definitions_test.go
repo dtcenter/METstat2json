@@ -13,13 +13,12 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"parser/pkg/structColumnTypes"
 	"path/filepath"
 	"strings"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
-
-	"parser/pkg/structColumnTypes"
 )
 
 // dummy function to satisfy the function signature of getExternalDocForId
@@ -43,15 +42,12 @@ func getExistingExternalDocForId(id string) (map[string]interface{}, error) {
 	if _err != nil {
 		return nil, _err
 	}
-	if _err != nil {
-		return doc.(map[string]interface{}), _err
-	}
 
 	// Put your own code here in this method but always return this exact error if the document is not found
 	return doc.(map[string]interface{}), nil
 }
 
-func ReadJsonFromGzipFile(filename string) ([]interface{}, error) {
+func ReadJsonFromGzipFile(filename string) (map[string]interface{}, error) {
 	file, err := os.Open(filename)
 	if err != nil {
 		return nil, err
@@ -63,10 +59,15 @@ func ReadJsonFromGzipFile(filename string) ([]interface{}, error) {
 	}
 	defer gz.Close()
 	decoder := json.NewDecoder(gz)
-	var parsedDoc []interface{}
-	err = decoder.Decode(&parsedDoc)
+	var result []interface{}
+	err = decoder.Decode(&result)
 	if err != nil {
 		return nil, err
+	}
+	parsedDoc := make(map[string]interface{})
+	for _, v := range result {
+		elem := v.(map[string]interface{})
+		parsedDoc[elem["id"].(string)] = elem
 	}
 	return parsedDoc, nil
 }
@@ -94,6 +95,7 @@ func TestGetExistingExternalDocForId(t *testing.T) {
 }
 
 func TestParseVAL1L2(t *testing.T) {
+	/* two of these data lines (dataLine and dataLine2) are the same. Only one of them should show up in the doc. The dataLine3 and dataLine4 only differ by their desc.*/
 	headerLine := "VERSION MODEL DESC FCST_LEAD FCST_VALID_BEG  FCST_VALID_END  OBS_LEAD OBS_VALID_BEG   OBS_VALID_END   FCST_VAR  FCST_UNITS FCST_LEV OBS_VAR   OBS_UNITS OBS_LEV  OBTYPE VX_MASK INTERP_MTHD INTERP_PNTS FCST_THRESH OBS_THRESH COV_THRESH ALPHA LINE_TYPE"
 	dataLine := "V12.0.0 FCST  NA   120000    20120409_120000 20120409_120000 000000   20120409_113000 20120409_123000 UGRD_VGRD m/s        Z10      UGRD_VGRD NA        Z10      ADPSFC LAND_L0 NEAREST     1           NA          NA         NA         NA    VAL1L2    4114    0.022881     -0.055846      -0.23975       0.11316       1.40894     2.39774     6.07755      1.35071    2.1488    4114           12.11241   65.18733  6744.28012"
 	dataLine2 := "V12.0.0 FCST  NA   120000    20120409_120000 20120409_120000 000000   20120409_113000 20120409_123000 UGRD_VGRD m/s        Z10      UGRD_VGRD NA        Z10      ADPSFC LMV     NEAREST     1           NA          NA         NA         NA    VAL1L2     393   -0.32297       0.32197       -0.79039       0.14006       1.34214     1.86519     3.95307      1.23297    1.78245    393           26.10387   54.98572  4500.31836"
@@ -141,15 +143,18 @@ func TestParseVAL1L2(t *testing.T) {
 	doc2Data := doc2["data"].(map[string]structColumnTypes.STAT_VAL1L2)
 	doc0Data120000 := doc0Data["120000"]
 	doc2Data180000 := doc2Data["180000"]
-	doc0DataTotal := doc0Data120000.Total
-	doc2DataTotal := doc2Data180000.Total
-	parsedDoc0 := parsedDoc[0].(map[string]interface{})
+	doc0DataTotal := doc0Data120000.TOTAL
+	doc2DataTotal := doc2Data180000.TOTAL
+
+	parsedDoc0 := parsedDoc["MET:DD:MET:V12.0.0:FCST:1333972800:1333972800:000000:1333971000:1333974600:UGRD_VGRD:m/s:Z10:UGRD_VGRD:Z10:ADPSFC:LAND_L0:NEAREST:1:VAL1L2"].(map[string]interface{})
+	parsedDoc2 := parsedDoc["MET:DD:MET:V12.0.0:FCST:this_is_a_:1333972800:1333972800:000000:1333971000:1333974600:UGRD_VGRD:m/s:Z10:UGRD_VGRD:Z10:ADPSFC:LMV:NEAREST:1:VAL1L2"].(map[string]interface{})
 	parsedDoc0Data := parsedDoc0["data"].(map[string]interface{})
-	parsedDoc2 := parsedDoc[2].(map[string]interface{})
 	parsedDoc2Data := parsedDoc2["data"].(map[string]interface{})
-	// Don't know why the parsedDoc (what we read back in) came back as a float and not an int
-	parsedDoc0DataTotal := int(parsedDoc0Data["120000"].(map[string]interface{})["total"].(float64))
-	parsedDoc2DataTotal := int(parsedDoc2Data["180000"].(map[string]interface{})["total"].(float64))
+	parsedDoc0Data120000 := parsedDoc0Data["120000"].(map[string]interface{})
+	parsedDoc2Data180000 := parsedDoc2Data["180000"].(map[string]interface{})
+	parsedDoc0DataTotal := int(parsedDoc0Data120000["total"].(float64))
+	parsedDoc2DataTotal := int(parsedDoc2Data180000["total"].(float64))
+
 	assert.Equal(t, doc0DataTotal, parsedDoc0DataTotal, "expected doc and parsedDoc to have equal values")
 	assert.Equal(t, doc2DataTotal, parsedDoc2DataTotal, "expected doc and parsedDoc to have equal values")
 	// Add more assertions based on the expected structure of parsedDoc
@@ -159,12 +164,11 @@ func TestParseVAL1L2(t *testing.T) {
 This test tests a data field dataKey.
 */
 func TestParseMODE_OBJ(t *testing.T) {
-	headerLine := "VERSION MODEL N_VALID GRID_RES DESC FCST_LEAD FCST_VALID FCST_ACCUM OBS_LEAD OBS_VALID OBS_ACCUM FCST_RAD FCST_THR OBS_RAD OBS_THR FCST_VAR FCST_UNITS FCST_LEV OBS_VAR OBS_UNITS OBS_LEV OBTYPE OBJECT_ID OBJECT_CAT CENTROID_X CENTROID_Y CENTROID_LAT CENTROID_LON AXIS_ANG LENGTH WIDTH AREA AREA_THRESH CURVATURE CURVATURE_X CURVATURE_Y COMPLEXITY INTENSITY_10 INTENSITY_25 INTENSITY_50 INTENSITY_75 INTENSITY_90 INTENSITY_95 INTENSITY_SUM CENTROID_DIST BOUNDARY_DIST CONVEX_HULL_DIST ANGLE_DIFF ASPECT_DIFF AREA_RATIO INTERSECTION_AREA UNION_AREA SYMMETRIC_DIFF INTERSECTION_OVER_AREA CURVATURE_RATIO COMPLEXITY_RATIO PERCENTILE_INTENSITY_RATIO INTEREST"
-	dataLine := "V11.1.0 HRRR_OPS 656523 3 E_CONUS 080000 20241201_190000 000000 000000 20241201_185837 000000 1 >=35 1 >=35 REFC dB L0 REFC dB R1 MRMS F001 CF000 1179.05714 847.2 46.60621 -86.59767 -42.90968 9.89291 4.18823 20 18 1627.71082 1838.91188 1172.93246 0.32203 36.85 39.375 40.59375 42.5 44.95 45.0625 810.3125 NA NA NA NA NA NA NA NA NA NA NA NA NA NA"
-	dataLine2 := "V11.1.0 HRRR_OPS 656523 3 E_CONUS 080000 20241201_190000 000000 000000 20241201_185837 000000 1 >=35 1 >=35 REFC dB L0 REFC dB R1 MRMS F002 CF000 1460.47059 790.02941 43.79098 -76.43034 37.76469 8.59583 4.38697 20 20 1907.78256 1981.5673 1571.67157 0.24528 37.36875 40.04688 41.125 42.20312 43.5875 43.81562 815.5 NA NA NA NA NA NA NA NA NA NA NA NA NA NA"
-	dataLine3 := "V11.1.0 HRRR_OPS 656523 3 E_CONUS 080000 20241201_190000 000000 000000 20241201_185837 000000 1 >=35 1 >=35 REFC dB L0 REFC dB R1 MRMS F003 CF000 1414.91176 532 37.24534 -79.91852 25.39649 11.60689 2.80129 17 16 1941.15256 1786.31378 1691.79385 0.38182 36.2625 37 37.25 38.25 38.9 39.15 637.4375 NA NA NA NA NA NA NA NA NA NA NA NA NA NA"
+	headerLine := "VERSION MODEL N_VALID GRID_RES DESC FCST_LEAD FCST_VALID      FCST_ACCUM OBS_LEAD OBS_VALID       OBS_ACCUM FCST_RAD FCST_THR OBS_RAD OBS_THR FCST_VAR FCST_UNITS FCST_LEV OBS_VAR OBS_UNITS OBS_LEV OBTYPE FIELD  TOTAL FY_OY FY_ON FN_OY FN_ON BASER   FMEAN    ACC     FBIAS  PODY       PODN    POFD     FAR     CSI        GSS       HK        HSS       ODDS      LODDS   ORSS     EDS      SEDS     EDI      SEDI     BAGSS"
+	dataLine := "V12.0.0 FCST  26026   9        NA   300000    20120410_180000 060000     120000   20050807_120000 120000    2        >=5.0    2       >=5.0   APCP_06  kg/m^2     A6       OBS     None      Surface STAGE4    RAW 26026    47  1356  5898 18725 0.22843 0.053908 0.72128 0.236  0.0079058  0.93247 0.067527 0.9665  0.0064375  -0.039178 -0.059621 -0.08155  0.11004   -2.2069 -0.80173 -0.53249 -0.3039  -0.28465 -0.28988 -0.11236"
+	dataLine2 := "V12.0.0 FCST  26026   9        this_is_a_long_description   300000    20120410_180000 060000     120000   20050807_120000 120000    2        >=5.0    2       >=5.0   APCP_06  kg/m^2     A6       OBS     None      Surface STAGE4 OBJECT 26026     4  1315  6322 18385 0.24306 0.05068  0.70656 0.2085 0.00063231 0.93325 0.066751 0.99697 0.00052349 -0.043249 -0.066119 -0.090409 0.0088459 -4.7278 -0.98246 -0.67783 -0.49927 -0.46256 -0.46613 -0.13686"
 
-	//fileType := "MODE_OBJ"
+	// fileType := "MODE_OBJ"
 	fName := "mode_python_mixed_300000L_20120410_180000V_060000A_cts.txt"
 	var doc map[string]interface{}
 	doc, err := ParseLine(headerLine, dataLine, &doc, fName, getMissingExternalDocForId)
@@ -175,18 +179,11 @@ func TestParseMODE_OBJ(t *testing.T) {
 	if err != nil {
 		t.Fatalf("Expected no error, got %v", err)
 	}
-	doc, err = ParseLine(headerLine, dataLine3, &doc, fName, getMissingExternalDocForId)
-	if err != nil {
-		t.Fatalf("Expected no error, got %v", err)
-	}
-	if doc == nil {
-		t.Fatalf("Expected parsed document, got nil")
-	}
+	// write the doc to a file
 	err = WriteJsonToGzipFile(doc, "/tmp/test_output.json.gz")
 	if err != nil {
 		t.Fatalf("Expected no error, got %v", err)
 	}
-
 	// read the file back in
 	parsedDoc, err := ReadJsonFromGzipFile("/tmp/test_output.json.gz")
 	if err != nil {
@@ -194,22 +191,25 @@ func TestParseMODE_OBJ(t *testing.T) {
 	}
 
 	assert.NotNil(t, parsedDoc)
-	assert.Equal(t, 3, len(parsedDoc), "expected 3 but got %d", len(parsedDoc)) // two top level elements
-	doc0 := doc["MET:DD:MET:V12.0.0:FCST:1333972800:1333972800:000000:1333971000:1333974600:UGRD_VGRD:m/s:Z10:UGRD_VGRD:Z10:ADPSFC:LAND_L0:NEAREST:1:VAL1L2"].(map[string]interface{})
-	doc2 := doc["MET:DD:MET:V12.0.0:FCST:this_is_a_:1333972800:1333972800:000000:1333971000:1333974600:UGRD_VGRD:m/s:Z10:UGRD_VGRD:Z10:ADPSFC:LMV:NEAREST:1:VAL1L2"].(map[string]interface{})
-	doc0Data := doc0["data"].(map[string]structColumnTypes.STAT_VAL1L2)
-	doc2Data := doc2["data"].(map[string]structColumnTypes.STAT_VAL1L2)
-	doc0Data120000 := doc0Data["120000"]
-	doc2Data180000 := doc2Data["180000"]
-	doc0DataTotal := doc0Data120000.Total
-	doc2DataTotal := doc2Data180000.Total
-	parsedDoc0 := parsedDoc[0].(map[string]interface{})
+	assert.Equal(t, 2, len(parsedDoc), "expected 3 but got %d", len(parsedDoc)) // two top level elements
+	doc0 := doc["MET:DD:MET:V12.0.0:FCST:26026:9:20120410_180000:060000:120000:20050807_120000:120000:2:>=5.0:2:>=5.0:APCP_06:kg/m^2:A6:OBS:None:Surface:STAGE4"].(map[string]interface{})
+	doc2 := doc["MET:DD:MET:V12.0.0:FCST:26026:9:this_is_a_:20120410_180000:060000:120000:20050807_120000:120000:2:>=5.0:2:>=5.0:APCP_06:kg/m^2:A6:OBS:None:Surface:STAGE4"].(map[string]interface{})
+	doc0Data := doc0["data"].(map[string]structColumnTypes.MODE_CTS)
+	doc2Data := doc2["data"].(map[string]structColumnTypes.MODE_CTS)
+	doc0Data120000 := doc0Data["300000"]
+	doc2Data180000 := doc2Data["300000"]
+	doc0DataTotal := doc0Data120000.TOTAL
+	doc2DataTotal := doc2Data180000.TOTAL
+
+	parsedDoc0 := parsedDoc["MET:DD:MET:V12.0.0:FCST:26026:9:20120410_180000:060000:120000:20050807_120000:120000:2:>=5.0:2:>=5.0:APCP_06:kg/m^2:A6:OBS:None:Surface:STAGE4"].(map[string]interface{})
+	parsedDoc2 := parsedDoc["MET:DD:MET:V12.0.0:FCST:26026:9:this_is_a_:20120410_180000:060000:120000:20050807_120000:120000:2:>=5.0:2:>=5.0:APCP_06:kg/m^2:A6:OBS:None:Surface:STAGE4"].(map[string]interface{})
 	parsedDoc0Data := parsedDoc0["data"].(map[string]interface{})
-	parsedDoc2 := parsedDoc[2].(map[string]interface{})
 	parsedDoc2Data := parsedDoc2["data"].(map[string]interface{})
-	// Don't know why the parsedDoc (what we read back in) came back as a float and not an int
-	parsedDoc0DataTotal := int(parsedDoc0Data["120000"].(map[string]interface{})["total"].(float64))
-	parsedDoc2DataTotal := int(parsedDoc2Data["180000"].(map[string]interface{})["total"].(float64))
+	parsedDoc0Data120000 := parsedDoc0Data["300000"].(map[string]interface{})
+	parsedDoc2Data180000 := parsedDoc2Data["300000"].(map[string]interface{})
+	parsedDoc0DataTotal := int(parsedDoc0Data120000["total"].(float64))
+	parsedDoc2DataTotal := int(parsedDoc2Data180000["total"].(float64))
+
 	assert.Equal(t, doc0DataTotal, parsedDoc0DataTotal, "expected doc and parsedDoc to have equal values")
 	assert.Equal(t, doc2DataTotal, parsedDoc2DataTotal, "expected doc and parsedDoc to have equal values")
 	// Add more assertions based on the expected structure of parsedDoc
@@ -247,7 +247,7 @@ func TestParseRegressionSuite(t *testing.T) {
 		lines := strings.Split(string(rawData), "\n")
 		headerLine := lines[0]
 		for line := range lines {
-			if line == 0 {
+			if line == 0 || lines[line] == "" {
 				continue
 			}
 			dataLine := lines[line]
@@ -261,13 +261,6 @@ func TestParseRegressionSuite(t *testing.T) {
 			if fileType == "DS_STORE" {
 				// skip the .DS_Store files
 				continue
-			}
-			if fileType == "txt" {
-				// .txt filepaths are different e.g.
-				// ./textfiles/point_stat_GRIB2_SREF_GDAS_150000L_20120409_120000V_sl1l2.txt
-				// ./textfiles/mode_MASK_POLY_300000L_20120410_180000V_060000A_cts.txt
-				// ./textfiles/mode_python_120000L_20050807_120000V_120000A_obj.txt
-				fileType = strings.Split(filePathParts[0], "_")[len(filePathParts[0])-1]
 			}
 			doc, err = ParseLine(headerLine, dataLine, &doc, fName, getMissingExternalDocForId)
 			if err != nil {
@@ -290,17 +283,7 @@ func TestParseRegressionSuite(t *testing.T) {
 	}
 
 	assert.NotNil(t, parsedDoc)
-	// assert.Equal(t, 2, len(parsedDoc), "expected 2 but got %d", len(parsedDoc)) // two top level elements
-	// doc0 := doc["V12.0.0:FCST:1333972800:1333972800:000000:1333971000:1333974600:UGRD_VGRD:m/s:Z10:UGRD_VGRD:Z10:ADPSFC:LAND_L0:NEAREST:1:VAL1L2"].(map[string]interface{})
-	// doc0Data := doc0["data"].(map[string]structColumnTypes.STAT_VAL1L2)
-	// doc0Data120000 := doc0Data["120000"]
-	// doc0DataTotal := doc0Data120000.Total
-	// parsedDoc0 := parsedDoc[0].(map[string]interface{})
-	// parsedDoc0Data := parsedDoc0["data"].(map[string]interface{})
-	// // Don't know why the parsedDoc (what we read back in) came back as a float and not an int
-	// parsedDoc0DataTotal := int(parsedDoc0Data["120000"].(map[string]interface{})["total"].(float64))
-	// assert.Equal(t, doc0DataTotal, parsedDoc0DataTotal, "expected doc and parsedDoc to have equal values")
-	// Add more assertions based on the expected structure of parsedDoc
+	// add other test assertions here
 }
 
 func TestParseG2G_v12_Suite(t *testing.T) {
@@ -324,6 +307,10 @@ func TestParseG2G_v12_Suite(t *testing.T) {
 				fmt.Println(path, fileInfo.Size())
 			} else {
 				// this is a file so process it
+				if strings.Contains(fileInfo.Name(), ".swp") {
+					// skip the swp files - might be editing a file and don't want to parse the .swp file
+					return nil
+				}
 				file, err := os.Open(path) // open the file
 				if err != nil {
 					t.Fatal("error opening file", err)
@@ -339,7 +326,7 @@ func TestParseG2G_v12_Suite(t *testing.T) {
 				lines := strings.Split(string(rawData), "\n")
 				headerLine := lines[0]
 				for line := range lines {
-					if line == 0 {
+					if line == 0 || lines[line] == "" {
 						continue
 					}
 					dataLine := lines[line]
@@ -347,6 +334,8 @@ func TestParseG2G_v12_Suite(t *testing.T) {
 					if err != nil {
 						if strings.Contains(err.Error(), "UNPARSABLE_LINE") {
 							// skip the line
+							// I know that the file ./G2G_v12/20241101-18z/grid_stat/grid_stat_GFS_TMP_vs_ANLYS_TMP_Z2_1080000L_20241101_180000V.stat
+							// has a truncated line at the end. I don't want to fail the test because of it.
 							fmt.Printf("Skipping line: %s because it isn't parsable from file %s\n", dataLine, fName)
 						} else {
 							t.Fatalf("Expected no error, got %v", err)
@@ -375,15 +364,5 @@ func TestParseG2G_v12_Suite(t *testing.T) {
 	}
 
 	assert.NotNil(t, parsedDoc)
-	// assert.Equal(t, 2, len(parsedDoc), "expected 2 but got %d", len(parsedDoc)) // two top level elements
-	// doc0 := doc["V12.0.0:FCST:1333972800:1333972800:000000:1333971000:1333974600:UGRD_VGRD:m/s:Z10:UGRD_VGRD:Z10:ADPSFC:LAND_L0:NEAREST:1:VAL1L2"].(map[string]interface{})
-	// doc0Data := doc0["data"].(map[string]structColumnTypes.STAT_VAL1L2)
-	// doc0Data120000 := doc0Data["120000"]
-	// doc0DataTotal := doc0Data120000.Total
-	// parsedDoc0 := parsedDoc[0].(map[string]interface{})
-	// parsedDoc0Data := parsedDoc0["data"].(map[string]interface{})
-	// // Don't know why the parsedDoc (what we read back in) came back as a float and not an int
-	// parsedDoc0DataTotal := int(parsedDoc0Data["120000"].(map[string]interface{})["total"].(float64))
-	// assert.Equal(t, doc0DataTotal, parsedDoc0DataTotal, "expected doc and parsedDoc to have equal values")
-	// Add more assertions based on the expected structure of parsedDoc
+	// add other test assertions here
 }
