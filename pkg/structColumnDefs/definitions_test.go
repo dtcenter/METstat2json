@@ -74,9 +74,9 @@ func ReadJsonFromGzipFile(filename string) ([]interface{}, error) {
 func TestGetMissingExternalDocForId(t *testing.T) {
 	headerLine := "VERSION MODEL DESC FCST_LEAD FCST_VALID_BEG  FCST_VALID_END  OBS_LEAD OBS_VALID_BEG   OBS_VALID_END   FCST_VAR  FCST_UNITS FCST_LEV OBS_VAR   OBS_UNITS OBS_LEV  OBTYPE VX_MASK INTERP_MTHD INTERP_PNTS FCST_THRESH OBS_THRESH COV_THRESH ALPHA LINE_TYPE"
 	dataLine := "V12.0.0 FCST  NA   120000    20120409_120000 20120409_120000 000000   20120409_113000 20120409_123000 UGRD_VGRD m/s        Z10      UGRD_VGRD NA        Z10      ADPSFC LAND_L0 NEAREST     1           NA          NA         NA         NA    VAL1L2    4114    0.022881     -0.055846      -0.23975       0.11316       1.40894     2.39774     6.07755      1.35071    2.1488    4114           12.11241   65.18733  6744.28012"
-	fileType := "STAT"
+	fName := "grid_stat_GFS_TMP_vs_ANLYS_TMP_Z2_900000L_20241104_180000V.stat"
 	var doc map[string]interface{}
-	doc, err := ParseLine(headerLine, dataLine, fileType, &doc, getMissingExternalDocForId)
+	doc, err := ParseLine(headerLine, dataLine, &doc, fName, getMissingExternalDocForId)
 	if err != nil {
 		t.Fatalf("Expected no error, got %v", err)
 	}
@@ -85,9 +85,9 @@ func TestGetMissingExternalDocForId(t *testing.T) {
 func TestGetExistingExternalDocForId(t *testing.T) {
 	headerLine := "VERSION MODEL DESC FCST_LEAD FCST_VALID_BEG  FCST_VALID_END  OBS_LEAD OBS_VALID_BEG   OBS_VALID_END   FCST_VAR  FCST_UNITS FCST_LEV OBS_VAR   OBS_UNITS OBS_LEV  OBTYPE VX_MASK INTERP_MTHD INTERP_PNTS FCST_THRESH OBS_THRESH COV_THRESH ALPHA LINE_TYPE"
 	dataLine := "V12.0.0 FCST  NA   120000    20120409_120000 20120409_120000 000000   20120409_113000 20120409_123000 UGRD_VGRD m/s        Z10      UGRD_VGRD NA        Z10      ADPSFC LAND_L0 NEAREST     1           NA          NA         NA         NA    VAL1L2    4114    0.022881     -0.055846      -0.23975       0.11316       1.40894     2.39774     6.07755      1.35071    2.1488    4114           12.11241   65.18733  6744.28012"
-	fileType := "STAT"
+	fName := "grid_stat_GFS_TMP_vs_ANLYS_TMP_Z2_900000L_20241104_180000V.stat"
 	var doc map[string]interface{}
-	doc, err := ParseLine(headerLine, dataLine, fileType, &doc, getExistingExternalDocForId)
+	doc, err := ParseLine(headerLine, dataLine, &doc, fName, getExistingExternalDocForId)
 	if err != nil {
 		t.Fatalf("Expected no error, got %v", err)
 	}
@@ -100,21 +100,21 @@ func TestParseVAL1L2(t *testing.T) {
 	dataLine3 := "V12.0.0 FCST  NA   180000    20120409_120000 20120409_120000 000000   20120409_113000 20120409_123000 UGRD_VGRD m/s        Z10      UGRD_VGRD NA        Z10      ADPSFC LMV     NEAREST     1           NA          NA         NA         NA    VAL1L2     393   -0.32297       0.32197       -0.79039       0.14006       1.34214     1.86519     3.95307      1.23297    1.78245    393           26.10387   54.98572  4500.31836"
 	dataLine4 := "V12.0.0 FCST  this_is_a_long_description_field   180000    20120409_120000 20120409_120000 000000   20120409_113000 20120409_123000 UGRD_VGRD m/s        Z10      UGRD_VGRD NA        Z10      ADPSFC LMV     NEAREST     1           NA          NA         NA         NA    VAL1L2     393   -0.32297       0.32197       -0.79039       0.14006       1.34214     1.86519     3.95307      1.23297    1.78245    393           26.10387   54.98572  4500.31836"
 
-	fileType := "STAT"
+	fName := "grid_stat_ECMWF_TMP_vs_ANLYS_TMP_P1000_anom_360000L_20241031_000000V.stat"
 	var doc map[string]interface{}
-	doc, err := ParseLine(headerLine, dataLine, fileType, &doc, getMissingExternalDocForId)
+	doc, err := ParseLine(headerLine, dataLine, &doc, fName, getMissingExternalDocForId)
 	if err != nil {
 		t.Fatalf("Expected no error, got %v", err)
 	}
-	doc, err = ParseLine(headerLine, dataLine2, fileType, &doc, getMissingExternalDocForId)
+	doc, err = ParseLine(headerLine, dataLine2, &doc, fName, getMissingExternalDocForId)
 	if err != nil {
 		t.Fatalf("Expected no error, got %v", err)
 	}
-	doc, err = ParseLine(headerLine, dataLine3, fileType, &doc, getMissingExternalDocForId)
+	doc, err = ParseLine(headerLine, dataLine3, &doc, fName, getMissingExternalDocForId)
 	if err != nil {
 		t.Fatalf("Expected no error, got %v", err)
 	}
-	doc, err = ParseLine(headerLine, dataLine4, fileType, &doc, getMissingExternalDocForId)
+	doc, err = ParseLine(headerLine, dataLine4, &doc, fName, getMissingExternalDocForId)
 	if err != nil {
 		t.Fatalf("Expected no error, got %v", err)
 	}
@@ -164,17 +164,18 @@ func TestParseMODE_OBJ(t *testing.T) {
 	dataLine2 := "V11.1.0 HRRR_OPS 656523 3 E_CONUS 080000 20241201_190000 000000 000000 20241201_185837 000000 1 >=35 1 >=35 REFC dB L0 REFC dB R1 MRMS F002 CF000 1460.47059 790.02941 43.79098 -76.43034 37.76469 8.59583 4.38697 20 20 1907.78256 1981.5673 1571.67157 0.24528 37.36875 40.04688 41.125 42.20312 43.5875 43.81562 815.5 NA NA NA NA NA NA NA NA NA NA NA NA NA NA"
 	dataLine3 := "V11.1.0 HRRR_OPS 656523 3 E_CONUS 080000 20241201_190000 000000 000000 20241201_185837 000000 1 >=35 1 >=35 REFC dB L0 REFC dB R1 MRMS F003 CF000 1414.91176 532 37.24534 -79.91852 25.39649 11.60689 2.80129 17 16 1941.15256 1786.31378 1691.79385 0.38182 36.2625 37 37.25 38.25 38.9 39.15 637.4375 NA NA NA NA NA NA NA NA NA NA NA NA NA NA"
 
-	fileType := "MODE_OBJ"
+	//fileType := "MODE_OBJ"
+	fName := "mode_python_mixed_300000L_20120410_180000V_060000A_cts.txt"
 	var doc map[string]interface{}
-	doc, err := ParseLine(headerLine, dataLine, fileType, &doc, getMissingExternalDocForId)
+	doc, err := ParseLine(headerLine, dataLine, &doc, fName, getMissingExternalDocForId)
 	if err != nil {
 		t.Fatalf("Expected no error, got %v", err)
 	}
-	doc, err = ParseLine(headerLine, dataLine2, fileType, &doc, getMissingExternalDocForId)
+	doc, err = ParseLine(headerLine, dataLine2, &doc, fName, getMissingExternalDocForId)
 	if err != nil {
 		t.Fatalf("Expected no error, got %v", err)
 	}
-	doc, err = ParseLine(headerLine, dataLine3, fileType, &doc, getMissingExternalDocForId)
+	doc, err = ParseLine(headerLine, dataLine3, &doc, fName, getMissingExternalDocForId)
 	if err != nil {
 		t.Fatalf("Expected no error, got %v", err)
 	}
@@ -239,13 +240,6 @@ func TestParseRegressionSuite(t *testing.T) {
 		}
 		defer file.Close()
 		fName := fileInfos.Name()
-		// fmt.Println("Parsing file:", fName)
-		ext := filepath.Ext(fName)
-		fileType := strings.ToUpper(strings.Split(ext, ".")[1])
-		if fileType == "SWP" {
-			// skip the swp files - might be editing a file and don't want to parse the .swp file
-			continue
-		}
 		rawData, err := io.ReadAll(file)
 		if err != nil {
 			t.Fatal("error reading file", err)
@@ -257,7 +251,25 @@ func TestParseRegressionSuite(t *testing.T) {
 				continue
 			}
 			dataLine := lines[line]
-			doc, err = ParseLine(headerLine, dataLine, fileType, &doc, getMissingExternalDocForId)
+			ext := filepath.Ext(fName)
+			filePathParts := strings.Split(ext, ".")
+			fileType := strings.ToUpper(filePathParts[1])
+			if fileType == "SWP" {
+				// skip the swp files - might be editing a file and don't want to parse the .swp file
+				continue
+			}
+			if fileType == "DS_STORE" {
+				// skip the .DS_Store files
+				continue
+			}
+			if fileType == "txt" {
+				// .txt filepaths are different e.g.
+				// ./textfiles/point_stat_GRIB2_SREF_GDAS_150000L_20120409_120000V_sl1l2.txt
+				// ./textfiles/mode_MASK_POLY_300000L_20120410_180000V_060000A_cts.txt
+				// ./textfiles/mode_python_120000L_20050807_120000V_120000A_obj.txt
+				fileType = strings.Split(filePathParts[0], "_")[len(filePathParts[0])-1]
+			}
+			doc, err = ParseLine(headerLine, dataLine, &doc, fName, getMissingExternalDocForId)
 			if err != nil {
 				t.Fatalf("Expected no error, got %v", err)
 			}
@@ -320,12 +332,6 @@ func TestParseG2G_v12_Suite(t *testing.T) {
 				fName := fileInfo.Name()
 				// uncomment the following for debugging
 				// fmt.Println("Parsing file:", fName)
-				ext := filepath.Ext(fName)
-				fileType := strings.ToUpper(strings.Split(ext, ".")[1])
-				if fileType == "SWP" {
-					// skip the swp files - might be editing a file and don't want to parse the .swp file
-					return nil
-				}
 				rawData, err := io.ReadAll(file)
 				if err != nil {
 					t.Fatal("error reading file", err)
@@ -337,7 +343,7 @@ func TestParseG2G_v12_Suite(t *testing.T) {
 						continue
 					}
 					dataLine := lines[line]
-					doc, err = ParseLine(headerLine, dataLine, fileType, &doc, getMissingExternalDocForId)
+					doc, err = ParseLine(headerLine, dataLine, &doc, fName, getMissingExternalDocForId)
 					if err != nil {
 						if strings.Contains(err.Error(), "UNPARSABLE_LINE") {
 							// skip the line

@@ -8,6 +8,7 @@ import (
 	"os"
 	"parser/pkg/buildHeaderLineTypeUtilities"
 	"parser/pkg/structColumnTypes"
+	"path/filepath"
 	"strings"
 )
 
@@ -48,13 +49,26 @@ is used to get a document from an external source, such as a database, that is i
 is not nil, it is added to the document map. If the external document is nil, a new document is created for the id.
 */
 
-func ParseLine(headerLine string, dataLine string, fileType string, docPtr *map[string]interface{}, getExternalDocForId func(id string) (map[string]interface{}, error)) (map[string]interface{}, error) {
+func ParseLine(headerLine string, dataLine string, docPtr *map[string]interface{}, fileName string, getExternalDocForId func(id string)(map[string]interface{}, error)) (map[string]interface{}, error) {
 	_err := error(nil)
 	if headerLine == "" || dataLine == "" {
-		return *docPtr, _err
+		return *docPtr, fmt.Errorf("empty line")
 	}
+	// make sure we have the basename here
+	fileName = filepath.Base(fileName)
+	filePathParts := strings.Split(fileName, ".")
+	fileType := strings.ToUpper(filePathParts[1])
+	if fileType == "SWP" {
+		// skip the swp files - might be editing a file and don't want to parse the .swp file
+		return *docPtr, fmt.Errorf("skipping swp file")
+	}
+	if fileType == "DS_STORE" {
+		// skip the .DS_Store files
+		return *docPtr, fmt.Errorf("skipping .DS_Store file")
+	}
+
 	// get the lineType
-	lineType, headerData, dataData, dataKey, descIndex, err := buildHeaderLineTypeUtilities.GetLineType(headerLine, dataLine, fileType)
+	fileLineType, headerData, dataData, dataKey, descIndex, err := buildHeaderLineTypeUtilities.GetLineType(headerLine, dataLine, fileName)
 	if err != nil {
 		// cannot process this line so return the docPtr as is - it is probably a truncated line
 		fmt.Println("Error getting line type: ", err)
@@ -67,12 +81,6 @@ func ParseLine(headerLine string, dataLine string, fileType string, docPtr *map[
 	}
 	// GetId will fill in the id field of the metaData struct with the constructed id
 	metaData := buildHeaderLineTypeUtilities.GetId(tmpHeaderData, &buildHeaderLineTypeUtilities.VxMetadata{Subset: "MET", Type: "DD", SubType: "MET"})
-	var fileLineType string
-	if strings.HasPrefix(fileType, "MODE") {
-		fileLineType = fileType
-	} else {
-		fileLineType = fileType + "_" + lineType
-	}
 	_, exists := (*docPtr)[metaData.ID]
 	if !exists {
 		// check to see if there is an existing external document for this id
