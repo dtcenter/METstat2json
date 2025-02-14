@@ -4,54 +4,63 @@ This is a parser for MET output files.
 
 ## Approach
 
-The approach is to use two files from the MET repo (which is versioned)
+The approach is to use a [GO program](https://github.com/ian-noaa/metlinetypes/blob/82d936b3aed5128676fed135bfda65897deb2c5a/pkg/buildHeaderLineTypes/buildHeaderLineTypes.go) that uses several files from the MET repo (which is versioned) to create a GO package that can then be
+used to create a GO package that can be used for parsing MET output files.
 
-```https://raw.githubusercontent.com/dtcenter/MET/refs/heads/main_v12.0/src/tools/core/stat_analysis/parse_stat_line.cc```
+[column defs](https://raw.githubusercontent.com/dtcenter/MET/refs/heads/main_v12.0/data/table_files/met_header_columns_V12.0.txt)
 
-and
+is used to get a list of required terms that need to be type defined. Then several source code files are searched for type conversion statements for those terms. If the type of a term cannot be determined from source code an attempt is made to look up the term in the MET user guide.
 
-```
-https://raw.githubusercontent.com/dtcenter/MET/refs/heads/main_v12.0/data/table_files/met_header_columns_V12.0.txt"
-```
+These are the src files that are searched...
 
-to derive column definitions and type information which is used to create a GO package "pkg/structColumnTypes" automatically that contains the struct definitions, fill functions, and parse routines necessary to convert MET output files into json documents for use in a GSL AVID Couchbase database, according to the AVID Couchbase data schema.
+- [mode_line.cc](https://raw.githubusercontent.com/dtcenter/MET/refs/heads/main_v12.0/src/libcode/vx_analysis_util/mode_line.cc)
+- [stat_job.cc](https://raw.githubusercontent.com/dtcenter/MET/refs/heads/main_v12.0/src/libcode/vx_analysis_util/stat_job.cc)
+- [unstructured_grid.cc](https://raw.githubusercontent.com/dtcenter/MET/refs/heads/main_v12.0/src/libcode/vx_grid/unstructured_grid.cc)
+- [prob_info_base.cc](https://raw.githubusercontent.com/dtcenter/MET/refs/heads/main_v12.0/src/libcode/vx_tc_util/prob_info_base.cc)
+- [prob_rirw_info.cc](https://raw.githubusercontent.com/dtcenter/MET/refs/heads/main_v12.0/src/libcode/vx_tc_util/prob_rirw_info.cc)
+- [prob_rirw_pair_info.cc](https://raw.githubusercontent.com/dtcenter/MET/refs/heads/main_v12.0/src/libcode/vx_tc_util/prob_rirw_pair_info.cc)
+- [track_pair_info.cc](https://raw.githubusercontent.com/dtcenter/MET/refs/heads/main_v12.0/src/libcode/vx_tc_util/track_pair_info.cc)
+- [parse_stat_line.cc](https://raw.githubusercontent.com/dtcenter/MET/refs/heads/main_v12.0/src/tools/core/stat_analysis/parse_stat_line.cc)
+- [tc_stat_job.cc](https://raw.githubusercontent.com/dtcenter/MET/refs/heads/main_v12.0/src/tools/tc_utils/tc_stat/tc_stat_job.cc)
+
+... and these are the usr guide files that are searched ...
+
+- [ensemble-stat.rst](https://raw.githubusercontent.com/dtcenter/MET/refs/heads/main_v12.0/docs/Users_Guide/ensemble-stat.rst)
+- [grid-stat.rst](https://raw.githubusercontent.com/dtcenter/MET/refs/heads/main_v12.0/docs/Users_Guide/grid-stat.rst)
+- [gsi-tools.rst](https://raw.githubusercontent.com/dtcenter/MET/refs/heads/main_v12.0/docs/Users_Guide/gsi-tools.rst)
+- [mode-td.rst](https://raw.githubusercontent.com/dtcenter/MET/refs/heads/main_v12.0/docs/Users_Guide/mode-td.rst)
+- [mode.rst](https://raw.githubusercontent.com/dtcenter/MET/refs/heads/main_v12.0/docs/Users_Guide/mode.rst)
+- [point-stat.rst](https://raw.githubusercontent.com/dtcenter/MET/refs/heads/main_v12.0/docs/Users_Guide/point-stat.rst)
+- [stat-analysis.rst](https://raw.githubusercontent.com/dtcenter/MET/refs/heads/main_v12.0/docs/Users_Guide/stat-analysis.rst)
+- [tc-gen.rst](https://raw.githubusercontent.com/dtcenter/MET/refs/heads/main_v12.0/docs/Users_Guide/tc-gen.rst)
+- [tc-pairs.rst](https://raw.githubusercontent.com/dtcenter/MET/refs/heads/main_v12.0/docs/Users_Guide/tc-pairs.rst)
+- [wavelet-stat.rst](https://raw.githubusercontent.com/dtcenter/MET/refs/heads/main_v12.0/docs/Users_Guide/wavelet-stat.rst)
+
+... to derive column definitions and type information which is used to create the GO package "pkg/structColumnTypes" that contains the struct definitions, fill functions, and parse routines necessary to convert MET output files into json documents for use in a GSL AVID Couchbase database, according to the AVID Couchbase data schema.
 
 In addition to the GO pkg "structColumnTypes" there are three other local packages, "structColumnDefs", "buildHeaderLineTypes", and "buildHeaderLineTypeUtilities".
 
 ### structColumnDefs
 
 This package is used to parse the data for MET output files.
-This package is used to parse the data for MET output files.
-The entry point to this package is the ParseLine function that takes a header line, a data line, a fileType,
-and a map of documents indexed by the document id. The document pointer can be an empty document. The header line
-is the first line of the file and contains the header field names.  The data line is any subsequent line of the file
-that contains the header and the data fields.
-The fileType is a string that represents the type of file being parsed. The docPtr is a pointer to a map of
-documents that are indexed by an id that is derived from the header fields minus the dataKey fields.
+The entry point to this package is the ParseLine function that takes a header line, a data line, a fileType, and a map of documents indexed by the document id. The document pointer can be an empty document. The header line is the first line of the file and contains the header field names.  The data line is any subsequent line of the file that contains the header and the data fields.
+The fileType is a string that represents the type of file being parsed. The docPtr is a pointer to a map of documents that are indexed by an id that is derived from the header fields minus the dataKey fields.
 
-A dataKey is an array of header field values. For example most line types have a dataKey of {"Fcst_lead"}
-which would have a string representation of the value of the "Fcst_lead" element in the header string.
-The dataKey fields are disallowed from the header id and are not included in the headerData. These keys serve
-the purpose of actually merging line data with the same dataKey values into a single document. The dataKey is used
-to index the data section of the document, which is a map[string]interface{}, where the interface is a specific concrete
-data type.
+A dataKey is an array of header field values. For example most line types have a dataKey of {"Fcst_lead"} which would have a string representation of the value of the "Fcst_lead" element in the header string.
+The dataKey fields are disallowed from the header id and are not included in the headerData. These keys serve the purpose of actually merging line data with the same dataKey values into a single document. The dataKey is used to index the data section of the document, which is a map[string]interface{}, where the interface is a specific concrete data type.
 
-The ParseLine function uses the GetLineType function to determine the lineType of the data line, the headerData,
-dataKey, and descIndex. headerData are the ordered data fields for the header section of the line, the dataKey is the actual
+The ParseLine function uses the GetLineType function to determine the lineType of the data line, the headerData, dataKey, and descIndex. headerData are the ordered data fields for the header section of the line, the dataKey is the actual
 dataKey i.e the concatenated dataKey values, and the descIndex is the ordinal index of the desc field.
 The descIndex is used to trim the desc field to 10 characters.
 
-The parseLine function also uses the
-getId function to determine the id of the data line. The id is derived from the headerData minus the dataKey fields and
-is returned in the form of a VxMetaData struct. The VxMetaData struct is then converted to a map[string]interface{}
+The parseLine function also uses the getId function to determine the id of the data line. The id is derived from the headerData minus the dataKey fields and is returned in the form of a VxMetaDa ta struct. The VxMetaData struct is then converted to a map[string]interface{}
 so that it can be passed to the GetDocForId function without the GetDocForId function needing to know the VxMetaData struct type.
 
 There are a couple of utility functions that are used to get the headerData without the NA values and to convert the VxMetaData struct.
 A document pointer is required as a place to store the parsed data. If the document is nil, a new document is created.
 The header line values (minus the dataKey fields) are used to derive the id, with date fields converted to epochs.
-If the data section of of the document[id] is nil, a new data section is created. The data section is then populated
-with the data fields from the data line. If the data section is not nil, the data fields are added to the existing data map
-*/
+If the data section of of the document[id] is nil, a new data section is created. The data section is then populated with the data fields from the data line. If the data section is not nil, the data fields are added to the existing data map
+
 
 ### buildHeaderLineTypeUtilities
 
@@ -100,7 +109,6 @@ ranpierce-mac1:buildHeaderLineTypes randy.pierce$ go run . > /tmp/types.go
 ranpierce-mac1:buildHeaderLineTypes randy.pierce$ cp /tmp/types.go ../structColumnTypes/structColumnTypes.go
 ```
 
-
 ## Usage
 
 This package is used to parse the data for MET output files.
@@ -146,7 +154,7 @@ For the command line this is how I do it
 ranpierce-mac1:buildHeaderLineTypeUtilities randy.pierce$ cd /Users/randy.pierce/metlinetypes/pkg/buildHeaderLineTypeUtilities/
 ranpierce-mac1:buildHeaderLineTypeUtilities randy.pierce$ go clean --testcache
 ranpierce-mac1:buildHeaderLineTypeUtilities randy.pierce$ go test ./...
-ok  	parser/pkg/buildHeaderLineTypeUtilities	0.185s
+ok   parser/pkg/buildHeaderLineTypeUtilities 0.185s
 ```
 
 or if I want more log output....
@@ -194,7 +202,7 @@ ranpierce-mac1:buildHeaderLineTypeUtilities randy.pierce$ go test -v ./...
     --- PASS: TestFindType/item3 (0.00s)
     --- PASS: TestFindType/item4 (0.00s)
 PASS
-ok  	parser/pkg/buildHeaderLineTypeUtilities	0.184s
+ok   parser/pkg/buildHeaderLineTypeUtilities 0.184s
 ```
 
 There are more comprehensive tests in the structColumnDefs pkg.
@@ -214,22 +222,22 @@ ranpierce-mac1:structColumnDefs randy.pierce$ go test -v ./...
 === RUN   TestParseVAL1L2
 --- FAIL: TestParseVAL1L2 (0.00s)
 panic: interface conversion: interface {} is nil, not map[string]interface {} [recovered]
-	panic: interface conversion: interface {} is nil, not map[string]interface {}
+ panic: interface conversion: interface {} is nil, not map[string]interface {}
 
 goroutine 4 [running]:
 testing.tRunner.func1.2({0x1047a0500, 0x14000073800})
-	/opt/homebrew/Cellar/go/1.23.3/libexec/src/testing/testing.go:1632 +0x1bc
+ /opt/homebrew/Cellar/go/1.23.3/libexec/src/testing/testing.go:1632 +0x1bc
 testing.tRunner.func1()
-	/opt/homebrew/Cellar/go/1.23.3/libexec/src/testing/testing.go:1635 +0x334
+ /opt/homebrew/Cellar/go/1.23.3/libexec/src/testing/testing.go:1635 +0x334
 panic({0x1047a0500?, 0x14000073800?})
-	/opt/homebrew/Cellar/go/1.23.3/libexec/src/runtime/panic.go:785 +0x124
+ /opt/homebrew/Cellar/go/1.23.3/libexec/src/runtime/panic.go:785 +0x124
 parser/pkg/structColumnDefs.TestParseVAL1L2(0x1400007a9c0)
-	/Users/randy.pierce/metlinetypes/pkg/structColumnDefs/definitions_test.go:100 +0x754
+ /Users/randy.pierce/metlinetypes/pkg/structColumnDefs/definitions_test.go:100 +0x754
 testing.tRunner(0x1400007a9c0, 0x1047e20b8)
-	/opt/homebrew/Cellar/go/1.23.3/libexec/src/testing/testing.go:1690 +0xe4
+ /opt/homebrew/Cellar/go/1.23.3/libexec/src/testing/testing.go:1690 +0xe4
 created by testing.(*T).Run in goroutine 1
-	/opt/homebrew/Cellar/go/1.23.3/libexec/src/testing/testing.go:1743 +0x314
-FAIL	parser/pkg/structColumnDefs	0.208s
+ /opt/homebrew/Cellar/go/1.23.3/libexec/src/testing/testing.go:1743 +0x314
+FAIL parser/pkg/structColumnDefs 0.208s
 FAIL
 ranpierce-mac1:structColumnDefs randy.pierce$ go test -v ./...
 === RUN   TestParseVAL1L2
@@ -280,9 +288,8 @@ Skipping line: V12.0.0 GFS   NA   1080000   20241101_180000 20241101_180000 0000
 /Users/randy.pierce/metlinetypes/test_data/G2G_v12/20241104-18z/grid_stat 1120
 --- PASS: TestParseG2G_v12_Suite (11.22s)
 PASS
-ok  	parser/pkg/structColumnDefs	14.742s
+ok   parser/pkg/structColumnDefs 14.742s
 
 ```
 
 NOTE: There is a current problem that requires running the test case twice.
-
