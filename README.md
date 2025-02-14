@@ -6,10 +6,7 @@ This is a parser for MET output files.
 
 The approach is to use a [GO program](https://github.com/ian-noaa/metlinetypes/blob/82d936b3aed5128676fed135bfda65897deb2c5a/pkg/buildHeaderLineTypes/buildHeaderLineTypes.go) that uses several files from the MET repo (which is versioned) to create a GO package that can then be
 used to create a GO package that can be used for parsing MET output files.
-
-[column defs](https://raw.githubusercontent.com/dtcenter/MET/refs/heads/main_v12.0/data/table_files/met_header_columns_V12.0.txt)
-
-is used to get a list of required terms that need to be type defined. Then several source code files are searched for type conversion statements for those terms. If the type of a term cannot be determined from source code an attempt is made to look up the term in the MET user guide.
+The file [column defs](https://raw.githubusercontent.com/dtcenter/MET/refs/heads/main_v12.0/data/table_files/met_header_columns_V12.0.txt) is used to get a list of required terms that need to be type defined. Then several source code files are searched for type conversion statements for those terms. If the type of a term cannot be determined from source code an attempt is made to look up the term in the MET user guide.
 
 These are the src files that are searched...
 
@@ -49,8 +46,7 @@ The fileType is a string that represents the type of file being parsed. The docP
 A dataKey is an array of header field values. For example most line types have a dataKey of {"Fcst_lead"} which would have a string representation of the value of the "Fcst_lead" element in the header string.
 The dataKey fields are disallowed from the header id and are not included in the headerData. These keys serve the purpose of actually merging line data with the same dataKey values into a single document. The dataKey is used to index the data section of the document, which is a map[string]interface{}, where the interface is a specific concrete data type.
 
-The ParseLine function uses the GetLineType function to determine the lineType of the data line, the headerData, dataKey, and descIndex. headerData are the ordered data fields for the header section of the line, the dataKey is the actual
-dataKey i.e the concatenated dataKey values, and the descIndex is the ordinal index of the desc field.
+The ParseLine function uses the GetLineType function to determine the lineType of the data line, the headerData, dataKey, and descIndex. headerData are the ordered data fields for the header section of the line, the dataKey is the actual dataKey i.e the concatenated dataKey values, and the descIndex is the ordinal index of the desc field.
 The descIndex is used to trim the desc field to 10 characters.
 
 The parseLine function also uses the getId function to determine the id of the data line. The id is derived from the headerData minus the dataKey fields and is returned in the form of a VxMetaDa ta struct. The VxMetaData struct is then converted to a map[string]interface{}
@@ -143,6 +139,10 @@ A document pointer is required as a place to store the parsed data. If the docum
 The header line values (minus the dataKey fields) are used to derive the id, with date fields converted to epochs.
 If the data section of of the document[id] is nil, a new data section is created. The data section is then populated
 with the data fields from the data line. If the data section is not nil, the data fields are added to the existing data map.
+
+### Formatting the generated structColumnDefs
+
+There is a scripts directory at the top of the repo with a format-lint.sh script that can be used to format and lint the go code in the repo, including the derived structColumnDefs package. It must be run from the root of the repo.
 
 ## Testing
 
@@ -291,5 +291,3 @@ PASS
 ok   parser/pkg/structColumnDefs 14.742s
 
 ```
-
-NOTE: There is a current problem that requires running the test case twice.
