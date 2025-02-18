@@ -57,7 +57,6 @@ A document pointer is required as a place to store the parsed data. If the docum
 The header line values (minus the dataKey fields) are used to derive the id, with date fields converted to epochs.
 If the data section of of the document[id] is nil, a new data section is created. The data section is then populated with the data fields from the data line. If the data section is not nil, the data fields are added to the existing data map
 
-
 ### buildHeaderLineTypeUtilities
 
 This package contains the utilities for building the header and line type for the data files.
@@ -103,7 +102,7 @@ You may have to create the ...pkg/structColumnTypes/ directory, but it probably 
 ranpierce-mac1:buildHeaderLineTypes randy.pierce$ cd /Users/randy.pierce/metlinetypes/pkg/buildHeaderLineTypes
 ranpierce-mac1:buildHeaderLineTypes randy.pierce$ go run . > /tmp/types.go
 ranpierce-mac1:buildHeaderLineTypes randy.pierce$ cp /tmp/types.go ../structColumnTypes/structColumnTypes.go
-```
+```text
 
 ## Usage
 
@@ -150,11 +149,18 @@ There are unit tests in the buildHeaderLineTypeUtilities package in the file bui
 In vscode there is usually a link above the test case function name that allows you to run or debug the test case.
 For the command line this is how I do it
 
+There are also integration level tests in the structColumnDefs/definitions_test.go file. These tests use the test_data directory that is included in the repo and test most (if not all) of the various output file formats from the 12.0 version of MET. As more kinds of data are added to subsequent releases of MET this test_data directory can be modified to include sample data for new ouputfile versions. These tests are good examples of how to use the parser.
+
 ```text
 ranpierce-mac1:buildHeaderLineTypeUtilities randy.pierce$ cd /Users/randy.pierce/metlinetypes/pkg/buildHeaderLineTypeUtilities/
 ranpierce-mac1:buildHeaderLineTypeUtilities randy.pierce$ go clean --testcache
 ranpierce-mac1:buildHeaderLineTypeUtilities randy.pierce$ go test ./...
 ok   parser/pkg/buildHeaderLineTypeUtilities 0.185s
+ranpierce-mac1:buildHeaderLineTypeUtilities randy.pierce$ cd /Users/randy.pierce/metlinetypes/pkg/structColumnDefs
+ranpierce-mac1:buildHeaderLineTypeUtilities randy.pierce$ go clean --testcache
+ranpierce-mac1:structColumnDefs randy.pierce$ go test ./...
+ok  parser/pkg/structColumnDefs 15.705s
+
 ```
 
 or if I want more log output....
@@ -207,7 +213,7 @@ ok   parser/pkg/buildHeaderLineTypeUtilities 0.184s
 
 There are more comprehensive tests in the structColumnDefs pkg.
 
-**NOTE: There is an error in one of the data files.** This error is expected.
+**NOTE: There is an error in one of the data files.** This error is expected because the file is truncated.
 
 ```text
 Error getting line type:  UNPARSABLE_LINE: lineTypeIndex is greater than the length of the data line
@@ -216,29 +222,6 @@ Skipping line: V12.0.0 GFS   NA   1080000   20241101_180000 20241101_180000 0000
 ```
 
 ```text
-cd /Users/randy.pierce/metlinetypes/pkg/structColumnDefs/
-go clean --testcache
-ranpierce-mac1:structColumnDefs randy.pierce$ go test -v ./...
-=== RUN   TestParseVAL1L2
---- FAIL: TestParseVAL1L2 (0.00s)
-panic: interface conversion: interface {} is nil, not map[string]interface {} [recovered]
- panic: interface conversion: interface {} is nil, not map[string]interface {}
-
-goroutine 4 [running]:
-testing.tRunner.func1.2({0x1047a0500, 0x14000073800})
- /opt/homebrew/Cellar/go/1.23.3/libexec/src/testing/testing.go:1632 +0x1bc
-testing.tRunner.func1()
- /opt/homebrew/Cellar/go/1.23.3/libexec/src/testing/testing.go:1635 +0x334
-panic({0x1047a0500?, 0x14000073800?})
- /opt/homebrew/Cellar/go/1.23.3/libexec/src/runtime/panic.go:785 +0x124
-parser/pkg/structColumnDefs.TestParseVAL1L2(0x1400007a9c0)
- /Users/randy.pierce/metlinetypes/pkg/structColumnDefs/definitions_test.go:100 +0x754
-testing.tRunner(0x1400007a9c0, 0x1047e20b8)
- /opt/homebrew/Cellar/go/1.23.3/libexec/src/testing/testing.go:1690 +0xe4
-created by testing.(*T).Run in goroutine 1
- /opt/homebrew/Cellar/go/1.23.3/libexec/src/testing/testing.go:1743 +0x314
-FAIL parser/pkg/structColumnDefs 0.208s
-FAIL
 ranpierce-mac1:structColumnDefs randy.pierce$ go test -v ./...
 === RUN   TestParseVAL1L2
 --- PASS: TestParseVAL1L2 (0.00s)
@@ -289,5 +272,28 @@ Skipping line: V12.0.0 GFS   NA   1080000   20241101_180000 20241101_180000 0000
 --- PASS: TestParseG2G_v12_Suite (11.22s)
 PASS
 ok   parser/pkg/structColumnDefs 14.742s
-
 ```
+
+## sample program
+
+There is a sample program called regression.go in pkg/regression/regregression.go.
+To build this program use something like...
+
+```text
+    go build -o /tmp/regression pkg/regression/regression.go
+```
+
+To run this program you must provide a path to a data directory...
+
+```text
+/tmp/regression -path=/Users/randy.pierce/metlinetypes/test_data/statfiles/
+```
+
+## build and install
+
+see [build and install](https://go.dev/doc/tutorial/compile-install)
+GO build ignores test files (files that end in "_test").
+The repo includes a bin directory. builTypkg/buildHeaderLineTypes/buildHeaderLineTypes.go
+
+the pkg/sample/regression.go file. This can be built into an executible using the script
+"scripts/buildRegression.sh". This script builds the regression sample

@@ -51,6 +51,13 @@ is not nil, it is added to the document map. If the external document is nil, a 
 
 func ParseLine(headerLine string, dataLine string, docPtr *map[string]interface{}, fileName string, getExternalDocForId func(id string) (map[string]interface{}, error)) (map[string]interface{}, error) {
 	_err := error(nil)
+	// recover from unexpected errors
+	defer func() {
+		if r := recover(); r != nil {
+			fmt.Printf("Recovered: %v for fileName %s\n", r, fileName)
+		}
+	}()
+
 	if headerLine == "" || dataLine == "" {
 		return *docPtr, fmt.Errorf("empty line")
 	}

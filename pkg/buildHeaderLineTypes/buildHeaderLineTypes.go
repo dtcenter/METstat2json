@@ -215,7 +215,7 @@ func getHeaderStructureString(fileType string, lineType string, getDocIDString s
 
 	keyFields := buildHeaderLineTypeUtilities.GetKeyDataFieldsForLineType(fileType)
 	headerStructString := fmt.Sprintf("type %s struct {\n", headerStructName)
-	fillHeaderString := fmt.Sprintf("func (s *%s) fill_%s_Header(fields []string, doc *map[string]interface{}){\n", docStructName, docStructName)
+	fillHeaderString := fmt.Sprintf("func (s *%s) fill_%s_Header(fields []string, doc *map[string]interface{}){\n\tdataLen := len(fields)\n\ti := -1\n", docStructName, docStructName)
 	fillHeaderString += "\t// fill the met fields leaving out \"\" and NA values\n"
 	getDocIDString += fmt.Sprintf("\tcase \"%s\":\n", docStructName)
 	getDocIDString += fmt.Sprintf("\t\telem := %s{}\n", docStructName)
@@ -236,7 +236,7 @@ func getHeaderStructureString(fileType string, lineType string, getDocIDString s
 			padding = len(term)
 		}
 	}
-	for index, term := range headerFields {
+	for _, term := range headerFields {
 		// skip the dataKey fields
 		isDataKey := false
 		for _, d := range keyFields {
@@ -259,7 +259,7 @@ func getHeaderStructureString(fileType string, lineType string, getDocIDString s
 		jsonName := strings.ToLower(name)
 		// headerStructString += fmt.Sprintf("    %-*s %s `json:\"%s\"`\n", padding, capName, dataType, name)
 		headerStructString += fmt.Sprintf("    %-*s %s `json:\"%s\"`\n", padding, name, dataType, jsonName)
-		fillHeaderString += fmt.Sprintf("\tif fields[%d] != \"\"  && fields[0] != \"NA\" {\n\t\t(*doc)[\"%s\"] = fields[%d]\n\t}\n", index, name, index)
+		fillHeaderString += fmt.Sprintf("\ti++; if i <= dataLen && fields[i] != \"\"  && fields[i] != \"NA\" {\n\t\t(*doc)[\"%s\"] = fields[i]\n\t}\n", name)
 	}
 	headerStructString += "}\n"
 	fillHeaderString += "}\n"
@@ -268,7 +268,8 @@ func getHeaderStructureString(fileType string, lineType string, getDocIDString s
 
 func getFillStructureString(docStructName string, dataFields []string, metDataTypesForLines map[string]string, fileType string, lineType string) (string, string) {
 	// returns fillStructureString and the dataStruct
-	fillStructureString := fmt.Sprintf("func (s *%s) fill_%s(fields []string) {\n", docStructName, docStructName)
+	fillStructureString := fmt.Sprintf("func (s *%s) fill_%s(fields []string) {\n\tdataLen := len(fields) - 1\n\ti := -1\n",
+		docStructName, docStructName)
 	// create the data struct for this line type
 	dataStruct := fmt.Sprintf("type %s struct {\n", docStructName)
 	// find the maximum length of the data fields for formatting (padding)
@@ -289,11 +290,12 @@ func getFillStructureString(docStructName string, dataFields []string, metDataTy
 		var numFields int
 		var err error
 		var repeatFillStructureString string
+		fillStructureString += "\ti++; if i <= dataLen {"
 		switch dataType {
 		case "int":
-			fillStructureString += fmt.Sprintf("\ts.%s, _ = strconv.Atoi(fields[%d])\n", cleanTerm, index)
+			fillStructureString += fmt.Sprintf("s.%s, _ = strconv.Atoi(fields[%d])", cleanTerm, index)
 		case "float64":
-			fillStructureString += fmt.Sprintf("\ts.%s, _ = strconv.ParseFloat(fields[%d], 64)\n", cleanTerm, index)
+			fillStructureString += fmt.Sprintf("s.%s, _ = strconv.ParseFloat(fields[%d], 64)", cleanTerm, index)
 		case "map[string]interface{}":
 			// this is a map which means that there are a sequence of fields that are repeated
 			numFields, repeatFillStructureString, err = getRepeatingSequenceStructureString(term, cleanTerm, fileType, lineType, index)
@@ -303,8 +305,9 @@ func getFillStructureString(docStructName string, dataFields []string, metDataTy
 			fillStructureString += repeatFillStructureString
 			index += numFields
 		default:
-			fillStructureString += fmt.Sprintf("\ts.%s = fields[%d]\n", cleanTerm, index)
+			fillStructureString += fmt.Sprintf("s.%s = fields[%d]", cleanTerm, index)
 		}
+		fillStructureString += "}\n"
 	}
 	fillStructureString += "}\n"
 
@@ -420,13 +423,20 @@ func getRepeatingSequenceStructureString(term string, cleanTerm string, fileType
 
 func getFillStructureSequenceString(keyPrefixes []string, cleanTerm string, elemType string, index int) (numFields int, structureString string, err error) {
 	var convStr string
+	// sometimes we need to do a nilCheck (if it is a conversion to an int) - otherwise we will get a panic
 	keyPrefixesStr := `"` + strings.Join(keyPrefixes, `","`) + `"`
 	if elemType == "float64" {
-		convStr = "strconv.ParseFloat(fields[index],64)"
+		convStr = `value, err = strconv.ParseFloat(fields[index],64)
+					if err != nil { // sometimes there can be these NA values in the data, which will be left out of json
+						value = "NA"
+					}`
 	} else if elemType == "int" {
-		convStr = "strconv.Atoi(fields[index])"
+		convStr = `value, err = strconv.Atoi(fields[index])
+					if err != nil { // sometimes there can be these NA values in the data, which will be left out of json
+						value = "NA"
+					}`
 	} else {
-		convStr = "fields[index], nil"
+		convStr = "value = fields[index]"
 	}
 	str := `    // the first field of the repeating fields is the TOTAL, the second field is the 1st dimenSion of the 1st sequence (there might be only one sequence)
 	var value interface{}
@@ -442,10 +452,7 @@ func getFillStructureSequenceString(keyPrefixes []string, cleanTerm string, elem
 			if index > len(fields) { // sometimes the data line is truncated - we will set expected data to "NA"
 				value = "NA"
 			} else {
-				value, err = %s
-				if err != nil { // sometimes there can be these NA values in the data, which will be left out of json
-					value = "NA"
-				}
+				%s
 			}
 			s.%s[key] = value
 		}` + "\n\t}\n"

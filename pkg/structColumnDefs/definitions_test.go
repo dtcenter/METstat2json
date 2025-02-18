@@ -215,6 +215,60 @@ func TestParseMODE_OBJ(t *testing.T) {
 	// Add more assertions based on the expected structure of parsedDoc
 }
 
+func TestModeFile(t *testing.T) {
+	var doc map[string]interface{}
+	var err error
+	fName := "../../test_data/MODE_compref/20241201-23/mode_compref_180000L_20241201_230000V_000000A_R1_T1_cts.txt"
+	file, err := os.Open(fName) // open the file
+	if err != nil {
+		t.Fatal("error opening file", err)
+	}
+	defer file.Close()
+	rawData, err := io.ReadAll(file)
+	if err != nil {
+		t.Fatal("error reading file", err)
+	}
+	lines := strings.Split(string(rawData), "\n")
+	headerLine := lines[0]
+	for line := range lines {
+		if line == 0 || lines[line] == "" {
+			continue
+		}
+		dataLine := lines[line]
+		ext := filepath.Ext(fName)
+		filePathParts := strings.Split(ext, ".")
+		fileType := strings.ToUpper(filePathParts[1])
+		if fileType == "SWP" {
+			// skip the swp files - might be editing a file and don't want to parse the .swp file
+			continue
+		}
+		if fileType == "DS_STORE" {
+			// skip the .DS_Store files
+			continue
+		}
+		doc, err = ParseLine(headerLine, dataLine, &doc, fName, getMissingExternalDocForId)
+		if err != nil {
+			t.Fatalf("Expected no error, got %v", err)
+		}
+	}
+	if doc == nil {
+		t.Fatalf("Expected parsed document, got nil")
+	}
+	err = WriteJsonToGzipFile(doc, "/tmp/test_output.json.gz")
+	if err != nil {
+		t.Fatalf("Expected no error, got %v", err)
+	}
+
+	// read the file back in
+	parsedDoc, err := ReadJsonFromGzipFile("/tmp/test_output.json.gz")
+	if err != nil {
+		t.Fatalf("Expected no error, got %v", err)
+	}
+
+	assert.NotNil(t, parsedDoc)
+	// add other test assertions here
+}
+
 func TestParseRegressionSuite(t *testing.T) {
 	var doc map[string]interface{}
 	var err error
