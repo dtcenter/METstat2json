@@ -11,6 +11,7 @@ import (
 	"parser/pkg/structColumnDefs"
 	"parser/pkg/structColumnTypes"
 	"path/filepath"
+	"runtime"
 	"strings"
 )
 
@@ -118,5 +119,6 @@ func parseFile(fPath string, fileInfos os.FileInfo, doc map[string]interface{}) 
 }
 
 func main() {
+	fmt.Println("environment:" + runtime.GOOS + "_" + runtime.GOARCH)
 	ParseRegressionSuite()
 }

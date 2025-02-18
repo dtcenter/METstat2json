@@ -13,13 +13,18 @@ echo "linting primary packages"
 golangci-lint run --fix ./pkg/buildHeaderLineTypeUtilities/... ./pkg/buildHeaderLineTypes/... ./pkg/structColumnDefs/... ./pkg/structColumnTypes/... ./pkg/sample_parser/...
 
 echo "building package buildHeaderLineTypes"
-go build -o ./bin/ pkg/buildHeaderLineTypes/buildHeaderLineTypes.go
+for arch in arm64 amd64; do
+	for os in linux darwin; do
+		echo "building for ${os}/${arch}"
+		env GOOS=${os} GOARCH=${arch} go build -o "./bin/${os}/${arch}/buildHeaderLineTypes" pkg/buildHeaderLineTypes/buildHeaderLineTypes.go
+	done
+done
 
 echo "saving current structColumnTypes.go to /tmp/structColumnTypes.go.bak"
 mv pkg/structColumnTypes/structColumnTypes.go pkg/structColumnTypes/structColumnTypes.go.bak
 
 echo "building new structColumnTypes.go"
-./bin/buildHeaderLineTypes > pkg/structColumnTypes/structColumnTypes.go
+go run pkg/buildHeaderLineTypes/buildHeaderLineTypes.go > pkg/structColumnTypes/structColumnTypes.go
 
 echo "format and lint structColumnTypes"
 echo "formatting ./pkg/structColumnTypes"
@@ -28,6 +33,12 @@ echo "linting ./pkg/structColumnTypes"
 golangci-lint run --fix ./pkg/structColumnTypes/...
 
 echo "building sample program"
-go build -o ./bin/sample_parser pkg/sample_parser/sample_parser.go
+for arch in arm64 amd64; do
+	for os in linux darwin; do
+		echo "building for ${os}/${arch}"
+		env GOOS=${os} GOARCH=${arch} go build -o "./bin/${os}/${arch}/sample_parser" pkg/sample_parser/sample_parser.go
+	done
+done
+
 echo "finished"
 exit 0
