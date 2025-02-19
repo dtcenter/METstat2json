@@ -104,7 +104,15 @@ func parseFile(fPath string, fileInfos os.FileInfo, doc map[string]interface{}) 
 		log.Fatal(err)
 	}
 	lines := strings.Split(string(rawData), "\n")
+	if len(lines) == 0 || lines[0] == "" {
+		log.Printf("empty file %s - skipping\n", fPath)
+		return doc
+	}
 	headerLine := lines[0]
+	if !strings.HasPrefix(headerLine, "VERSION") {
+		log.Printf("missing VERSION at start of header line - bad header line? for file %s - skipping rest of file\n", fPath)
+		return doc
+	}
 	for line := range lines {
 		if line == 0 || lines[line] == "" {
 			continue

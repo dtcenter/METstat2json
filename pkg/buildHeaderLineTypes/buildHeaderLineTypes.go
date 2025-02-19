@@ -125,8 +125,8 @@ func main() {
 		fillDataFuncs[docStructName] = fillStructureString
 	}
 	// end the switch statements in the getDocForId and addDataElementStrings now that the line loop is over
-	docIDString += "\tdefault:\n\t\treturn nil, errors.New(\"Unknown file_line type:\" + fileLineType)\n\t}\n\treturn doc, nil\n}\n"
-	addDataElementString += "\tdefault:\n\t\treturn errors.New(\"Unknown file_line type:\" + fileLineType)\n\t}\n\treturn nil\n}\n"
+	docIDString += "\tdefault:\n\t\treturn nil, errors.New(\"GetDocForId: Unknown file_line type:\" + fileLineType)\n\t}\n\treturn doc, nil\n}\n"
+	addDataElementString += "\tdefault:\n\t\treturn errors.New(\"AddDataElement: Unknown file_line type:\" + fileLineType)\n\t}\n\treturn nil\n}\n"
 
 	// print the package - header structs, fillHeader functions, data structs, fillStructure functions, getDocForId functions, addDataElement functions
 	fmt.Println("package structColumnTypes")

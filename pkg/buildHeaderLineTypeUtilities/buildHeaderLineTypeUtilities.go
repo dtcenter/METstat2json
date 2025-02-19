@@ -125,6 +125,9 @@ func dateToEpoch(date string) string {
 func GetLineType(headerLine string, dataLine string, fileName string) (string, []string, []string, string, int, error) {
 	// make sure we have the basename here
 	fileName = filepath.Base(fileName)
+	// if fileName == "PROBRIRW_filter_ee.tcst" {
+	// 	fmt.Println("PROBRIRW_filter_ee.tcst")
+	// }
 	desc_index := -1
 	allHeaderFields := strings.Fields(headerLine)
 	// get the data fields from the data line
@@ -151,15 +154,15 @@ func GetLineType(headerLine string, dataLine string, fileName string) (string, [
 	} else if strings.HasPrefix(fileName, "mtd_") {
 		separatorField = "OBJECT_ID"
 		if strings.Contains(fileName, "2d") {
-			fileLineType = "MTD_2D"
+			fileLineType = "MTD_2DSINGLE"
 		} else if strings.Contains(fileName, "3d_single_cluster") {
-			fileLineType = "MTD_3D_SINGLE_CLUSTER"
+			fileLineType = "MTD_3DSINGLE"
 		} else if strings.Contains(fileName, "3d_single_simple") {
-			fileLineType = "MTD_3D_SINGLE_SIMPLE"
+			fileLineType = "MTD_3DSINGLE"
 		} else if strings.Contains(fileName, "3d_pair_cluster") {
-			fileLineType = "MTD_3D_PAIR_CLUSTER"
+			fileLineType = "MTD_3DPAIR"
 		} else if strings.Contains(fileName, "3d_pair_simple") {
-			fileLineType = "MTD_3D_PAIR_SIMPLE"
+			fileLineType = "MTD_3DPAIR"
 		}
 	} else {
 		separatorField = "LINE_TYPE"
@@ -167,9 +170,6 @@ func GetLineType(headerLine string, dataLine string, fileName string) (string, [
 	}
 	headerStringFields, _ := SplitColumnDefLine(fileLineType, headerLine)
 	dataStartIndex := len(headerStringFields)
-	if len(allData) < dataStartIndex {
-		return "", nil, nil, "", desc_index, fmt.Errorf("UNPARSABLE_LINE: data line is shorter than the header line")
-	}
 	dataData := allData[dataStartIndex:]
 	lineTypeIndex := len(headerStringFields) - 1
 	if lineTypeIndex > len(allData) {
@@ -177,7 +177,11 @@ func GetLineType(headerLine string, dataLine string, fileName string) (string, [
 	}
 	// now we know the lineType for stat files.
 	if separatorField == "LINE_TYPE" {
-		fileLineType = "STAT" + "_" + allData[lineTypeIndex]
+		if strings.Contains(fileName, "tcst") {
+			fileLineType = "TCST" + "_" + allData[lineTypeIndex]
+		} else {
+			fileLineType = "STAT" + "_" + allData[lineTypeIndex]
+		}
 	}
 	// get the desc_index
 	for i, h := range headerStringFields {

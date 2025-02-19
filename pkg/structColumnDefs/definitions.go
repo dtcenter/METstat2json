@@ -61,6 +61,9 @@ func ParseLine(headerLine string, dataLine string, docPtr *map[string]interface{
 	if headerLine == "" || dataLine == "" {
 		return *docPtr, fmt.Errorf("empty line")
 	}
+	if !strings.HasPrefix(headerLine, "VERSION") {
+		return *docPtr, fmt.Errorf("missing VERSION at start of header line - bad header line?")
+	}
 	// make sure we have the basename here
 	fileName = filepath.Base(fileName)
 	filePathParts := strings.Split(fileName, ".")
@@ -108,14 +111,14 @@ func ParseLine(headerLine string, dataLine string, docPtr *map[string]interface{
 			// indexed by dataKey value in the document
 			(*docPtr)[metaData.ID], _err = structColumnTypes.GetDocForId(fileLineType, metaDataMap, headerData, dataData, dataKey)
 			if _err != nil {
-				return *docPtr, _err
+				return *docPtr, fmt.Errorf("Error getting doc for file: %s error: %w", fileName, _err)
 			}
 		}
 	}
 	tempDoc := (*docPtr)[metaData.ID].(map[string]interface{})
 	_err = structColumnTypes.AddDataElement(dataKey, fileLineType, dataData, &tempDoc)
 	if _err != nil {
-		return *docPtr, _err
+		return *docPtr, fmt.Errorf("Error getting doc for file: %s error: %w", fileName, _err)
 	}
 	return *docPtr, _err
 }
