@@ -10,7 +10,7 @@
 # ignore files that are being edited with vim
 *.swp
 # ignore backup files
-*.backup
+*.bak
 #ignore copies of files
 *.copy
 # ignore created pkg directory
