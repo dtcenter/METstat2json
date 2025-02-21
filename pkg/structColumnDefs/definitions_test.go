@@ -401,7 +401,254 @@ func TestParseG2G_v12_Suite(t *testing.T) {
 			}
 			if fileInfo.IsDir() {
 				// this is a directory
-				fmt.Println(path, fileInfo.Size())
+				// fmt.Println(path, fileInfo.Size())
+			} else {
+				// this is a file so process it
+				if strings.Contains(fileInfo.Name(), ".swp") {
+					// skip the swp files - might be editing a file and don't want to parse the .swp file
+					return nil
+				}
+				file, err := os.Open(path) // open the file
+				if err != nil {
+					t.Fatal("error opening file", err)
+				}
+				defer file.Close()
+				fName := fileInfo.Name()
+				// uncomment the following for debugging
+				// fmt.Println("Parsing file:", fName)
+				rawData, err := io.ReadAll(file)
+				if err != nil {
+					t.Fatal("error reading file", err)
+				}
+				lines := strings.Split(string(rawData), "\n")
+				headerLine := lines[0]
+				for line := range lines {
+					if line == 0 || lines[line] == "" {
+						continue
+					}
+					dataLine := lines[line]
+					doc, err = ParseLine(headerLine, dataLine, &doc, fName, getMissingExternalDocForId)
+					if err != nil {
+						if strings.Contains(err.Error(), "UNPARSABLE_LINE") {
+							// skip the line
+							// I know that the file ./G2G_v12/20241101-18z/grid_stat/grid_stat_GFS_TMP_vs_ANLYS_TMP_Z2_1080000L_20241101_180000V.stat
+							// has a truncated line at the end. I don't want to fail the test because of it.
+							fmt.Printf("Skipping line: %s because it isn't parsable from file %s\n", dataLine, fName)
+						} else {
+							t.Fatalf("Expected no error, got %v", err)
+						}
+					}
+				}
+			}
+			return nil
+		})
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if doc == nil {
+		t.Fatalf("Expected parsed document, got nil")
+	}
+	err = WriteJsonToGzipFile(doc, "/tmp/test_output.json.gz")
+	if err != nil {
+		t.Fatalf("Expected no error, got %v", err)
+	}
+
+	// read the file back in
+	parsedDoc, err := ReadJsonFromGzipFile("/tmp/test_output.json.gz")
+	if err != nil {
+		t.Fatalf("Expected no error, got %v", err)
+	}
+
+	assert.NotNil(t, parsedDoc)
+	// add other test assertions here
+}
+
+func TestParse_tc_data_Suite(t *testing.T) {
+	var doc map[string]interface{}
+	var err error
+	var path string
+
+	path, err = os.Getwd()
+	if err != nil {
+		t.Fatal("error getting working directory:", err)
+	}
+	directory := path + "/../../test_data/tc_data" // The tc_data top level directory
+
+	err = filepath.Walk(directory,
+		func(path string, fileInfo os.FileInfo, err error) error {
+			if err != nil {
+				return err
+			}
+			if fileInfo.IsDir() {
+				// this is a directory
+				// fmt.Println(path, fileInfo.Size())
+			} else {
+				// this is a file so process it
+				if strings.Contains(fileInfo.Name(), ".swp") {
+					// skip the swp files - might be editing a file and don't want to parse the .swp file
+					return nil
+				}
+				file, err := os.Open(path) // open the file
+				if err != nil {
+					t.Fatal("error opening file", err)
+				}
+				defer file.Close()
+				fName := fileInfo.Name()
+				// uncomment the following for debugging
+				// fmt.Println("Parsing file:", fName)
+				rawData, err := io.ReadAll(file)
+				if err != nil {
+					t.Fatal("error reading file", err)
+				}
+				lines := strings.Split(string(rawData), "\n")
+				headerLine := lines[0]
+				for line := range lines {
+					if line == 0 || lines[line] == "" {
+						continue
+					}
+					dataLine := lines[line]
+					doc, err = ParseLine(headerLine, dataLine, &doc, fName, getMissingExternalDocForId)
+					if err != nil {
+						if strings.Contains(err.Error(), "UNPARSABLE_LINE") {
+							// skip the line
+							// I know that the file ./G2G_v12/20241101-18z/grid_stat/grid_stat_GFS_TMP_vs_ANLYS_TMP_Z2_1080000L_20241101_180000V.stat
+							// has a truncated line at the end. I don't want to fail the test because of it.
+							fmt.Printf("Skipping line: %s because it isn't parsable from file %s\n", dataLine, fName)
+						} else {
+							t.Fatalf("Expected no error, got %v", err)
+						}
+					}
+				}
+			}
+			return nil
+		})
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if doc == nil {
+		t.Fatalf("Expected parsed document, got nil")
+	}
+	err = WriteJsonToGzipFile(doc, "/tmp/test_output.json.gz")
+	if err != nil {
+		t.Fatalf("Expected no error, got %v", err)
+	}
+
+	// read the file back in
+	parsedDoc, err := ReadJsonFromGzipFile("/tmp/test_output.json.gz")
+	if err != nil {
+		t.Fatalf("Expected no error, got %v", err)
+	}
+
+	assert.NotNil(t, parsedDoc)
+	// add other test assertions here
+}
+
+func TestParse_tcst_Suite(t *testing.T) {
+	var doc map[string]interface{}
+	var err error
+	var path string
+
+	path, err = os.Getwd()
+	if err != nil {
+		t.Fatal("error getting working directory:", err)
+	}
+	directory := path + "/../../test_data/tcstfiles" // The tc_data top level directory
+
+	err = filepath.Walk(directory,
+		func(path string, fileInfo os.FileInfo, err error) error {
+			if err != nil {
+				return err
+			}
+			if fileInfo.IsDir() {
+				// this is a directory
+				// fmt.Println(path, fileInfo.Size())
+			} else {
+				// this is a file so process it
+				if strings.Contains(fileInfo.Name(), ".swp") {
+					// skip the swp files - might be editing a file and don't want to parse the .swp file
+					return nil
+				}
+				file, err := os.Open(path) // open the file
+				if err != nil {
+					t.Fatal("error opening file", err)
+				}
+				defer file.Close()
+				fName := fileInfo.Name()
+				// uncomment the following for debugging
+				// fmt.Println("Parsing file:", fName)
+				rawData, err := io.ReadAll(file)
+				if err != nil {
+					t.Fatal("error reading file", err)
+				}
+				lines := strings.Split(string(rawData), "\n")
+				headerLine := lines[0]
+				for line := range lines {
+					if line == 0 || lines[line] == "" {
+						continue
+					}
+					dataLine := lines[line]
+					doc, err = ParseLine(headerLine, dataLine, &doc, fName, getMissingExternalDocForId)
+					if err != nil {
+						if strings.Contains(err.Error(), "UNPARSABLE_LINE") {
+							// skip the line
+							// I know that the file ./G2G_v12/20241101-18z/grid_stat/grid_stat_GFS_TMP_vs_ANLYS_TMP_Z2_1080000L_20241101_180000V.stat
+							// has a truncated line at the end. I don't want to fail the test because of it.
+							fmt.Printf("Skipping line: %s because it isn't parsable from file %s\n", dataLine, fName)
+						} else if strings.Contains(err.Error(), "missing VERSION") {
+							// skip the line
+							// I know that some files have missing VERSION
+							fmt.Printf("Skipping line: %s because it isn't parsable from file %s\n", dataLine, fName)
+						} else {
+							t.Fatalf("Expected no error, got %v", err)
+						}
+					}
+				}
+			}
+			return nil
+		})
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if doc == nil {
+		t.Fatalf("Expected parsed document, got nil")
+	}
+	err = WriteJsonToGzipFile(doc, "/tmp/test_output.json.gz")
+	if err != nil {
+		t.Fatalf("Expected no error, got %v", err)
+	}
+
+	// read the file back in
+	parsedDoc, err := ReadJsonFromGzipFile("/tmp/test_output.json.gz")
+	if err != nil {
+		t.Fatalf("Expected no error, got %v", err)
+	}
+
+	assert.NotNil(t, parsedDoc)
+	// add other test assertions here
+}
+
+func TestParse_textfiles_Suite(t *testing.T) {
+	var doc map[string]interface{}
+	var err error
+	var path string
+
+	path, err = os.Getwd()
+	if err != nil {
+		t.Fatal("error getting working directory:", err)
+	}
+	directory := path + "/../../test_data/textfiles" // The tc_data top level directory
+
+	err = filepath.Walk(directory,
+		func(path string, fileInfo os.FileInfo, err error) error {
+			if err != nil {
+				return err
+			}
+			if fileInfo.IsDir() {
+				// this is a directory
+				// fmt.Println(path, fileInfo.Size())
 			} else {
 				// this is a file so process it
 				if strings.Contains(fileInfo.Name(), ".swp") {
