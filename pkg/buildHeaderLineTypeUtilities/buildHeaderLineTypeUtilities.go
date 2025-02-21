@@ -185,6 +185,7 @@ func GetLineType(headerLine string, dataLine string, fileName string) (string, [
 		headerFields, err := getLineTypeFromColumnDefsFile(headerLine)
 		if err == nil {
 			fileLineType = headerFields.FileType + "_" + headerFields.LineType
+			separatorField = headerFields.SeparatorField
 		}
 	}
 	headerStringFields, _ := SplitColumnDefLine(fileLineType, headerLine)
