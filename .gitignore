@@ -7,6 +7,12 @@
 *.dll
 *.so
 *.dylib
+# ignore files that are being edited with vim
+*.swp
+# ignore backup files
+*.backup
+#ignore copies of files
+*.copy
 # ignore created pkg directory
 *pkg/pkg
 *pkg/bin

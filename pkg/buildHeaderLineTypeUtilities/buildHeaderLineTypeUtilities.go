@@ -17,12 +17,25 @@ data fields for a given line type, and to find the data type of a given field in
 
 import (
 	"fmt"
+	"io"
+	"net/http"
+	"os"
 	"path/filepath"
 	"regexp"
 	"strconv"
 	"strings"
 	"time"
 )
+
+type HeaderFields struct {
+	Header         string
+	Version        string
+	LineType       string
+	FileType       string
+	SeparatorField string
+}
+
+var MetHeaderColumnsFileUrl = "https://raw.githubusercontent.com/dtcenter/MET/refs/heads/main_v12.0/data/table_files/met_header_columns_V12.0.txt"
 
 // vxMetadata struct definition
 type VxMetadata struct {
@@ -125,9 +138,6 @@ func dateToEpoch(date string) string {
 func GetLineType(headerLine string, dataLine string, fileName string) (string, []string, []string, string, int, error) {
 	// make sure we have the basename here
 	fileName = filepath.Base(fileName)
-	// if fileName == "PROBRIRW_filter_ee.tcst" {
-	// 	fmt.Println("PROBRIRW_filter_ee.tcst")
-	// }
 	desc_index := -1
 	allHeaderFields := strings.Fields(headerLine)
 	// get the data fields from the data line
@@ -143,15 +153,18 @@ func GetLineType(headerLine string, dataLine string, fileName string) (string, [
 	// If the base fileName is an mtd file (i.e. starts with "mtd_") then it can be treated
 	// as an mtd type file and the line separator is also OBJECT_ID.
 	var fileLineType string
-	if strings.HasPrefix(fileName, "mode_") {
-		if strings.HasSuffix(fileName, "obj.txt") || strings.HasSuffix(fileName, "merge.txt") {
+	if strings.Contains(fileName, "stat") {
+		separatorField = "LINE_TYPE"
+		fileLineType = "STAT"
+	} else if strings.Contains(fileName, "mode") {
+		if strings.Contains(fileName, "obj") || strings.Contains(fileName, "merge") {
 			separatorField = "OBJECT_ID"
 			fileLineType = "MODE_OBJ"
-		} else if strings.HasSuffix(fileName, "cts.txt") {
+		} else if strings.Contains(fileName, "cts") {
 			separatorField = "FIELD"
 			fileLineType = "MODE_CTS"
 		}
-	} else if strings.HasPrefix(fileName, "mtd_") {
+	} else if strings.Contains(fileName, "mtd") {
 		separatorField = "OBJECT_ID"
 		if strings.Contains(fileName, "2d") {
 			fileLineType = "MTD_2DSINGLE"
@@ -165,8 +178,14 @@ func GetLineType(headerLine string, dataLine string, fileName string) (string, [
 			fileLineType = "MTD_3DPAIR"
 		}
 	} else {
-		separatorField = "LINE_TYPE"
-		// don't know the fileLineType for stat files yet.
+		// check for differently named files?
+		// there appear to be some files that aren't named like the others
+		// Check the header line to see if it matches a line in the column defs file
+		// if it does then we can use the line type from the column defs file
+		headerFields, err := getLineTypeFromColumnDefsFile(headerLine)
+		if err == nil {
+			fileLineType = headerFields.FileType + "_" + headerFields.LineType
+		}
 	}
 	headerStringFields, _ := SplitColumnDefLine(fileLineType, headerLine)
 	dataStartIndex := len(headerStringFields)
@@ -175,7 +194,7 @@ func GetLineType(headerLine string, dataLine string, fileName string) (string, [
 	if lineTypeIndex > len(allData) {
 		return "", nil, nil, "", desc_index, fmt.Errorf("UNPARSABLE_LINE: lineTypeIndex is greater than the length of the data line")
 	}
-	// now we know the lineType for stat files.
+	// now we know the lineType for  files.
 	if separatorField == "LINE_TYPE" {
 		if strings.Contains(fileName, "tcst") {
 			fileLineType = "TCST" + "_" + allData[lineTypeIndex]
@@ -328,4 +347,120 @@ func GetId(tmpHeaderData []string, metaData *VxMetadata) VxMetadata {
 	id := strings.Join(idElems, ":")
 	metaData.ID = id
 	return *metaData
+}
+
+func getLineTypeFromColumnDefsFile(headerLine string) (HeaderFields, error) {
+	// this function will read the column definitions file and return the line type for the header line
+	// if it is found in the column definitions file
+	// If the columnsDefinition file is not present then the file will be downloaded from the
+	// structColumnTypes.MetHeaderColumnsFileUrl
+	var headerFields HeaderFields
+	var trimmedColumnDefsLine string
+	var lines []string
+	wd, _ := os.Getwd()
+	if strings.Contains(headerLine, " CYCLONE ") {
+		// these are TCST files
+		headerFields.FileType = "TCST"
+		headerFields.SeparatorField = "LINE_TYPE"
+		headerFields.Header = headerLine
+		if strings.Contains(headerLine, " WATCH_WARN ") {
+			headerFields.LineType = "TCMPR"
+		} else if strings.Contains(headerLine, " DIAG_SOURCE ") {
+			headerFields.LineType = "TCDIAG"
+		} else if strings.Contains(headerLine, " RIRW_WINDOW ") {
+			headerFields.LineType = "PROBRIRW"
+		}
+		return headerFields, nil
+	} else if strings.Contains(headerLine, " SPACE_CENTROID_DIST ") {
+		// these are MTD 3dpair files
+		headerFields.Header = headerLine
+		headerFields.SeparatorField = "OBJECT_ID"
+		headerFields.FileType = "MTD"
+		headerFields.LineType = "3DPAIR"
+		return headerFields, nil
+	} else if strings.Contains(headerLine, " TIME_INDEX ") {
+		// MTD 2dsingle files
+		headerFields.Header = headerLine
+		headerFields.SeparatorField = "OBJECT_ID"
+		headerFields.FileType = "MTD"
+		headerFields.LineType = "2DSINGLE"
+		return headerFields, nil
+	} else if strings.Contains(headerLine, " CDIST_TRAVELLED ") {
+		// MTD 3dsingle files
+		headerFields.Header = headerLine
+		headerFields.SeparatorField = "OBJECT_ID"
+		headerFields.FileType = "MTD"
+		headerFields.LineType = "3DSINGLE"
+		return headerFields, nil
+	} else if strings.Contains(headerLine, " GRID_RES ") {
+		// these are MODE files
+		headerFields.Header = headerLine
+		headerFields.FileType = "MODE"
+		if strings.Contains(headerLine, " OBJECT_ID ") {
+			headerFields.SeparatorField = "OBJECT_ID"
+			headerFields.LineType = "OBJ"
+		} else if strings.Contains(headerLine, " FIELD ") {
+			headerFields.SeparatorField = "FIELD"
+			headerFields.LineType = "CTS"
+		}
+		return headerFields, nil
+	}
+	// If I made it to here I couldn't parse it from the headerline easily so I have to read the column definitions file
+	// and find the line type for the header line by looking line by line in the column definitions file.
+	// The column definitions file is a text file that contains the line type for each header line.
+	// If the column definitions file is not present then the file will be downloaded from the
+	// structColumnTypes.MetHeaderColumnsFileUrl.
+	columnDefsFilePath := wd + "/" + "./column_defs.txt"
+	_, err := os.Stat(columnDefsFilePath)
+	if os.IsNotExist(err) {
+		resp, err := http.Get(MetHeaderColumnsFileUrl)
+		if err != nil {
+			return HeaderFields{}, err
+		}
+		defer resp.Body.Close()
+		out, err := os.Create(columnDefsFilePath)
+		if err != nil {
+			return HeaderFields{}, err
+		}
+		defer out.Close()
+		// Write the body to file
+		_, err = io.Copy(out, resp.Body)
+		if err != nil {
+			fmt.Println("error getting met_header_columns file: " + err.Error())
+			return HeaderFields{}, err
+		}
+	}
+	// read the column definitions file
+	rawColumnsBytes, err := os.ReadFile(columnDefsFilePath)
+	if err != nil {
+		return HeaderFields{}, err
+	}
+	// Either the ColumnsDefinitions file is present or we just downloaded it
+	// Now we need to find the header line in the file
+	lines = strings.Split(string(rawColumnsBytes), "\n")
+	// find the trimmed header line in the column definitions file.
+	trimmedHeaderLine := strings.Join(strings.Fields(headerLine), " ")
+	found := false
+	for _, line := range lines {
+		if line == "" {
+			continue
+		}
+		// ignore the first 3 fields of the columndefs line for comparison
+		// squeeze extra white space out of the line and remove the first 3 prefix fields
+		trimmedColumnDefsLine = strings.Split(strings.Join(strings.Fields(line), " "), ": ")[3]
+		if strings.HasPrefix(trimmedHeaderLine, trimmedColumnDefsLine) {
+			headerFields.Header = line
+			lineFields := strings.Split(headerFields.Header, ":")
+			headerFields.FileType = strings.TrimSpace(lineFields[1])
+			headerFields.LineType = strings.TrimSpace(lineFields[2])
+			found = true
+			break
+		}
+	}
+	if found {
+		return headerFields, nil
+	} else {
+		// we didn't find the separator so we can't process this line
+		return HeaderFields{}, fmt.Errorf("separator not found in column definitions file")
+	}
 }

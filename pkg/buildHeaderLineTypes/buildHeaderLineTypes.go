@@ -68,7 +68,7 @@ var metUserDocFiles = []string{
 	"https://raw.githubusercontent.com/dtcenter/MET/refs/heads/main_v12.0/docs/Users_Guide/wavelet-stat.rst",
 }
 
-var metHeaderColumnsFileUrl = "https://raw.githubusercontent.com/dtcenter/MET/refs/heads/main_v12.0/data/table_files/met_header_columns_V12.0.txt"
+var metHeaderColumnsFileUrl = buildHeaderLineTypeUtilities.MetHeaderColumnsFileUrl
 
 /*
 The output of this program is a series of structs that can be used to define the header
@@ -99,9 +99,9 @@ func main() {
 	fillHeaderFuncs := make(HeaderStructs)
 	fillDataFuncs := make(DataStructs)
 	// create the getDocFoID function
-	docIDString := "func GetDocForId(fileLineType string, metaDataMap map[string]interface{}, headerData []string, dataData []string, dataKey string) (interface{}, error) {\n\tdoc := make(map[string] interface{})\n\t" +
+	docIDString := "func GetDocForId(fileLineType string, metaDataMap map[string]interface{}, headerData []string, dataData []string, dataKey string) (map[string]interface{}, error) {\n\tdoc := make(map[string] interface{})\n\t" +
 		"// add the metadata to the doc\n\tfor key, value := range metaDataMap {\n\t\tdoc[key] = value\n\t}\n\tswitch fileLineType {\n"
-	addDataElementString := "func AddDataElement(dataKey string, fileLineType string, dataData []string, doc *map[string]interface{}) error {\n\tswitch fileLineType {\n"
+	addDataElementString := "func AddDataElement(dataKey string, fileLineType string, dataData []string, doc *map[string]interface{}) (map[string]interface{}, error) {\n\tswitch fileLineType {\n"
 	// iterate through every line in the met_header_columns file to create the getDocId case and the structs and functions for each met header column line
 	var docStructName, headerStructName, headerStructString, fillHeaderString string
 	for _, line := range met_header_columns_lines {
@@ -126,7 +126,7 @@ func main() {
 	}
 	// end the switch statements in the getDocForId and addDataElementStrings now that the line loop is over
 	docIDString += "\tdefault:\n\t\treturn nil, errors.New(\"GetDocForId: Unknown file_line type:\" + fileLineType)\n\t}\n\treturn doc, nil\n}\n"
-	addDataElementString += "\tdefault:\n\t\treturn errors.New(\"AddDataElement: Unknown file_line type:\" + fileLineType)\n\t}\n\treturn nil\n}\n"
+	addDataElementString += "\tdefault:\n\t\treturn nil, errors.New(\"AddDataElement: Unknown file_line type:\" + fileLineType)\n\t}\n\treturn *doc, nil\n}\n"
 
 	// print the package - header structs, fillHeader functions, data structs, fillStructure functions, getDocForId functions, addDataElement functions
 	fmt.Println("package structColumnTypes")
@@ -184,6 +184,7 @@ func main() {
 	fmt.Println("")
 	fmt.Println("	// DateFieldNames is a list of the date fields that need to be converted to epochs")
 	fmt.Println("var DateFieldNames = []string{\"FCST_VALID_BEG\", \"FCST_VALID_END\", \"OBS_VALID_BEG\", \"OBS_VALID_END\"}")
+	fmt.Println("var MetHeaderColumnsFileUrl = \"" + metHeaderColumnsFileUrl + "\"")
 	fmt.Println("")
 }
 

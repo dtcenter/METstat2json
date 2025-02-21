@@ -44,7 +44,7 @@ func getExistingExternalDocForId(id string) (map[string]interface{}, error) {
 	}
 
 	// Put your own code here in this method but always return this exact error if the document is not found
-	return doc.(map[string]interface{}), nil
+	return doc, nil
 }
 
 func ReadJsonFromGzipFile(filename string) (map[string]interface{}, error) {

@@ -76,7 +76,6 @@ func ParseLine(headerLine string, dataLine string, docPtr *map[string]interface{
 		// skip the .DS_Store files
 		return *docPtr, fmt.Errorf("skipping .DS_Store file")
 	}
-
 	// get the lineType
 	fileLineType, headerData, dataData, dataKey, descIndex, err := buildHeaderLineTypeUtilities.GetLineType(headerLine, dataLine, fileName)
 	if err != nil {
@@ -110,13 +109,13 @@ func ParseLine(headerLine string, dataLine string, docPtr *map[string]interface{
 			// This function will also fill in the headerData fields
 			// indexed by dataKey value in the document
 			(*docPtr)[metaData.ID], _err = structColumnTypes.GetDocForId(fileLineType, metaDataMap, headerData, dataData, dataKey)
-			if _err != nil {
+			if _err != nil || (*docPtr)[metaData.ID] == nil {
 				return *docPtr, fmt.Errorf("Error getting doc for file: %s error: %w", fileName, _err)
 			}
 		}
 	}
 	tempDoc := (*docPtr)[metaData.ID].(map[string]interface{})
-	_err = structColumnTypes.AddDataElement(dataKey, fileLineType, dataData, &tempDoc)
+	tempDoc, _err = structColumnTypes.AddDataElement(dataKey, fileLineType, dataData, &tempDoc)
 	if _err != nil {
 		return *docPtr, fmt.Errorf("Error getting doc for file: %s error: %w", fileName, _err)
 	}
