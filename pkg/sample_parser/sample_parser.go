@@ -81,7 +81,7 @@ func ParseRegressionSuite() {
 		log.Fatal(err)
 	}
 	// write output to json	gzipped file
-	err = structColumnDefs.WriteJsonToGzipFile(doc, output_directory+"sample_output.json.gz")
+	err = structColumnDefs.WriteJsonToCompressedFile(doc, output_directory+"sample_output.json.gz")
 	if err != nil {
 		log.Fatal(err)
 	}

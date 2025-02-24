@@ -164,7 +164,7 @@ func getTmpHeaderSanNA(headerData []string, descIndex int) []string {
 	return tmpHeaderData
 }
 
-func WriteJsonToGzipFile(doc map[string]interface{}, filename string) error {
+func WriteJsonToCompressedFile(doc map[string]interface{}, filename string) error {
 	// get the documents as a list
 	// Defines the Slice capacity to match the Map elements count
 	docList := make([]interface{}, 0, len(doc))

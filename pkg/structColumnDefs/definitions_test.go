@@ -124,7 +124,7 @@ func TestParseVAL1L2(t *testing.T) {
 	if doc == nil {
 		t.Fatalf("Expected parsed document, got nil")
 	}
-	err = WriteJsonToGzipFile(doc, "/tmp/test_output.json.gz")
+	err = WriteJsonToCompressedFile(doc, "/tmp/test_output.json.gz")
 	if err != nil {
 		t.Fatalf("Expected no error, got %v", err)
 	}
@@ -180,7 +180,7 @@ func TestParseMODE_OBJ(t *testing.T) {
 		t.Fatalf("Expected no error, got %v", err)
 	}
 	// write the doc to a file
-	err = WriteJsonToGzipFile(doc, "/tmp/test_output.json.gz")
+	err = WriteJsonToCompressedFile(doc, "/tmp/test_output.json.gz")
 	if err != nil {
 		t.Fatalf("Expected no error, got %v", err)
 	}
@@ -254,7 +254,7 @@ func TestModeFile(t *testing.T) {
 	if doc == nil {
 		t.Fatalf("Expected parsed document, got nil")
 	}
-	err = WriteJsonToGzipFile(doc, "/tmp/test_output.json.gz")
+	err = WriteJsonToCompressedFile(doc, "/tmp/test_output.json.gz")
 	if err != nil {
 		t.Fatalf("Expected no error, got %v", err)
 	}
@@ -297,7 +297,7 @@ func TestMC_PCP_File(t *testing.T) {
 	if doc == nil {
 		t.Fatalf("Expected parsed document, got nil")
 	}
-	err = WriteJsonToGzipFile(doc, "/tmp/test_output.json.gz")
+	err = WriteJsonToCompressedFile(doc, "/tmp/test_output.json.gz")
 	if err != nil {
 		t.Fatalf("Expected no error, got %v", err)
 	}
@@ -368,7 +368,7 @@ func TestParseRegressionSuite(t *testing.T) {
 	if doc == nil {
 		t.Fatalf("Expected parsed document, got nil")
 	}
-	err = WriteJsonToGzipFile(doc, "/tmp/test_output.json.gz")
+	err = WriteJsonToCompressedFile(doc, "/tmp/test_output.json.gz")
 	if err != nil {
 		t.Fatalf("Expected no error, got %v", err)
 	}
@@ -449,7 +449,7 @@ func TestParseG2G_v12_Suite(t *testing.T) {
 	if doc == nil {
 		t.Fatalf("Expected parsed document, got nil")
 	}
-	err = WriteJsonToGzipFile(doc, "/tmp/test_output.json.gz")
+	err = WriteJsonToCompressedFile(doc, "/tmp/test_output.json.gz")
 	if err != nil {
 		t.Fatalf("Expected no error, got %v", err)
 	}
@@ -530,7 +530,7 @@ func TestParse_tc_data_Suite(t *testing.T) {
 	if doc == nil {
 		t.Fatalf("Expected parsed document, got nil")
 	}
-	err = WriteJsonToGzipFile(doc, "/tmp/test_output.json.gz")
+	err = WriteJsonToCompressedFile(doc, "/tmp/test_output.json.gz")
 	if err != nil {
 		t.Fatalf("Expected no error, got %v", err)
 	}
@@ -615,7 +615,7 @@ func TestParse_tcst_Suite(t *testing.T) {
 	if doc == nil {
 		t.Fatalf("Expected parsed document, got nil")
 	}
-	err = WriteJsonToGzipFile(doc, "/tmp/test_output.json.gz")
+	err = WriteJsonToCompressedFile(doc, "/tmp/test_output.json.gz")
 	if err != nil {
 		t.Fatalf("Expected no error, got %v", err)
 	}
@@ -696,7 +696,7 @@ func TestParse_textfiles_Suite(t *testing.T) {
 	if doc == nil {
 		t.Fatalf("Expected parsed document, got nil")
 	}
-	err = WriteJsonToGzipFile(doc, "/tmp/test_output.json.gz")
+	err = WriteJsonToCompressedFile(doc, "/tmp/test_output.json.gz")
 	if err != nil {
 		t.Fatalf("Expected no error, got %v", err)
 	}
