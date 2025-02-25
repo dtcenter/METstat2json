@@ -155,7 +155,6 @@ func GetLineType(headerLine string, dataLine string, fileName string) (string, [
 	var fileLineType string
 	if strings.Contains(fileName, "stat") {
 		separatorField = "LINE_TYPE"
-		fileLineType = "STAT"
 	} else if strings.Contains(fileName, "mode") {
 		if strings.Contains(fileName, "obj") || strings.Contains(fileName, "merge") {
 			separatorField = "OBJECT_ID"

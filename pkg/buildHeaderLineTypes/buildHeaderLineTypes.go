@@ -237,7 +237,7 @@ func getHeaderStructureString(fileType string, lineType string, getDocIDString s
 			padding = len(term)
 		}
 	}
-	for _, term := range headerFields {
+	for _i, term := range headerFields {
 		// skip the dataKey fields
 		isDataKey := false
 		for _, d := range keyFields {
@@ -260,7 +260,7 @@ func getHeaderStructureString(fileType string, lineType string, getDocIDString s
 		jsonName := strings.ToLower(name)
 		// headerStructString += fmt.Sprintf("    %-*s %s `json:\"%s\"`\n", padding, capName, dataType, name)
 		headerStructString += fmt.Sprintf("    %-*s %s `json:\"%s\"`\n", padding, name, dataType, jsonName)
-		fillHeaderString += fmt.Sprintf("\ti++; if i <= dataLen && fields[i] != \"\"  && fields[i] != \"NA\" {\n\t\t(*doc)[\"%s\"] = fields[i]\n\t}\n", name)
+		fillHeaderString += fmt.Sprintf("\ti++; if i <= dataLen && fields[%d] != \"\"  && fields[%d] != \"NA\" {\n\t\t(*doc)[\"%s\"] = fields[%d]\n\t}\n", _i, _i, name, _i)
 	}
 	headerStructString += "}\n"
 	fillHeaderString += "}\n"
