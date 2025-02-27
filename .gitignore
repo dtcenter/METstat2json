@@ -34,6 +34,9 @@ __debug*
 # all .history folders
 .history/
 
+# all built binaries
+/bin/*/*
+
 # Go workspace file
 go.work
 go.work.sum

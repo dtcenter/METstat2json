@@ -668,7 +668,7 @@ func fillMetDataMapFromUserGuide(metDataTypesForLines, fieldNameMap map[string]s
 			}
 		}
 	}
-	// Fill undefined's that I have found in the MET user guide files in text (not column tables), or in data files themselves.
+	// Fill undefined's that I have not found in the MET user guide files in text (not column tables), or in data files themselves.
 	metDataTypesForLines["RIRW_WINDOW"] = "int"
 	metDataTypesForLines["F[0-9]*_O[0-9]*"] = "string"
 	metDataTypesForLines["INTENSITY_USER"] = "float64"
