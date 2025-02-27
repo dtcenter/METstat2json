@@ -13,8 +13,10 @@ echo "linting primary packages"
 golangci-lint run --fix ./pkg/buildHeaderLineTypeUtilities/... ./pkg/buildHeaderLineTypes/... ./pkg/structColumnDefs/... ./pkg/structColumnTypes/... ./pkg/sample_parser/...
 
 echo "building package buildHeaderLineTypes"
+mkdir -p bin
 for arch in arm64 amd64; do
 	for os in linux darwin; do
+		mkdir -p bin/linux/${os}/${arch}
 		echo "building for ${os}/${arch}"
 		env GOOS=${os} GOARCH=${arch} go build -o "./bin/${os}/${arch}/buildHeaderLineTypes" pkg/buildHeaderLineTypes/buildHeaderLineTypes.go
 	done
