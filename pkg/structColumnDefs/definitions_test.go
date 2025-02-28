@@ -355,6 +355,51 @@ func TestMC_CTS_File(t *testing.T) {
 	// add other test assertions here
 }
 
+// tcpairs test
+// test_data/tc_data/CMC/2023060100/tc_pairs_al91.dat.tcst
+func Test_TCPAIRS_File(t *testing.T) {
+	var doc map[string]interface{}
+	var err error
+	fName := "../../test_data/tc_data/CMC/2023060800/tc_pairs_al02.dat.tcst"
+	file, err := os.Open(fName) // open the file
+	if err != nil {
+		t.Fatal("error opening file", err)
+	}
+	defer file.Close()
+	rawData, err := io.ReadAll(file)
+	if err != nil {
+		t.Fatal("error reading file", err)
+	}
+	lines := strings.Split(string(rawData), "\n")
+	headerLine := lines[0]
+	for line := range lines {
+		if line == 0 || lines[line] == "" {
+			continue
+		}
+		dataLine := lines[line]
+		doc, err = ParseLine(headerLine, dataLine, &doc, fName, getMissingExternalDocForId)
+		if err != nil {
+			t.Fatalf("Expected no error, got %v", err)
+		}
+	}
+	if doc == nil {
+		t.Fatalf("Expected parsed document, got nil")
+	}
+	err = WriteJsonToCompressedFile(doc, "/tmp/test_output.json.gz")
+	if err != nil {
+		t.Fatalf("Expected no error, got %v", err)
+	}
+
+	// read the file back in
+	parsedDoc, err := ReadJsonFromGzipFile("/tmp/test_output.json.gz")
+	if err != nil {
+		t.Fatalf("Expected no error, got %v", err)
+	}
+
+	assert.NotNil(t, parsedDoc)
+	// add other test assertions here
+}
+
 func TestMC_SAL1L2_File(t *testing.T) {
 	var doc map[string]interface{}
 	var err error

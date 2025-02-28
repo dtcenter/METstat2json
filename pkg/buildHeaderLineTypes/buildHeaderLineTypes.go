@@ -669,6 +669,13 @@ func fillMetDataMapFromUserGuide(metDataTypesForLines, fieldNameMap map[string]s
 		}
 	}
 	// Fill undefined's that I have not found in the MET user guide files in text (not column tables), or in data files themselves.
+	// NOTE: These will overwrite any previous data types for specific named fields that were found in the MET source files.
+	metDataTypesForLines, _ = overRideDefinedMetDataTypes(metDataTypesForLines, fieldNameMap)
+
+	return metDataTypesForLines
+}
+
+func overRideDefinedMetDataTypes(metDataTypesForLines map[string]string, fieldNameMap map[string]string) (map[string]string, map[string]string) {
 	metDataTypesForLines["RIRW_WINDOW"] = "int"
 	metDataTypesForLines["F[0-9]*_O[0-9]*"] = "string"
 	metDataTypesForLines["INTENSITY_USER"] = "float64"
@@ -723,8 +730,7 @@ func fillMetDataMapFromUserGuide(metDataTypesForLines, fieldNameMap map[string]s
 	if len(undefineds) > 0 {
 		fmt.Printf("\n/*undefined: %v*/\n", undefineds)
 	}
-
-	return metDataTypesForLines
+	return metDataTypesForLines, fieldNameMap
 }
 
 func getPatterns() *map[string]Pattern {

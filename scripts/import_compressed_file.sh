@@ -26,10 +26,15 @@ done
 [ -z "${collection}" ] && usage
 [ -z "${json_f}" ] && usage
 
-file ${json_f} | grep "gzip compressed data" && {
+file ${json_f} | grep "gzip compressed data"
+ret=$?
+if [ $ret -eq 0 ]; then
     echo "File is compressed - uncompressing it"
     gunzip ${json_f}
     export json=$(echo ${json_f} | sed 's/.gz//')
-}
+else
+    export json="${json_f}"
+fi
+
 export number_of_cpus=$(nproc)
 cbimport json --threads ${number_of_cpus} --cluster ${cb_host} --bucket ${bucket} --scope-collection-exp ${scope}.${collection} --username ${cb_user} --password ${cb_pwd} --format list --generate-key %id% --dataset file:///${json}

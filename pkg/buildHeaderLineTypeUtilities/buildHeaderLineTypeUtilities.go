@@ -88,9 +88,9 @@ var DataKeyMap = map[string][]string{
 	"MTD_3D_PAIR_SIMPLE":    {"FCST_LEAD", "OBJECT_ID"},
 	"MTD_3D_SINGLE_CLUSTER": {"FCST_LEAD", "OBJECT_ID"},
 	"MTD_3D_SINGLE_SIMPLE":  {"FCST_LEAD", "OBJECT_ID"},
-	"TCST_TCMPR":            {"FCST_LEAD"},
-	"TCST_TCDIAG":           {"FCST_LEAD"},
-	"TCST_PROBRIRW":         {"FCST_LEAD"},
+	"TCST_TCMPR":            {"LEAD"},
+	"TCST_TCDIAG":           {"LEAD"},
+	"TCST_PROBRIRW":         {"LEAD"},
 }
 
 var DateFieldNames = []string{"FCST_VALID_BEG", "FCST_VALID_END", "OBS_VALID_BEG", "OBS_VALID_END"}

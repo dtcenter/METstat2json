@@ -62,7 +62,7 @@ After this runs you will have a compressed json file in the output path (/tmp) w
 ## importing the compressed json file
 
 ```text
-scripts/import_compressed_file.sh -h localhost:8091 -u Administrator -p 'pwd_av!d' -b met -s _default -c MET -f /tmp/sample_output.json.gz
+scripts/import_compressed_file.sh -h localhost:8091 -u Administrator -p 'pwd_av!d' -b metplusdata -s _default -c MET -f /tmp/sample_output.json.gz
 /tmp/sample_output.json.gz: gzip compressed data, original size modulo 2^32 486133947
 File is compressed - uncompressing it
 /tmp/sample_output.json already exists -- do you wish to overwrite (y or n)? y
