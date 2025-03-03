@@ -7,6 +7,20 @@
 *.dll
 *.so
 *.dylib
+# ignore files that are being edited with vim
+*.swp
+# ignore backup files
+*.bak
+#ignore copies of files
+*.copy
+# ignore created pkg directory
+*pkg/pkg
+*pkg/bin
+
+# ignore the DS_Store files
+**/.DS_Store
+# ignore vscode debug file
+__debug*
 
 # Test binary, built with `go test -c`
 *.test
@@ -17,9 +31,18 @@
 # Dependency directories (remove the comment below to include it)
 # vendor/
 
+# all .history folders
+.history/
+
+# all built binaries
+/bin/*/*
+
 # Go workspace file
 go.work
 go.work.sum
 
 # env file
 .env
+
+# IDEs
+.vscode
