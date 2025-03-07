@@ -47,50 +47,48 @@ type VxMetadata struct {
 
 // data key definitions
 var DataKeyMap = map[string][]string{
-	"STAT_CNT":              {"FCST_LEAD"},
-	"STAT_CTC":              {"FCST_LEAD"},
-	"STAT_CTS":              {"FCST_LEAD"},
-	"STAT_FHO":              {"FCST_LEAD"},
-	"STAT_ISC":              {"FCST_LEAD"},
-	"STAT_MCTC":             {"FCST_LEAD"},
-	"STAT_MCTS":             {"FCST_LEAD"},
-	"STAT_MPR":              {"FCST_LEAD"},
-	"STAT_SEEPS":            {"FCST_LEAD"},
-	"STAT_SEEPS_MPR":        {"FCST_LEAD"},
-	"STAT_NBRCNT":           {"FCST_LEAD"},
-	"STAT_NBRCTC":           {"FCST_LEAD"},
-	"STAT_NBRCTS":           {"FCST_LEAD"},
-	"STAT_GRAD":             {"FCST_LEAD"},
-	"STAT_DMAP":             {"FCST_LEAD"},
-	"STAT_ORANK":            {"FCST_LEAD"},
-	"STAT_PCT":              {"FCST_LEAD"},
-	"STAT_PJC":              {"FCST_LEAD"},
-	"STAT_PRC":              {"FCST_LEAD"},
-	"STAT_PSTD":             {"FCST_LEAD"},
-	"STAT_ECLV":             {"FCST_LEAD"},
-	"STAT_ECNT":             {"FCST_LEAD"},
-	"STAT_RPS":              {"FCST_LEAD"},
-	"STAT_RHIST":            {"FCST_LEAD"},
-	"STAT_PHIST":            {"FCST_LEAD"},
-	"STAT_RELP":             {"FCST_LEAD"},
-	"STAT_SAL1L2":           {"FCST_LEAD"},
-	"STAT_SL1L2":            {"FCST_LEAD"},
-	"STAT_SSVAR":            {"FCST_LEAD"},
-	"STAT_VAL1L2":           {"FCST_LEAD"},
-	"STAT_VL1L2":            {"FCST_LEAD"},
-	"STAT_VCNT":             {"FCST_LEAD"},
-	"STAT_GENMPR":           {"FCST_LEAD"},
-	"STAT_SSIDX":            {"FCST_LEAD"},
-	"MODE_OBJ":              {"FCST_LEAD", "OBJECT_ID"}, // this one is a datafield key
-	"MODE_CTS":              {"FCST_LEAD"},
-	"MODE_2D":               {"FCST_LEAD", "OBJECT_ID"},
-	"MTD_3D_PAIR_CLUSTER":   {"FCST_LEAD", "OBJECT_ID"},
-	"MTD_3D_PAIR_SIMPLE":    {"FCST_LEAD", "OBJECT_ID"},
-	"MTD_3D_SINGLE_CLUSTER": {"FCST_LEAD", "OBJECT_ID"},
-	"MTD_3D_SINGLE_SIMPLE":  {"FCST_LEAD", "OBJECT_ID"},
-	"TCST_TCMPR":            {"LEAD"},
-	"TCST_TCDIAG":           {"LEAD"},
-	"TCST_PROBRIRW":         {"LEAD"},
+	"STAT_CNT":       {"FCST_LEAD"},
+	"STAT_CTC":       {"FCST_LEAD"},
+	"STAT_CTS":       {"FCST_LEAD"},
+	"STAT_FHO":       {"FCST_LEAD"},
+	"STAT_ISC":       {"FCST_LEAD"},
+	"STAT_MCTC":      {"FCST_LEAD"},
+	"STAT_MCTS":      {"FCST_LEAD"},
+	"STAT_MPR":       {"FCST_LEAD"},
+	"STAT_SEEPS":     {"FCST_LEAD"},
+	"STAT_SEEPS_MPR": {"FCST_LEAD"},
+	"STAT_NBRCNT":    {"FCST_LEAD"},
+	"STAT_NBRCTC":    {"FCST_LEAD"},
+	"STAT_NBRCTS":    {"FCST_LEAD"},
+	"STAT_GRAD":      {"FCST_LEAD"},
+	"STAT_DMAP":      {"FCST_LEAD"},
+	"STAT_ORANK":     {"FCST_LEAD"},
+	"STAT_PCT":       {"FCST_LEAD"},
+	"STAT_PJC":       {"FCST_LEAD"},
+	"STAT_PRC":       {"FCST_LEAD"},
+	"STAT_PSTD":      {"FCST_LEAD"},
+	"STAT_ECLV":      {"FCST_LEAD"},
+	"STAT_ECNT":      {"FCST_LEAD"},
+	"STAT_RPS":       {"FCST_LEAD"},
+	"STAT_RHIST":     {"FCST_LEAD"},
+	"STAT_PHIST":     {"FCST_LEAD"},
+	"STAT_RELP":      {"FCST_LEAD"},
+	"STAT_SAL1L2":    {"FCST_LEAD"},
+	"STAT_SL1L2":     {"FCST_LEAD"},
+	"STAT_SSVAR":     {"FCST_LEAD"},
+	"STAT_VAL1L2":    {"FCST_LEAD"},
+	"STAT_VL1L2":     {"FCST_LEAD"},
+	"STAT_VCNT":      {"FCST_LEAD"},
+	"STAT_GENMPR":    {"FCST_LEAD"},
+	"STAT_SSIDX":     {"FCST_LEAD"},
+	"MODE_OBJ":       {"FCST_LEAD", "OBJECT_ID"},
+	"MODE_CTS":       {"FCST_LEAD"},
+	"MTD_2DSINGLE":   {"OBJECT_ID", "TIME_INDEX"},
+	"MTD_3DSINGLE":   {"OBJECT_ID"},
+	"MTD_3DPAIR":     {"OBJECT_ID"},
+	"TCST_TCMPR":     {"LEAD"},
+	"TCST_TCDIAG":    {"LEAD"},
+	"TCST_PROBRIRW":  {"LEAD"},
 }
 
 var DateFieldNames = []string{"FCST_VALID_BEG", "FCST_VALID_END", "OBS_VALID_BEG", "OBS_VALID_END"}
@@ -181,10 +179,10 @@ func GetLineType(headerLine string, dataLine string, fileName string) (string, [
 		// there appear to be some files that aren't named like the others
 		// Check the header line to see if it matches a line in the column defs file
 		// if it does then we can use the line type from the column defs file
-		headerFields, err := getLineTypeFromColumnDefsFile(headerLine)
+		columnDefHeaderFields, err := getLineTypeFromColumnDefsFile(headerLine)
 		if err == nil {
-			fileLineType = headerFields.FileType + "_" + headerFields.LineType
-			separatorField = headerFields.SeparatorField
+			fileLineType = columnDefHeaderFields.FileType + "_" + columnDefHeaderFields.LineType
+			separatorField = columnDefHeaderFields.SeparatorField
 		}
 	}
 	headerStringFields, _ := SplitColumnDefLine(fileLineType, headerLine)
@@ -218,7 +216,12 @@ func GetLineType(headerLine string, dataLine string, fileName string) (string, [
 		for _, dk := range DataKeyMap[fileLineType] {
 			if field == dk {
 				isDataKey = true
-				dataKeyFields = append(dataKeyFields, allData[fIndex])
+				if allData[fIndex] != "NA" {
+					// the dataKey is the value that belongs to the associated field
+					// not the field itself. Datakeys deliniate data sections
+					// based on their values
+					dataKeyFields = append(dataKeyFields, allData[fIndex])
+				}
 				break
 			}
 		}
@@ -245,12 +248,17 @@ func GetLineType(headerLine string, dataLine string, fileName string) (string, [
 					headerData = append(headerData, allData[fIndex])
 				}
 			} else {
-				// blank out the dataKeyFields
+				// blank out the dataKeyFields - they will be squeezed out by the join below
 				headerData = append(headerData, "")
 			}
 		}
 	}
 	dataKey := strings.Join(dataKeyFields, "_")
+	if dataKey == "" {
+		// if the dataKey is empty this is an error
+		return "", nil, nil, "", desc_index, fmt.Errorf("UNPARSABLE_LINE: dataKey is empty")
+	}
+	// return the lineType, the headerData, the dataData, the dataKey, and the desc_index
 	return fileLineType, headerData, dataData, dataKey, desc_index, nil
 }
 
@@ -267,8 +275,11 @@ func SplitColumnDefLine(fileLineType string, headerLine string) ([]string, []str
 	var headerString string
 	var dataString string
 	var parts []string
-	switch fileLineType {
-	case "MTD", "MTD_2DSINGLE", "MTD_3DSINGLE", "MTD_3DPAIR":
+	switch {
+	case fileLineType == "MTD",
+		fileLineType == "MTD_2DSINGLE",
+		fileLineType == "MTD_3DSINGLE",
+		fileLineType == "MTD_3DPAIR":
 		parts = strings.Split(headerLine, " OBS_LEV ")
 		if len(parts) > 1 {
 			headerString = parts[0] + " OBS_LEV"
@@ -277,7 +288,8 @@ func SplitColumnDefLine(fileLineType string, headerLine string) ([]string, []str
 			headerString = parts[0]
 			dataString = ""
 		}
-	case "MODE_OBJ", "MODE_CTS":
+	case fileLineType == "MODE_OBJ",
+		fileLineType == "MODE_CTS":
 		parts = strings.Split(headerLine, " OBTYPE ")
 		if len(parts) > 1 {
 			headerString = parts[0] + " OBTYPE"
@@ -354,56 +366,56 @@ func getLineTypeFromColumnDefsFile(headerLine string) (HeaderFields, error) {
 	// if it is found in the column definitions file
 	// If the columnsDefinition file is not present then the file will be downloaded from the
 	// structColumnTypes.MetHeaderColumnsFileUrl
-	var headerFields HeaderFields
+	var columnDefHeaderFields HeaderFields
 	var trimmedColumnDefsLine string
 	var lines []string
 	wd, _ := os.Getwd()
 	if strings.Contains(headerLine, " CYCLONE ") {
 		// these are TCST files
-		headerFields.FileType = "TCST"
-		headerFields.SeparatorField = "LINE_TYPE"
-		headerFields.Header = headerLine
+		columnDefHeaderFields.FileType = "TCST"
+		columnDefHeaderFields.SeparatorField = "LINE_TYPE"
+		columnDefHeaderFields.Header = headerLine
 		if strings.Contains(headerLine, " WATCH_WARN ") {
-			headerFields.LineType = "TCMPR"
+			columnDefHeaderFields.LineType = "TCMPR"
 		} else if strings.Contains(headerLine, " DIAG_SOURCE ") {
-			headerFields.LineType = "TCDIAG"
+			columnDefHeaderFields.LineType = "TCDIAG"
 		} else if strings.Contains(headerLine, " RIRW_WINDOW ") {
-			headerFields.LineType = "PROBRIRW"
+			columnDefHeaderFields.LineType = "PROBRIRW"
 		}
-		return headerFields, nil
+		return columnDefHeaderFields, nil
 	} else if strings.Contains(headerLine, " SPACE_CENTROID_DIST ") {
 		// these are MTD 3dpair files
-		headerFields.Header = headerLine
-		headerFields.SeparatorField = "OBJECT_ID"
-		headerFields.FileType = "MTD"
-		headerFields.LineType = "3DPAIR"
-		return headerFields, nil
+		columnDefHeaderFields.Header = headerLine
+		columnDefHeaderFields.SeparatorField = "OBJECT_ID"
+		columnDefHeaderFields.FileType = "MTD"
+		columnDefHeaderFields.LineType = "3DPAIR"
+		return columnDefHeaderFields, nil
 	} else if strings.Contains(headerLine, " TIME_INDEX ") {
 		// MTD 2dsingle files
-		headerFields.Header = headerLine
-		headerFields.SeparatorField = "OBJECT_ID"
-		headerFields.FileType = "MTD"
-		headerFields.LineType = "2DSINGLE"
-		return headerFields, nil
+		columnDefHeaderFields.Header = headerLine
+		columnDefHeaderFields.SeparatorField = "OBJECT_ID"
+		columnDefHeaderFields.FileType = "MTD"
+		columnDefHeaderFields.LineType = "2DSINGLE"
+		return columnDefHeaderFields, nil
 	} else if strings.Contains(headerLine, " CDIST_TRAVELLED ") {
 		// MTD 3dsingle files
-		headerFields.Header = headerLine
-		headerFields.SeparatorField = "OBJECT_ID"
-		headerFields.FileType = "MTD"
-		headerFields.LineType = "3DSINGLE"
-		return headerFields, nil
+		columnDefHeaderFields.Header = headerLine
+		columnDefHeaderFields.SeparatorField = "OBJECT_ID"
+		columnDefHeaderFields.FileType = "MTD"
+		columnDefHeaderFields.LineType = "3DSINGLE"
+		return columnDefHeaderFields, nil
 	} else if strings.Contains(headerLine, " GRID_RES ") {
 		// these are MODE files
-		headerFields.Header = headerLine
-		headerFields.FileType = "MODE"
+		columnDefHeaderFields.Header = headerLine
+		columnDefHeaderFields.FileType = "MODE"
 		if strings.Contains(headerLine, " OBJECT_ID ") {
-			headerFields.SeparatorField = "OBJECT_ID"
-			headerFields.LineType = "OBJ"
+			columnDefHeaderFields.SeparatorField = "OBJECT_ID"
+			columnDefHeaderFields.LineType = "OBJ"
 		} else if strings.Contains(headerLine, " FIELD ") {
-			headerFields.SeparatorField = "FIELD"
-			headerFields.LineType = "CTS"
+			columnDefHeaderFields.SeparatorField = "FIELD"
+			columnDefHeaderFields.LineType = "CTS"
 		}
-		return headerFields, nil
+		return columnDefHeaderFields, nil
 	}
 	// If I made it to here I couldn't parse it from the headerline easily so I have to read the column definitions file
 	// and find the line type for the header line by looking line by line in the column definitions file.
@@ -449,16 +461,16 @@ func getLineTypeFromColumnDefsFile(headerLine string) (HeaderFields, error) {
 		// squeeze extra white space out of the line and remove the first 3 prefix fields
 		trimmedColumnDefsLine = strings.Split(strings.Join(strings.Fields(line), " "), ": ")[3]
 		if strings.HasPrefix(trimmedHeaderLine, trimmedColumnDefsLine) {
-			headerFields.Header = line
-			lineFields := strings.Split(headerFields.Header, ":")
-			headerFields.FileType = strings.TrimSpace(lineFields[1])
-			headerFields.LineType = strings.TrimSpace(lineFields[2])
+			columnDefHeaderFields.Header = line
+			lineFields := strings.Split(columnDefHeaderFields.Header, ":")
+			columnDefHeaderFields.FileType = strings.TrimSpace(lineFields[1])
+			columnDefHeaderFields.LineType = strings.TrimSpace(lineFields[2])
 			found = true
 			break
 		}
 	}
 	if found {
-		return headerFields, nil
+		return columnDefHeaderFields, nil
 	} else {
 		// we didn't find the separator so we can't process this line
 		return HeaderFields{}, fmt.Errorf("separator not found in column definitions file")
