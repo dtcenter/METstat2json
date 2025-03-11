@@ -6,8 +6,8 @@ import (
 	"encoding/json"
 	"fmt"
 	"os"
-	"parser/pkg/buildHeaderLineTypeUtilities"
-	"parser/pkg/structColumnTypes"
+	"github.com/NOAA-GSL/MET-parser/pkg/buildHeaderLineTypeUtilities"
+	"github.com/NOAA-GSL/MET-parser/pkg/structColumnTypes"
 	"path/filepath"
 	"strings"
 )
