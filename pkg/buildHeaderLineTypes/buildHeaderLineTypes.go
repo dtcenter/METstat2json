@@ -131,13 +131,47 @@ func main() {
 	// print the package - header structs, fillHeader functions, data structs, fillStructure functions, getDocForId functions, addDataElement functions
 	fmt.Println("package structColumnTypes")
 	fmt.Println("")
-	fmt.Println("import (\n\t\"strconv\"\n\t\"errors\"\n\t\"fmt\"\n)")
+	fmt.Println("import (\n\t\"strconv\"\n\t\"errors\"\n\t\"fmt\"\n\t\"time\"\n)")
 	fmt.Println("\n/*\nTHIS CODE IS AUTOMATICALLY GENERATED - DO NOT EDIT THIS CODE")
 	fmt.Println("To modify this code - modify the buildHeaderLineTypes.go file and run the buildHeaderLineTypes.go program")
 	fmt.Println("cd  <repo path>/metlinetypes/pkg/buildHeaderLineTypes")
 	fmt.Println("go run . > /tmp/types.go")
 	fmt.Println("cp /tmp/types.go ../structColumnTypes/structColumnTypes.go\n*/")
 	fmt.Println("")
+
+	// print some utility funcs
+	fmt.Println(`
+	func GetLeadFromInitValid(data []string, dataFieldIndex int) string {
+		initTime, _ := time.Parse("20060102_150405", data[dataFieldIndex-1])
+		validTime, _ := time.Parse("20060102_150405", data[dataFieldIndex+1])
+		lead := validTime.Sub(initTime)
+		return strconv.FormatInt(int64(lead.Hours()), 10)
+	}
+
+	func SetValueForField(doc *map[string]interface{}, fileType string, term string, i int, dataLen int, fields []string, fieldIndex int) {
+		if term == "INIT" && fileType != "TCST" {
+			// do not assign any value to the INIT field for TCST files
+			// The INIT field needs to be moved from the header to the data section.
+			return
+		}
+		if term == "LEAD" && fileType == "TCST" {
+			// This is a special case for TCST files.
+			// if the TERM is LEAD and the lead is NA then we
+			// have to get the lead from the init and valid fields.
+			// INIT is the prior field and VALID is the next field from LEAD.
+			// the init and valid fields are in the format YYYYMMDD_HHMMSS
+			// the lead is the difference between the valid and the init
+			// in hours
+			(*doc)["LEAD"] = GetLeadFromInitValid(fields, fieldIndex)
+			return
+		}
+
+		if i <= dataLen && fields[fieldIndex] != "" && fields[fieldIndex] != "NA" {
+			(*doc)[term] = fields[fieldIndex]
+			return
+		}
+	}
+	`)
 
 	fmt.Println("const DOC_NOT_FOUND = \"Document not found:\"")
 	// print the header structs
@@ -278,7 +312,15 @@ func getHeaderStructureString(fileType string, lineType string, getDocIDString s
 			fileLineType := `"` + fileType + "_" + lineType + `"`
 			fillHeaderString += fmt.Sprintf("\t\t(*doc)[\"LINE_TYPE\"] = %s\n\t\n", fileLineType)
 		} else {
-			fillHeaderString += fmt.Sprintf("\ti++; if i <= dataLen && fields[%d] != \"\"  && fields[%d] != \"NA\" {\n\t\t(*doc)[\"%s\"] = fields[%d]\n\t}\n", _i, _i, name, _i)
+			// fillHeaderString += fmt.Sprintf("\ti++; if i <= dataLen && fields[%d] != \"\"  && fields[%d] != \"NA\" {\n\t\t(*doc)[\"%s\"] = fields[%d]\n\t}\n", _i, _i, name, _i)
+			// buildHeaderLineTypeUtilities.SetValueForField(doc, "STORM_NAME", i, dataLen, fields, 7)
+			// i++
+			// buildHeaderLineTypeUtilities.SetValueForField(doc, "INIT", i, dataLen, fields, 8)
+			// i++
+			// buildHeaderLineTypeUtilities.SetValueForField(doc, "LEAD", i, dataLen, fields, 9)
+			// i++
+
+			fillHeaderString += fmt.Sprintf("\ti++; SetValueForField(doc, \"%s\", \"%s\", i, dataLen, fields, %d)\n", fileType, name, _i)
 		}
 	}
 	headerStructString += "}\n"

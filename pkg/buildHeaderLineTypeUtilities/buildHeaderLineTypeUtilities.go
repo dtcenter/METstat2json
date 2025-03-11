@@ -100,6 +100,13 @@ func dateToEpoch(date string) string {
 	return strconv.FormatInt(theTime.Unix(), 10)
 }
 
+func getLeadFromInitValid(data []string, dataFieldIndex int) string {
+	initTime, _ := time.Parse("20060102_150405", data[dataFieldIndex-1])
+	validTime, _ := time.Parse("20060102_150405", data[dataFieldIndex+1])
+	lead := validTime.Sub(initTime)
+	return strconv.FormatInt(int64(lead.Hours()), 10)
+}
+
 /*
 	    Returns the lineType of the data line, and the headerFields and dataFields of the data line as []string.
 			There are some assumptions here for mode and mtd files. The assumptions are that we can derive the fileType
@@ -216,6 +223,14 @@ func GetLineType(headerLine string, dataLine string, fileName string) (string, [
 		for _, dk := range DataKeyMap[fileLineType] {
 			if field == dk {
 				isDataKey = true
+				if (dk == "LEAD" || dk == "FCST_LEAD") && allData[fIndex] == "NA" {
+					// This is a special case.
+					// if the datakey is LEAD or FCST_LEAD and the lead is NA then we
+					// have to get the lead from the init and valid fields
+					if allData[fIndex] == "NA" {
+						allData[fIndex] = getLeadFromInitValid(allData, fIndex)
+					}
+				}
 				if allData[fIndex] != "NA" {
 					// the dataKey is the value that belongs to the associated field
 					// not the field itself. Datakeys deliniate data sections
@@ -465,6 +480,20 @@ func getLineTypeFromColumnDefsFile(headerLine string) (HeaderFields, error) {
 			lineFields := strings.Split(columnDefHeaderFields.Header, ":")
 			columnDefHeaderFields.FileType = strings.TrimSpace(lineFields[1])
 			columnDefHeaderFields.LineType = strings.TrimSpace(lineFields[2])
+			switch columnDefHeaderFields.FileType {
+			case "STAT":
+				columnDefHeaderFields.SeparatorField = "LINE_TYPE"
+			case "MODE":
+				if strings.Contains(columnDefHeaderFields.LineType, "OBJ") {
+					columnDefHeaderFields.SeparatorField = "OBJECT_ID"
+				} else if strings.Contains(columnDefHeaderFields.LineType, "CTS") {
+					columnDefHeaderFields.SeparatorField = "FIELD"
+				}
+			case "MTD":
+				columnDefHeaderFields.SeparatorField = "OBJECT_ID"
+			case "TCST":
+				columnDefHeaderFields.SeparatorField = "LINE_TYPE"
+			}
 			found = true
 			break
 		}
