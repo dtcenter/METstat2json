@@ -7,10 +7,10 @@ if [ "$root" != `pwd` ]; then
 fi
 
 echo "formatting primary packages"
-gofumpt -w ./pkg/buildHeaderLineTypeUtilities ./pkg/buildHeaderLineTypes ./pkg/structColumnDefs ./pkg/structColumnTypes ./pkg/sample_parser
+gofumpt -w ./pkg/buildHeaderLineTypeUtilities ./pkg/buildHeaderLineTypes ./pkg/structColumnDefs ./pkg/sample_parser
 
 echo "linting primary packages"
-golangci-lint run --fix ./pkg/buildHeaderLineTypeUtilities/... ./pkg/buildHeaderLineTypes/... ./pkg/structColumnDefs/... ./pkg/structColumnTypes/... ./pkg/sample_parser/...
+golangci-lint run --fix ./pkg/buildHeaderLineTypeUtilities/... ./pkg/buildHeaderLineTypes/... ./pkg/structColumnDefs/...  ./pkg/sample_parser/...
 
 echo "building package buildHeaderLineTypes"
 mkdir -p bin

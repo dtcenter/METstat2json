@@ -114,7 +114,7 @@ func main() {
 		// split the line into header and data fields
 		headerFields, dataFields := buildHeaderLineTypeUtilities.SplitColumnDefLine(fileLineType, fieldStr)
 		// create the header struct string and the fillHeader function string
-		docStructName, headerStructName, headerStructString, fillHeaderString, docIDString, addDataElementString = getHeaderStructureString(fileType, lineType, docIDString, addDataElementString, headerFields)
+		docStructName, headerStructName, headerStructString, fillHeaderString, docIDString, addDataElementString = getHeaderStructureString(fileType, lineType, docIDString, addDataElementString, headerFields, metDataTypesForLines)
 		// add the header struct string to the map for printing later
 		headerStructs[headerStructName] = headerStructString
 		// add the fillHeader function string to the map for printing later
@@ -131,13 +131,46 @@ func main() {
 	// print the package - header structs, fillHeader functions, data structs, fillStructure functions, getDocForId functions, addDataElement functions
 	fmt.Println("package structColumnTypes")
 	fmt.Println("")
-	fmt.Println("import (\n\t\"strconv\"\n\t\"errors\"\n\t\"fmt\"\n)")
+	fmt.Println("import (\n\t\"strconv\"\n\t\"errors\"\n\t\"fmt\"\n\t\"time\"\n)")
 	fmt.Println("\n/*\nTHIS CODE IS AUTOMATICALLY GENERATED - DO NOT EDIT THIS CODE")
 	fmt.Println("To modify this code - modify the buildHeaderLineTypes.go file and run the buildHeaderLineTypes.go program")
 	fmt.Println("cd  <repo path>/metlinetypes/pkg/buildHeaderLineTypes")
 	fmt.Println("go run . > /tmp/types.go")
 	fmt.Println("cp /tmp/types.go ../structColumnTypes/structColumnTypes.go\n*/")
 	fmt.Println("")
+
+	// print some utility funcs
+	fmt.Println(`
+	func GetLeadFromInitValid(data []string, dataFieldIndex int) string {
+		initTime, _ := time.Parse("20060102_150405", data[dataFieldIndex-1])
+		validTime, _ := time.Parse("20060102_150405", data[dataFieldIndex+1])
+		lead := validTime.Sub(initTime)
+		return strconv.FormatInt(int64(lead.Hours()), 10)
+	}
+
+	func SetValueForField(doc *map[string]interface{}, fileType string, term string, i int, dataLen int, fields []string, fieldIndex int) {
+		if term == "INIT" && fileType != "TCST" {
+			// do not assign any value to the INIT field for TCST files
+			// The INIT field needs to be moved from the header to the data section.
+			return
+		}
+		if term == "LEAD" && fileType == "TCST" {
+			// This is a special case for TCST files.
+			// if the TERM is LEAD and the lead is NA then we
+			// have to get the lead from the init and valid fields.
+			// INIT is the prior field and VALID is the next field from LEAD.
+			// the init and valid fields are in the format YYYYMMDD_HHMMSS
+			// the lead is the difference between the valid and the init
+			// in hours
+			(*doc)["LEAD"] = GetLeadFromInitValid(fields, fieldIndex)
+			return
+		}
+		if i <= dataLen && fields[fieldIndex] != "" && fields[fieldIndex] != "NA" {
+			(*doc)[term] = fields[fieldIndex]
+			return
+		}
+	}
+	`)
 
 	fmt.Println("const DOC_NOT_FOUND = \"Document not found:\"")
 	// print the header structs
@@ -210,12 +243,25 @@ func getFileLineType(line string) (string, string, string, error) {
 	return fieldStr, fileType, lineType, nil
 }
 
-func getHeaderStructureString(fileType string, lineType string, getDocIDString string, addDataElementString string, headerFields []string) (string, string, string, string, string, string) {
+func getHeaderStructureString(fileType string, lineType string, getDocIDString string, addDataElementString string, headerFields []string, metDataTypesForLines map[string]string) (string, string, string, string, string, string) {
+	/* The header struct is created from the headerFields and the fillHeader function is created from the headerFields
+	There are a few data types that require special attention, i.e
+	the MODE and MTD file types do NOT HAVE a LINE_TYPE field in the header definition
+	from the met_header_columns file. A LINE_TYPE can be inferred from
+	a combination of the header fields and the data fields.
+	*/
+	//TODO - FIX THIS!!
 	docStructName := fmt.Sprintf("%s_%s", fileType, lineType)
 	headerStructName := fmt.Sprintf("%s_header", docStructName)
 
 	keyFields := buildHeaderLineTypeUtilities.GetKeyDataFieldsForLineType(fileType)
 	headerStructString := fmt.Sprintf("type %s struct {\n", headerStructName)
+	if fileType == "MODE" || fileType == "MTD" {
+		// these file types do not have a LINE_TYPE field in the header definition
+		// from the met_header_columns file. We add a LINE_TYPE field to the header struct
+		// and the fillHeader function
+		headerFields = append(headerFields, `LINE_TYPE`)
+	}
 	fillHeaderString := fmt.Sprintf("func (s *%s) fill_%s_Header(fields []string, doc *map[string]interface{}){\n\tdataLen := len(fields)\n\ti := -1\n", docStructName, docStructName)
 	fillHeaderString += "\t// fill the met fields leaving out \"\" and NA values\n"
 	getDocIDString += fmt.Sprintf("\tcase \"%s\":\n", docStructName)
@@ -254,13 +300,19 @@ func getHeaderStructureString(fileType string, lineType string, getDocIDString s
 		term = strings.Replace(term, "(", "", -1)
 		term = strings.Replace(term, ")", "", -1)
 		term = strings.Replace(term, "[0-9]*", "i", -1)
-		// name := cases.Title(language.English).String(term)
 		name := strings.ToUpper(term)
-		dataType := "string"
+		_, dataType := getDataType(term, &metDataTypesForLines)
 		jsonName := strings.ToLower(name)
-		// headerStructString += fmt.Sprintf("    %-*s %s `json:\"%s\"`\n", padding, capName, dataType, name)
 		headerStructString += fmt.Sprintf("    %-*s %s `json:\"%s\"`\n", padding, name, dataType, jsonName)
-		fillHeaderString += fmt.Sprintf("\ti++; if i <= dataLen && fields[%d] != \"\"  && fields[%d] != \"NA\" {\n\t\t(*doc)[\"%s\"] = fields[%d]\n\t}\n", _i, _i, name, _i)
+		if term == "LINE_TYPE" && (fileType == "MODE" || fileType == "MTD") {
+			// these file types do not have a LINE_TYPE field in the header definition
+			// from the met_header_columns file. We add a LINE_TYPE field to the header struct
+			// and the fillHeader function
+			fileLineType := `"` + fileType + "_" + lineType + `"`
+			fillHeaderString += fmt.Sprintf("\t\t(*doc)[\"LINE_TYPE\"] = %s\n\t\n", fileLineType)
+		} else {
+			fillHeaderString += fmt.Sprintf("\ti++; SetValueForField(doc, \"%s\", \"%s\", i, dataLen, fields, %d)\n", fileType, name, _i)
+		}
 	}
 	headerStructString += "}\n"
 	fillHeaderString += "}\n"
