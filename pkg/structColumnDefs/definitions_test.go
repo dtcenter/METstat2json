@@ -355,7 +355,6 @@ func TestTC_CTS_File(t *testing.T) {
 	// add other test assertions here
 }
 
-
 func TestMC_CTS_File(t *testing.T) {
 	var doc map[string]interface{}
 	var err error

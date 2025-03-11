@@ -100,7 +100,13 @@ func dateToEpoch(date string) string {
 	return strconv.FormatInt(theTime.Unix(), 10)
 }
 
-func getLeadFromInitValid(data []string, dataFieldIndex int) string {
+func getLeadFromInitValid(headerFields []string, data []string, dataFieldIndex int) string {
+	if (headerFields[dataFieldIndex] != "LEAD" &&
+		headerFields[dataFieldIndex] != "FCST_LEAD") ||
+		headerFields[dataFieldIndex-1] != "INIT" ||
+		headerFields[dataFieldIndex+1] != "VALID" {
+		return "MISSING"
+	}
 	initTime, _ := time.Parse("20060102_150405", data[dataFieldIndex-1])
 	validTime, _ := time.Parse("20060102_150405", data[dataFieldIndex+1])
 	lead := validTime.Sub(initTime)
@@ -226,9 +232,12 @@ func GetLineType(headerLine string, dataLine string, fileName string) (string, [
 				if (dk == "LEAD" || dk == "FCST_LEAD") && allData[fIndex] == "NA" {
 					// This is a special case.
 					// if the datakey is LEAD or FCST_LEAD and the lead is NA then we
-					// have to get the lead from the init and valid fields
+					// have to get the lead from the init and valid fields, if possible,
+					// and use that as the lead. If it isn't possible to get the lead
+					// from the init and valid fields then we will set the lead to "MISSING"
+					// and the data section will have one entry with the key set to "MISSING"
 					if allData[fIndex] == "NA" {
-						allData[fIndex] = getLeadFromInitValid(allData, fIndex)
+						allData[fIndex] = getLeadFromInitValid(allHeaderFields, allData, fIndex)
 					}
 				}
 				if allData[fIndex] != "NA" {

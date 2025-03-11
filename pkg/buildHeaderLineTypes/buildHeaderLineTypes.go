@@ -165,7 +165,6 @@ func main() {
 			(*doc)["LEAD"] = GetLeadFromInitValid(fields, fieldIndex)
 			return
 		}
-
 		if i <= dataLen && fields[fieldIndex] != "" && fields[fieldIndex] != "NA" {
 			(*doc)[term] = fields[fieldIndex]
 			return
@@ -312,14 +311,6 @@ func getHeaderStructureString(fileType string, lineType string, getDocIDString s
 			fileLineType := `"` + fileType + "_" + lineType + `"`
 			fillHeaderString += fmt.Sprintf("\t\t(*doc)[\"LINE_TYPE\"] = %s\n\t\n", fileLineType)
 		} else {
-			// fillHeaderString += fmt.Sprintf("\ti++; if i <= dataLen && fields[%d] != \"\"  && fields[%d] != \"NA\" {\n\t\t(*doc)[\"%s\"] = fields[%d]\n\t}\n", _i, _i, name, _i)
-			// buildHeaderLineTypeUtilities.SetValueForField(doc, "STORM_NAME", i, dataLen, fields, 7)
-			// i++
-			// buildHeaderLineTypeUtilities.SetValueForField(doc, "INIT", i, dataLen, fields, 8)
-			// i++
-			// buildHeaderLineTypeUtilities.SetValueForField(doc, "LEAD", i, dataLen, fields, 9)
-			// i++
-
 			fillHeaderString += fmt.Sprintf("\ti++; SetValueForField(doc, \"%s\", \"%s\", i, dataLen, fields, %d)\n", fileType, name, _i)
 		}
 	}
