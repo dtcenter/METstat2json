@@ -50,16 +50,16 @@ func ReadJsonFromGzipFile(filename string) (map[string]interface{}, error) {
 func ParseRegressionSuite() {
 	var doc map[string]interface{}
 	var err error
-	var test_data_directory string
+	var testdata_directory string
 	output_directory := "/tmp"
 	Usage := func() {
 		fmt.Fprintf(os.Stderr, "Usage of %s:\n", os.Args[0])
 		flag.PrintDefaults()
 	}
-	flag.StringVar(&test_data_directory, "path", "", "Required - Path to the regression test data")
+	flag.StringVar(&testdata_directory, "path", "", "Required - Path to the regression test data")
 	flag.StringVar(&output_directory, "outdir", "", "Optional - Path to the output directory - defaults to /tmp")
 	flag.Parse()
-	if test_data_directory == "" {
+	if testdata_directory == "" {
 		Usage()
 		os.Exit(1)
 	}
@@ -67,7 +67,7 @@ func ParseRegressionSuite() {
 		output_directory += "/"
 	}
 	// walk through the directory to read files using filepath.Walk
-	err = filepath.Walk(test_data_directory, func(path string, info os.FileInfo, err error) error {
+	err = filepath.Walk(testdata_directory, func(path string, info os.FileInfo, err error) error {
 		if err != nil {
 			return err
 		}

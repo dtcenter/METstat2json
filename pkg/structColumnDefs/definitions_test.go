@@ -218,7 +218,7 @@ func TestParseMODE_OBJ(t *testing.T) {
 func TestModeFile(t *testing.T) {
 	var doc map[string]interface{}
 	var err error
-	fName := "../../test_data/MODE_compref/20241201-23/mode_compref_180000L_20241201_230000V_000000A_R1_T1_cts.txt"
+	fName := "../../testdata/MODE_compref/20241201-23/mode_compref_180000L_20241201_230000V_000000A_R1_T1_cts.txt"
 	file, err := os.Open(fName) // open the file
 	if err != nil {
 		t.Fatal("error opening file", err)
@@ -272,7 +272,7 @@ func TestModeFile(t *testing.T) {
 func TestMC_PCP_File(t *testing.T) {
 	var doc map[string]interface{}
 	var err error
-	fName := "../../test_data/textfiles/job_summary_APCP_12_simple_fcst.txt"
+	fName := "../../testdata/textfiles/job_summary_APCP_12_simple_fcst.txt"
 	file, err := os.Open(fName) // open the file
 	if err != nil {
 		t.Fatal("error opening file", err)
@@ -315,7 +315,7 @@ func TestMC_PCP_File(t *testing.T) {
 func TestTC_CTS_File(t *testing.T) {
 	var doc map[string]interface{}
 	var err error
-	fName := "../../test_data/textfiles/tc_gen_2016_cts.txt"
+	fName := "../../testdata/textfiles/tc_gen_2016_cts.txt"
 	file, err := os.Open(fName) // open the file
 	if err != nil {
 		t.Fatal("error opening file", err)
@@ -358,7 +358,7 @@ func TestTC_CTS_File(t *testing.T) {
 func TestMC_CTS_File(t *testing.T) {
 	var doc map[string]interface{}
 	var err error
-	fName := "../../test_data/statfiles/point_stat_OS_UNIQUE_ALL_120000L_20120409_120000V.stat"
+	fName := "../../testdata/statfiles/point_stat_OS_UNIQUE_ALL_120000L_20120409_120000V.stat"
 	file, err := os.Open(fName) // open the file
 	if err != nil {
 		t.Fatal("error opening file", err)
@@ -399,11 +399,11 @@ func TestMC_CTS_File(t *testing.T) {
 }
 
 // tcst file
-// test_data/tcstfiles/al022013_interp12_fill.tcst
+// testdata/tcstfiles/al022013_interp12_fill.tcst
 func Test_TCST_File(t *testing.T) {
 	var doc map[string]interface{}
 	var err error
-	fName := "../../test_data/tcstfiles/al022013_interp12_fill.tcst"
+	fName := "../../testdata/tcstfiles/al022013_interp12_fill.tcst"
 	file, err := os.Open(fName) // open the file
 	if err != nil {
 		t.Fatal("error opening file", err)
@@ -444,11 +444,11 @@ func Test_TCST_File(t *testing.T) {
 }
 
 // tcpairs test
-// test_data/tc_data/CMC/2023060100/tc_pairs_al91.dat.tcst
+// testdata/tc_data/CMC/2023060100/tc_pairs_al91.dat.tcst
 func Test_TCPAIRS_File(t *testing.T) {
 	var doc map[string]interface{}
 	var err error
-	fName := "../../test_data/tc_data/CMC/2023060800/tc_pairs_al02.dat.tcst"
+	fName := "../../testdata/tc_data/CMC/2023060800/tc_pairs_al02.dat.tcst"
 	file, err := os.Open(fName) // open the file
 	if err != nil {
 		t.Fatal("error opening file", err)
@@ -491,7 +491,7 @@ func Test_TCPAIRS_File(t *testing.T) {
 func TestMC_SAL1L2_File(t *testing.T) {
 	var doc map[string]interface{}
 	var err error
-	fName := "../../test_data/statfiles/point_stat_GRIB1_NAM_GDAS_MASK_SID_120000L_20120409_120000V.stat"
+	fName := "../../testdata/statfiles/point_stat_GRIB1_NAM_GDAS_MASK_SID_120000L_20120409_120000V.stat"
 	file, err := os.Open(fName) // open the file
 	if err != nil {
 		t.Fatal("error opening file", err)
@@ -538,7 +538,7 @@ func TestParseRegressionSuite(t *testing.T) {
 	if err != nil {
 		t.Fatal("error getting working directory:", err)
 	}
-	directory := path + "/../../test_data/statfiles/" // The statfiles directory
+	directory := path + "/../../testdata/statfiles/" // The statfiles directory
 
 	files, err := os.Open(directory) // open the directory to read files in the directory
 	if err != nil {
@@ -611,7 +611,7 @@ func TestParseG2G_v12_Suite(t *testing.T) {
 	if err != nil {
 		t.Fatal("error getting working directory:", err)
 	}
-	directory := path + "/../../test_data/G2G_v12" // The G2G_v12 top level directory
+	directory := path + "/../../testdata/G2G_v12" // The G2G_v12 top level directory
 
 	err = filepath.Walk(directory,
 		func(path string, fileInfo os.FileInfo, err error) error {
@@ -692,7 +692,7 @@ func TestParse_tc_data_Suite(t *testing.T) {
 	if err != nil {
 		t.Fatal("error getting working directory:", err)
 	}
-	directory := path + "/../../test_data/tc_data" // The tc_data top level directory
+	directory := path + "/../../testdata/tc_data" // The tc_data top level directory
 
 	err = filepath.Walk(directory,
 		func(path string, fileInfo os.FileInfo, err error) error {
@@ -773,7 +773,7 @@ func TestParse_tcst_Suite(t *testing.T) {
 	if err != nil {
 		t.Fatal("error getting working directory:", err)
 	}
-	directory := path + "/../../test_data/tcstfiles" // The tc_data top level directory
+	directory := path + "/../../testdata/tcstfiles" // The tc_data top level directory
 
 	err = filepath.Walk(directory,
 		func(path string, fileInfo os.FileInfo, err error) error {
@@ -858,7 +858,7 @@ func TestParse_textfiles_Suite(t *testing.T) {
 	if err != nil {
 		t.Fatal("error getting working directory:", err)
 	}
-	directory := path + "/../../test_data/textfiles" // The tc_data top level directory
+	directory := path + "/../../testdata/textfiles" // The tc_data top level directory
 
 	err = filepath.Walk(directory,
 		func(path string, fileInfo os.FileInfo, err error) error {

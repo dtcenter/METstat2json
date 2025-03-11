@@ -149,7 +149,7 @@ There are unit tests in the buildHeaderLineTypeUtilities package in the file bui
 In vscode there is usually a link above the test case function name that allows you to run or debug the test case.
 For the command line this is how I do it
 
-There are also integration level tests in the structColumnDefs/definitions_test.go file. These tests use the test_data directory that is included in the repo and test most (if not all) of the various output file formats from the 12.0 version of MET. As more kinds of data are added to subsequent releases of MET this test_data directory can be modified to include sample data for new ouputfile versions. These tests are good examples of how to use the parser.
+There are also integration level tests in the structColumnDefs/definitions_test.go file. These tests use the testdata directory that is included in the repo and test most (if not all) of the various output file formats from the 12.0 version of MET. As more kinds of data are added to subsequent releases of MET this testdata directory can be modified to include sample data for new ouputfile versions. These tests are good examples of how to use the parser.
 
 ```text
 ranpierce-mac1:buildHeaderLineTypeUtilities randy.pierce$ cd /Users/randy.pierce/metlinetypes/pkg/buildHeaderLineTypeUtilities/
@@ -218,7 +218,7 @@ There are more comprehensive tests in the structColumnDefs pkg.
 ```text
 Error getting line type:  UNPARSABLE_LINE: lineTypeIndex is greater than the length of the data line
 Skipping line: V12.0.0 GFS   NA   1080000   20241101_180000 20241101_180000 000000   20241101_180000 20241101_180000 RH   because it isn't parsable from file grid_stat_GFS_TMP_vs_ANLYS_TMP_Z2_1080000L_20241101_180000V.stat
-/Users/randy.pierce/metlinetypes/test_data/G2G_v12/20241102-00z 96
+/Users/randy.pierce/metlinetypes/testdata/G2G_v12/20241102-00z 96
 ```
 
 ```text
@@ -228,47 +228,47 @@ ranpierce-mac1:structColumnDefs randy.pierce$ go test -v ./...
 === RUN   TestParseRegressionSuite
 --- PASS: TestParseRegressionSuite (3.29s)
 === RUN   TestParseG2G_v12_Suite
-/Users/randy.pierce/metlinetypes/pkg/structColumnDefs/../../test_data/G2G_v12 672
-/Users/randy.pierce/metlinetypes/test_data/G2G_v12/20241031-00z 96
-/Users/randy.pierce/metlinetypes/test_data/G2G_v12/20241031-00z/grid_stat 1280
-/Users/randy.pierce/metlinetypes/test_data/G2G_v12/20241031-06z 96
-/Users/randy.pierce/metlinetypes/test_data/G2G_v12/20241031-06z/grid_stat 1248
-/Users/randy.pierce/metlinetypes/test_data/G2G_v12/20241031-12z 96
-/Users/randy.pierce/metlinetypes/test_data/G2G_v12/20241031-12z/grid_stat 1280
-/Users/randy.pierce/metlinetypes/test_data/G2G_v12/20241031-18z 96
-/Users/randy.pierce/metlinetypes/test_data/G2G_v12/20241031-18z/grid_stat 1248
-/Users/randy.pierce/metlinetypes/test_data/G2G_v12/20241101-00z 96
-/Users/randy.pierce/metlinetypes/test_data/G2G_v12/20241101-00z/grid_stat 1280
-/Users/randy.pierce/metlinetypes/test_data/G2G_v12/20241101-06z 96
-/Users/randy.pierce/metlinetypes/test_data/G2G_v12/20241101-06z/grid_stat 1248
-/Users/randy.pierce/metlinetypes/test_data/G2G_v12/20241101-12z 96
-/Users/randy.pierce/metlinetypes/test_data/G2G_v12/20241101-12z/grid_stat 1280
-/Users/randy.pierce/metlinetypes/test_data/G2G_v12/20241101-18z 96
-/Users/randy.pierce/metlinetypes/test_data/G2G_v12/20241101-18z/grid_stat 1248
+/Users/randy.pierce/metlinetypes/pkg/structColumnDefs/../../testdata/G2G_v12 672
+/Users/randy.pierce/metlinetypes/testdata/G2G_v12/20241031-00z 96
+/Users/randy.pierce/metlinetypes/testdata/G2G_v12/20241031-00z/grid_stat 1280
+/Users/randy.pierce/metlinetypes/testdata/G2G_v12/20241031-06z 96
+/Users/randy.pierce/metlinetypes/testdata/G2G_v12/20241031-06z/grid_stat 1248
+/Users/randy.pierce/metlinetypes/testdata/G2G_v12/20241031-12z 96
+/Users/randy.pierce/metlinetypes/testdata/G2G_v12/20241031-12z/grid_stat 1280
+/Users/randy.pierce/metlinetypes/testdata/G2G_v12/20241031-18z 96
+/Users/randy.pierce/metlinetypes/testdata/G2G_v12/20241031-18z/grid_stat 1248
+/Users/randy.pierce/metlinetypes/testdata/G2G_v12/20241101-00z 96
+/Users/randy.pierce/metlinetypes/testdata/G2G_v12/20241101-00z/grid_stat 1280
+/Users/randy.pierce/metlinetypes/testdata/G2G_v12/20241101-06z 96
+/Users/randy.pierce/metlinetypes/testdata/G2G_v12/20241101-06z/grid_stat 1248
+/Users/randy.pierce/metlinetypes/testdata/G2G_v12/20241101-12z 96
+/Users/randy.pierce/metlinetypes/testdata/G2G_v12/20241101-12z/grid_stat 1280
+/Users/randy.pierce/metlinetypes/testdata/G2G_v12/20241101-18z 96
+/Users/randy.pierce/metlinetypes/testdata/G2G_v12/20241101-18z/grid_stat 1248
 Error getting line type:  UNPARSABLE_LINE: lineTypeIndex is greater than the length of the data line
 Skipping line: V12.0.0 GFS   NA   1080000   20241101_180000 20241101_180000 000000   20241101_180000 20241101_180000 RH   because it isn't parsable from file grid_stat_GFS_TMP_vs_ANLYS_TMP_Z2_1080000L_20241101_180000V.stat
-/Users/randy.pierce/metlinetypes/test_data/G2G_v12/20241102-00z 96
-/Users/randy.pierce/metlinetypes/test_data/G2G_v12/20241102-00z/grid_stat 1280
-/Users/randy.pierce/metlinetypes/test_data/G2G_v12/20241102-06z 96
-/Users/randy.pierce/metlinetypes/test_data/G2G_v12/20241102-06z/grid_stat 1248
-/Users/randy.pierce/metlinetypes/test_data/G2G_v12/20241102-12z 96
-/Users/randy.pierce/metlinetypes/test_data/G2G_v12/20241102-12z/grid_stat 1280
-/Users/randy.pierce/metlinetypes/test_data/G2G_v12/20241102-18z 96
-/Users/randy.pierce/metlinetypes/test_data/G2G_v12/20241102-18z/grid_stat 1248
-/Users/randy.pierce/metlinetypes/test_data/G2G_v12/20241103-00z 96
-/Users/randy.pierce/metlinetypes/test_data/G2G_v12/20241103-00z/grid_stat 1280
-/Users/randy.pierce/metlinetypes/test_data/G2G_v12/20241103-06z 96
-/Users/randy.pierce/metlinetypes/test_data/G2G_v12/20241103-06z/grid_stat 1248
-/Users/randy.pierce/metlinetypes/test_data/G2G_v12/20241103-12z 96
-/Users/randy.pierce/metlinetypes/test_data/G2G_v12/20241103-12z/grid_stat 1280
-/Users/randy.pierce/metlinetypes/test_data/G2G_v12/20241103-18z 96
-/Users/randy.pierce/metlinetypes/test_data/G2G_v12/20241103-18z/grid_stat 1248
-/Users/randy.pierce/metlinetypes/test_data/G2G_v12/20241104-00z 96
-/Users/randy.pierce/metlinetypes/test_data/G2G_v12/20241104-00z/grid_stat 1280
-/Users/randy.pierce/metlinetypes/test_data/G2G_v12/20241104-06z 96
-/Users/randy.pierce/metlinetypes/test_data/G2G_v12/20241104-06z/grid_stat 1248
-/Users/randy.pierce/metlinetypes/test_data/G2G_v12/20241104-18z 96
-/Users/randy.pierce/metlinetypes/test_data/G2G_v12/20241104-18z/grid_stat 1120
+/Users/randy.pierce/metlinetypes/testdata/G2G_v12/20241102-00z 96
+/Users/randy.pierce/metlinetypes/testdata/G2G_v12/20241102-00z/grid_stat 1280
+/Users/randy.pierce/metlinetypes/testdata/G2G_v12/20241102-06z 96
+/Users/randy.pierce/metlinetypes/testdata/G2G_v12/20241102-06z/grid_stat 1248
+/Users/randy.pierce/metlinetypes/testdata/G2G_v12/20241102-12z 96
+/Users/randy.pierce/metlinetypes/testdata/G2G_v12/20241102-12z/grid_stat 1280
+/Users/randy.pierce/metlinetypes/testdata/G2G_v12/20241102-18z 96
+/Users/randy.pierce/metlinetypes/testdata/G2G_v12/20241102-18z/grid_stat 1248
+/Users/randy.pierce/metlinetypes/testdata/G2G_v12/20241103-00z 96
+/Users/randy.pierce/metlinetypes/testdata/G2G_v12/20241103-00z/grid_stat 1280
+/Users/randy.pierce/metlinetypes/testdata/G2G_v12/20241103-06z 96
+/Users/randy.pierce/metlinetypes/testdata/G2G_v12/20241103-06z/grid_stat 1248
+/Users/randy.pierce/metlinetypes/testdata/G2G_v12/20241103-12z 96
+/Users/randy.pierce/metlinetypes/testdata/G2G_v12/20241103-12z/grid_stat 1280
+/Users/randy.pierce/metlinetypes/testdata/G2G_v12/20241103-18z 96
+/Users/randy.pierce/metlinetypes/testdata/G2G_v12/20241103-18z/grid_stat 1248
+/Users/randy.pierce/metlinetypes/testdata/G2G_v12/20241104-00z 96
+/Users/randy.pierce/metlinetypes/testdata/G2G_v12/20241104-00z/grid_stat 1280
+/Users/randy.pierce/metlinetypes/testdata/G2G_v12/20241104-06z 96
+/Users/randy.pierce/metlinetypes/testdata/G2G_v12/20241104-06z/grid_stat 1248
+/Users/randy.pierce/metlinetypes/testdata/G2G_v12/20241104-18z 96
+/Users/randy.pierce/metlinetypes/testdata/G2G_v12/20241104-18z/grid_stat 1120
 --- PASS: TestParseG2G_v12_Suite (11.22s)
 PASS
 ok   parser/pkg/structColumnDefs 14.742s
@@ -286,7 +286,7 @@ To build this program use something like...
 To run this program you must provide a path to a data directory...
 
 ```text
-/tmp/regression -path=/Users/randy.pierce/metlinetypes/test_data/statfiles/
+/tmp/regression -path=/Users/randy.pierce/metlinetypes/testdata/statfiles/
 ```
 
 ## build and install
