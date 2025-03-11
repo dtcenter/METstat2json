@@ -1,4 +1,4 @@
-module parser
+module MET-parser
 
 go 1.23.3
 
