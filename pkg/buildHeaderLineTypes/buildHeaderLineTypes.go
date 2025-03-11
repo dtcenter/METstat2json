@@ -5,7 +5,7 @@ import (
 	"io"
 	"net/http"
 	"os"
-	"parser/pkg/buildHeaderLineTypeUtilities"
+	"github.com/NOAA-GSL/MET-parser/pkg/buildHeaderLineTypeUtilities"
 	"regexp"
 	"strings"
 )
