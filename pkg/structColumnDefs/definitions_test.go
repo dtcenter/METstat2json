@@ -13,7 +13,7 @@ import (
 	"fmt"
 	"io"
 	"os"
-	"parser/pkg/structColumnTypes"
+	"github.com/NOAA-GSL/MET-parser/pkg/structColumnTypes"
 	"path/filepath"
 	"strings"
 	"testing"
