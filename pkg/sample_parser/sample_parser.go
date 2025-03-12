@@ -8,11 +8,12 @@ import (
 	"io"
 	"log"
 	"os"
-	"github.com/NOAA-GSL/MET-parser/pkg/structColumnDefs"
-	"github.com/NOAA-GSL/MET-parser/pkg/structColumnTypes"
 	"path/filepath"
 	"runtime"
 	"strings"
+
+	"github.com/NOAA-GSL/MET-parser/pkg/structColumnDefs"
+	"github.com/NOAA-GSL/MET-parser/pkg/structColumnTypes"
 )
 
 // dummy function to satisfy the function signature of getExternalDocForId

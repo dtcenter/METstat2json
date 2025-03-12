@@ -91,7 +91,11 @@ var DataKeyMap = map[string][]string{
 	"TCST_PROBRIRW":  {"LEAD"},
 }
 
-var DateFieldNames = []string{"FCST_VALID_BEG", "FCST_VALID_END", "OBS_VALID_BEG", "OBS_VALID_END"}
+// these fields will be converted to an int in the header section
+var IntFieldNames = []string{"FCST_LEAD", "OBS_LEAD", "LEAD"}
+
+// these fields will be converted to an epoch int in the header section
+var DateFieldNames = []string{"FCST_VALID_BEG", "FCST_VALID_END", "OBS_VALID_BEG", "OBS_VALID_END", "INIT", "VALID"}
 
 func dateToEpoch(date string) string {
 	// convert the date to an epoch from YYYYMMDD_HHMMSS
@@ -254,6 +258,7 @@ func GetLineType(headerLine string, dataLine string, fileName string) (string, [
 		// iterate through the header fields and
 		// if the field is a header field and a dataKeyField then blank it out
 		// convert header DATE fields that are not dataKeys to epochs
+		// Note: DateFieldNames also get a type of int in getDataType function
 		if isHeaderField {
 			if !isDataKey {
 				// keep these header fields but convert them

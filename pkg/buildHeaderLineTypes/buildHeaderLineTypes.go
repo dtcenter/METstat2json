@@ -5,9 +5,11 @@ import (
 	"io"
 	"net/http"
 	"os"
-	"github.com/NOAA-GSL/MET-parser/pkg/buildHeaderLineTypeUtilities"
 	"regexp"
+	"slices"
 	"strings"
+
+	"github.com/NOAA-GSL/MET-parser/pkg/buildHeaderLineTypeUtilities"
 )
 
 /*
@@ -148,7 +150,7 @@ func main() {
 		return strconv.FormatInt(int64(lead.Hours()), 10)
 	}
 
-	func SetValueForField(doc *map[string]interface{}, fileType string, term string, i int, dataLen int, fields []string, fieldIndex int) {
+	func SetValueForField(doc *map[string]interface{}, fileType string, term string, i int, dataLen int, fields []string, fieldIndex int, dataType string) {
 		if term == "INIT" && fileType != "TCST" {
 			// do not assign any value to the INIT field for TCST files
 			// The INIT field needs to be moved from the header to the data section.
@@ -162,12 +164,24 @@ func main() {
 			// the init and valid fields are in the format YYYYMMDD_HHMMSS
 			// the lead is the difference between the valid and the init
 			// in hours
-			(*doc)["LEAD"] = GetLeadFromInitValid(fields, fieldIndex)
+			(*doc)["LEAD"], _ = strconv.Atoi(GetLeadFromInitValid(fields, fieldIndex))
 			return
 		}
 		if i <= dataLen && fields[fieldIndex] != "" && fields[fieldIndex] != "NA" {
-			(*doc)[term] = fields[fieldIndex]
-			return
+			switch dataType {
+			case "int":
+				(*doc)[term], _ = strconv.Atoi(fields[fieldIndex])
+				return
+			case "float64":
+				(*doc)[term], _ = strconv.ParseFloat(fields[fieldIndex], 64)
+				return
+			case "string":
+				(*doc)[term] = fields[fieldIndex]
+				return
+			default:
+				(*doc)[term] = fields[fieldIndex]
+				return
+			}
 		}
 	}
 	`)
@@ -215,8 +229,6 @@ func main() {
 
 	// print the DateFieldNames
 	fmt.Println("")
-	fmt.Println("	// DateFieldNames is a list of the date fields that need to be converted to epochs")
-	fmt.Println("var DateFieldNames = []string{\"FCST_VALID_BEG\", \"FCST_VALID_END\", \"OBS_VALID_BEG\", \"OBS_VALID_END\"}")
 	fmt.Println("var MetHeaderColumnsFileUrl = \"" + metHeaderColumnsFileUrl + "\"")
 	fmt.Println("")
 }
@@ -311,7 +323,7 @@ func getHeaderStructureString(fileType string, lineType string, getDocIDString s
 			fileLineType := `"` + fileType + "_" + lineType + `"`
 			fillHeaderString += fmt.Sprintf("\t\t(*doc)[\"LINE_TYPE\"] = %s\n\t\n", fileLineType)
 		} else {
-			fillHeaderString += fmt.Sprintf("\ti++; SetValueForField(doc, \"%s\", \"%s\", i, dataLen, fields, %d)\n", fileType, name, _i)
+			fillHeaderString += fmt.Sprintf("\ti++; SetValueForField(doc, \"%s\", \"%s\", i, dataLen, fields, %d, \"%s\")\n", fileType, name, _i, dataType)
 		}
 	}
 	headerStructString += "}\n"
@@ -918,6 +930,14 @@ func getDataType(name string, metDataTypesLines *map[string]string) (key string,
 	// it could still be undefined - if it is then set it to string
 	if dataType == "" {
 		dataType = "string"
+	}
+	// convert the type of a field that is a date to "int"
+	if slices.Contains(buildHeaderLineTypeUtilities.DateFieldNames, uName) {
+		dataType = "int"
+	}
+	// convert the type of a field that is an int to "int"
+	if slices.Contains(buildHeaderLineTypeUtilities.IntFieldNames, uName) {
+		dataType = "int"
 	}
 	return uName, dataType
 }

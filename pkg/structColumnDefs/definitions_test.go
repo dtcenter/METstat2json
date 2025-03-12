@@ -13,10 +13,11 @@ import (
 	"fmt"
 	"io"
 	"os"
-	"github.com/NOAA-GSL/MET-parser/pkg/structColumnTypes"
 	"path/filepath"
 	"strings"
 	"testing"
+
+	"github.com/NOAA-GSL/MET-parser/pkg/structColumnTypes"
 
 	"github.com/stretchr/testify/assert"
 )
