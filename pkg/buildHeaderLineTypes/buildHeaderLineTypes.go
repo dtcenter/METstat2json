@@ -266,7 +266,7 @@ func getHeaderStructureString(fileType string, lineType string, getDocIDString s
 	docStructName := fmt.Sprintf("%s_%s", fileType, lineType)
 	headerStructName := fmt.Sprintf("%s_header", docStructName)
 
-	keyFields := buildHeaderLineTypeUtilities.GetKeyDataFieldsForLineType(fileType)
+	keyFields := buildHeaderLineTypeUtilities.DataKeyMap[fileType+"_"+lineType]
 	headerStructString := fmt.Sprintf("type %s struct {\n", headerStructName)
 	if fileType == "MODE" || fileType == "MTD" {
 		// these file types do not have a LINE_TYPE field in the header definition

@@ -345,25 +345,6 @@ func SplitColumnDefLine(fileLineType string, headerLine string) ([]string, []str
 	return headerFields, dataFields
 }
 
-/*
-This routine is used to get the key data fields for a given line type. These fields are used to
-essentially merge documents. All the documents with the same header field values excluding the key data fields
-are merged into a single document. The key data fields are used to index the data section of the document.
-*/
-func GetKeyDataFieldsForLineType(lineType string) []string {
-	lineTypeUpper := strings.ToUpper(lineType)
-	switch lineTypeUpper {
-	case "MODE":
-		// I have no idea if this is the correct key for MODE!
-		return []string{"FCST_LEAD", "FCST_LEV"}
-	case "MTD":
-		// I have no idea if this is the correct key for MTD!
-		return []string{"FCST_LEAD", "FCST_LEV"}
-	default:
-		return []string{"FCST_LEAD"}
-	}
-}
-
 func FindType(name string, data []byte) (string, error) {
 	r, _ := regexp.Compile("ato.*get_item.*" + name)
 	res := r.FindSubmatch(data)

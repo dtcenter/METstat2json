@@ -133,39 +133,6 @@ func TestSplitColumnDefLine(t *testing.T) {
 	}
 }
 
-func TestGetKeyDataFieldsForLineType(t *testing.T) {
-	tests := []struct {
-		lineType string
-		want     []string
-	}{
-		{
-			lineType: "MODE",
-			want:     []string{"FCST_LEAD", "FCST_LEV"},
-		},
-		{
-			lineType: "MTD",
-			want:     []string{"FCST_LEAD", "FCST_LEV"},
-		},
-		{
-			lineType: "STAT",
-			want:     []string{"FCST_LEAD"},
-		},
-		{
-			lineType: "unknown",
-			want:     []string{"FCST_LEAD"},
-		},
-	}
-
-	for _, tt := range tests {
-		t.Run(tt.lineType, func(t *testing.T) {
-			got := GetKeyDataFieldsForLineType(tt.lineType)
-			if !equal(got, tt.want) {
-				t.Errorf("GetKeyDataFieldsForLineType() = %v, want %v", got, tt.want)
-			}
-		})
-	}
-}
-
 func TestFindType(t *testing.T) {
 	tests := []struct {
 		name    string
