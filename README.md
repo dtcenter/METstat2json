@@ -297,3 +297,15 @@ The repo includes a bin directory. builTypkg/buildHeaderLineTypes/buildHeaderLin
 
 the pkg/sample/regression.go file. This can be built into an executible using the script
 "scripts/buildRegression.sh". This script builds the regression sample
+
+There is a sample build script for the sample_parser in scripts/build.sh.
+This is an example of how it might be used.
+
+```bash
+> scripts/build.sh
+> bin/darwin/arm64/sample_parser -outdir /tmp -path .../testdata
+> gunzip /tmp/sample_output.json.gz 
+> jq . /tmp/sample_output.json > /tmp/sample_output-pretty.json 
+> vim /tmp/sample_output-pretty.json
+```
+
