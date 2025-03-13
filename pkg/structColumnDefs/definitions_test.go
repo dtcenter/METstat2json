@@ -11,16 +11,52 @@ import (
 	"compress/gzip"
 	"encoding/json"
 	"fmt"
+	"github.com/NOAA-GSL/MET-parser/pkg/structColumnTypes"
+	"github.com/stretchr/testify/assert"
 	"io"
 	"os"
+	"os/exec"
 	"path/filepath"
 	"strings"
 	"testing"
-
-	"github.com/NOAA-GSL/MET-parser/pkg/structColumnTypes"
-
-	"github.com/stretchr/testify/assert"
 )
+
+var testdataDir = ""
+
+func getTestDataDir() (string, error) {
+	if testdataDir == "" {
+		// get the directory for testing.
+		// We use a real directory - not a temporary one - because the testdata is large
+		// and we don't want to download it every time.
+		// The directory is set in the environment variable TESTDATADIR
+		// If the directory is not set, we use /tmp/testdata.
+		// If the directory does not exist, we clone the testdata from the github repository
+		testdataDir = os.Getenv("TESTDATADIR")
+		if testdataDir == "" {
+			testdataDir = "/tmp/testdata"
+		}
+		_, err := os.Stat(testdataDir)
+		if err != nil {
+			if os.IsNotExist(err) {
+				fmt.Println("fetching testdata from github")
+				// git fetch the testdata from the github repository if the directory does not aleady exist
+				_, err := exec.Command("git", "clone", "https://github.com/NOAA-GSL/MET-parser-testdata", testdataDir).Output()
+				if err != nil {
+					os.RemoveAll(testdataDir)
+					return "", err
+				}
+			}
+		} else {
+			// do a git pull since it exists
+			fmt.Println("pulling testdata from github")
+			_, err := exec.Command("git", "-C", testdataDir, "pull").Output()
+			if err != nil {
+				return "", err
+			}
+		}
+	}
+	return testdataDir + "/testdata", nil
+}
 
 // dummy function to satisfy the function signature of getExternalDocForId
 func getMissingExternalDocForId(id string) (map[string]interface{}, error) {
@@ -218,8 +254,11 @@ func TestParseMODE_OBJ(t *testing.T) {
 
 func TestModeFile(t *testing.T) {
 	var doc map[string]interface{}
-	var err error
-	fName := "../../testdata/MODE_compref/20241201-23/mode_compref_180000L_20241201_230000V_000000A_R1_T1_cts.txt"
+	dir, err := getTestDataDir()
+	if err != nil {
+		t.Fatal("error getting test data directory", err)
+	}
+	fName := dir + "/MODE_compref/20241201-23/mode_compref_180000L_20241201_230000V_000000A_R1_T1_cts.txt"
 	file, err := os.Open(fName) // open the file
 	if err != nil {
 		t.Fatal("error opening file", err)
@@ -272,8 +311,11 @@ func TestModeFile(t *testing.T) {
 
 func TestMC_PCP_File(t *testing.T) {
 	var doc map[string]interface{}
-	var err error
-	fName := "../../testdata/textfiles/job_summary_APCP_12_simple_fcst.txt"
+	dir, err := getTestDataDir()
+	if err != nil {
+		t.Fatal("error getting test data directory", err)
+	}
+	fName := dir + "/MODE_compref/20241201-23/mode_compref_180000L_20241201_230000V_000000A_R1_T1_cts.txt"
 	file, err := os.Open(fName) // open the file
 	if err != nil {
 		t.Fatal("error opening file", err)
@@ -315,8 +357,11 @@ func TestMC_PCP_File(t *testing.T) {
 
 func TestTC_CTS_File(t *testing.T) {
 	var doc map[string]interface{}
-	var err error
-	fName := "../../testdata/textfiles/tc_gen_2016_cts.txt"
+	dir, err := getTestDataDir()
+	if err != nil {
+		t.Fatal("error getting test data directory", err)
+	}
+	fName := dir + "/MODE_compref/20241201-23/mode_compref_180000L_20241201_230000V_000000A_R1_T1_cts.txt"
 	file, err := os.Open(fName) // open the file
 	if err != nil {
 		t.Fatal("error opening file", err)
@@ -358,8 +403,11 @@ func TestTC_CTS_File(t *testing.T) {
 
 func TestMC_CTS_File(t *testing.T) {
 	var doc map[string]interface{}
-	var err error
-	fName := "../../testdata/statfiles/point_stat_OS_UNIQUE_ALL_120000L_20120409_120000V.stat"
+	dir, err := getTestDataDir()
+	if err != nil {
+		t.Fatal("error getting test data directory", err)
+	}
+	fName := dir + "/MODE_compref/20241201-23/mode_compref_180000L_20241201_230000V_000000A_R1_T1_cts.txt"
 	file, err := os.Open(fName) // open the file
 	if err != nil {
 		t.Fatal("error opening file", err)
@@ -403,8 +451,11 @@ func TestMC_CTS_File(t *testing.T) {
 // testdata/tcstfiles/al022013_interp12_fill.tcst
 func Test_TCST_File(t *testing.T) {
 	var doc map[string]interface{}
-	var err error
-	fName := "../../testdata/tcstfiles/al022013_interp12_fill.tcst"
+	dir, err := getTestDataDir()
+	if err != nil {
+		t.Fatal("error getting test data directory", err)
+	}
+	fName := dir + "/MODE_compref/20241201-23/mode_compref_180000L_20241201_230000V_000000A_R1_T1_cts.txt"
 	file, err := os.Open(fName) // open the file
 	if err != nil {
 		t.Fatal("error opening file", err)
@@ -448,8 +499,11 @@ func Test_TCST_File(t *testing.T) {
 // testdata/tc_data/CMC/2023060100/tc_pairs_al91.dat.tcst
 func Test_TCPAIRS_File(t *testing.T) {
 	var doc map[string]interface{}
-	var err error
-	fName := "../../testdata/tc_data/CMC/2023060800/tc_pairs_al02.dat.tcst"
+	dir, err := getTestDataDir()
+	if err != nil {
+		t.Fatal("error getting test data directory", err)
+	}
+	fName := dir + "/MODE_compref/20241201-23/mode_compref_180000L_20241201_230000V_000000A_R1_T1_cts.txt"
 	file, err := os.Open(fName) // open the file
 	if err != nil {
 		t.Fatal("error opening file", err)
@@ -491,8 +545,11 @@ func Test_TCPAIRS_File(t *testing.T) {
 
 func TestMC_SAL1L2_File(t *testing.T) {
 	var doc map[string]interface{}
-	var err error
-	fName := "../../testdata/statfiles/point_stat_GRIB1_NAM_GDAS_MASK_SID_120000L_20120409_120000V.stat"
+	dir, err := getTestDataDir()
+	if err != nil {
+		t.Fatal("error getting test data directory", err)
+	}
+	fName := dir + "/MODE_compref/20241201-23/mode_compref_180000L_20241201_230000V_000000A_R1_T1_cts.txt"
 	file, err := os.Open(fName) // open the file
 	if err != nil {
 		t.Fatal("error opening file", err)

@@ -32,28 +32,28 @@ pks pkg/buildHeaderLineTypeUtilities, pkg/structColumnDefs and pkg/ample_parser.
 ## running the parser
 
 ```text
-bin/darwin/arm64/sample_parser -outdir /tmp -path <clone_dir>/testdata
+bin/darwin/arm64/sample_parser -outdir /tmp -path <MET-parser-tesdata>
 environment:darwin_arm64
 Recovered: runtime error: slice bounds out of range [24:10] for fileName grid_stat_GFS_TMP_vs_ANLYS_TMP_Z2_1080000L_20241101_180000V.stat
-2025/02/24 14:35:05 empty file /Users/randy.pierce/MET-parser/testdata/G2G_v12/20241101-18z/grid_stat/grid_stat_GFS_TMP_vs_ANLYS_TMP_Z2_420000L_20241101_180000V.stat - skipping
-2025/02/24 14:35:05 empty file /Users/randy.pierce/MET-parser/testdata/G2G_v12/20241101-18z/grid_stat/grid_stat_GFS_TMP_vs_ANLYS_TMP_Z2_540000L_20241101_180000V.stat - skipping
-2025/02/24 14:35:05 empty file /Users/randy.pierce/MET-parser/testdata/G2G_v12/20241101-18z/grid_stat/grid_stat_GFS_TMP_vs_ANLYS_TMP_Z2_600000L_20241101_180000V.stat - skipping
-2025/02/24 14:35:05 empty file /Users/randy.pierce/MET-parser/testdata/G2G_v12/20241101-18z/grid_stat/grid_stat_GFS_TMP_vs_ANLYS_TMP_Z2_660000L_20241101_180000V.stat - skipping
-2025/02/24 14:35:05 empty file /Users/randy.pierce/MET-parser/testdata/G2G_v12/20241101-18z/grid_stat/grid_stat_GFS_TMP_vs_ANLYS_TMP_Z2_900000L_20241101_180000V.stat - skipping
-2025/02/24 14:35:05 empty file /Users/randy.pierce/MET-parser/testdata/G2G_v12/20241102-00z/grid_stat/grid_stat_GFS_TMP_vs_ANLYS_TMP_Z2_180000L_20241102_000000V.stat - skipping
-2025/02/24 14:35:05 empty file /Users/randy.pierce/MET-parser/testdata/G2G_v12/20241102-00z/grid_stat/grid_stat_GFS_TMP_vs_ANLYS_TMP_Z2_480000L_20241102_000000V.stat - skipping
-2025/02/24 14:35:07 empty file /Users/randy.pierce/MET-parser/testdata/G2G_v12/20241103-12z/grid_stat/grid_stat_GFS_TMP_vs_ANLYS_TMP_Z2_1020000L_20241103_120000V.stat - skipping
-2025/02/24 14:35:09 missing VERSION at start of header line - bad header line? for file /Users/randy.pierce/MET-parser/testdata/__MACOSX/._G2G_v12 - skipping rest of file
-2025/02/24 14:35:11 empty file /Users/randy.pierce/MET-parser/testdata/tc_data/CMC/2023062606/tc_pairs_al92.dat.tcst - skipping
-2025/02/24 14:35:11 empty file /Users/randy.pierce/MET-parser/testdata/tc_data/CMC/2023062606/tc_pairs_al92.dat_PROBRIRW.tcst - skipping
-2025/02/24 14:35:14 empty file /Users/randy.pierce/MET-parser/testdata/tc_data/GFSO/2024081218/tc_pairs_al05.dat_PROBRIRW.tcst - skipping
-2025/02/24 14:35:17 empty file /Users/randy.pierce/MET-parser/testdata/tc_data/HMON/2023062606/tc_pairs_al03.dat.tcst - skipping
-2025/02/24 14:35:17 empty file /Users/randy.pierce/MET-parser/testdata/tc_data/HMON/2023062606/tc_pairs_al03.dat_PROBRIRW.tcst - skipping
-2025/02/24 14:35:17 empty file /Users/randy.pierce/MET-parser/testdata/tc_data/HMON/2023062606/tc_pairs_al92.dat.tcst - skipping
-2025/02/24 14:35:18 empty file /Users/randy.pierce/MET-parser/testdata/tc_data/HMON/2024081306/tc_pairs_al05.dat_PROBRIRW.tcst - skipping
-2025/02/24 14:35:18 empty file /Users/randy.pierce/MET-parser/testdata/tc_data/HWRF/2023062606/tc_pairs_al92.dat.tcst - skipping
-2025/02/24 14:35:20 missing VERSION at start of header line - bad header line? for file /Users/randy.pierce/MET-parser/testdata/tcstfiles/PROBRIRW_filter_ee.tcst - skipping rest of file
-2025/02/24 14:35:20 missing VERSION at start of header line - bad header line? for file /Users/randy.pierce/MET-parser/testdata/tcstfiles/PROBRIRW_summary_tk_err.tcst - skipping rest of file
+2025/02/24 14:35:05 empty file <MET-parser-tesdata>G2G_v12/20241101-18z/grid_stat/grid_stat_GFS_TMP_vs_ANLYS_TMP_Z2_420000L_20241101_180000V.stat - skipping
+2025/02/24 14:35:05 empty file <MET-parser-tesdata>G2G_v12/20241101-18z/grid_stat/grid_stat_GFS_TMP_vs_ANLYS_TMP_Z2_540000L_20241101_180000V.stat - skipping
+2025/02/24 14:35:05 empty file <MET-parser-tesdata>G2G_v12/20241101-18z/grid_stat/grid_stat_GFS_TMP_vs_ANLYS_TMP_Z2_600000L_20241101_180000V.stat - skipping
+2025/02/24 14:35:05 empty file <MET-parser-tesdata>G2G_v12/20241101-18z/grid_stat/grid_stat_GFS_TMP_vs_ANLYS_TMP_Z2_660000L_20241101_180000V.stat - skipping
+2025/02/24 14:35:05 empty file <MET-parser-tesdata>G2G_v12/20241101-18z/grid_stat/grid_stat_GFS_TMP_vs_ANLYS_TMP_Z2_900000L_20241101_180000V.stat - skipping
+2025/02/24 14:35:05 empty file <MET-parser-tesdata>G2G_v12/20241102-00z/grid_stat/grid_stat_GFS_TMP_vs_ANLYS_TMP_Z2_180000L_20241102_000000V.stat - skipping
+2025/02/24 14:35:05 empty file <MET-parser-tesdata>G2G_v12/20241102-00z/grid_stat/grid_stat_GFS_TMP_vs_ANLYS_TMP_Z2_480000L_20241102_000000V.stat - skipping
+2025/02/24 14:35:07 empty file <MET-parser-tesdata>G2G_v12/20241103-12z/grid_stat/grid_stat_GFS_TMP_vs_ANLYS_TMP_Z2_1020000L_20241103_120000V.stat - skipping
+2025/02/24 14:35:09 missing VERSION at start of header line - bad header line? for file <MET-parser-tesdata>__MACOSX/._G2G_v12 - skipping rest of file
+2025/02/24 14:35:11 empty file <MET-parser-tesdata>tc_data/CMC/2023062606/tc_pairs_al92.dat.tcst - skipping
+2025/02/24 14:35:11 empty file <MET-parser-tesdata>tc_data/CMC/2023062606/tc_pairs_al92.dat_PROBRIRW.tcst - skipping
+2025/02/24 14:35:14 empty file <MET-parser-tesdata>tc_data/GFSO/2024081218/tc_pairs_al05.dat_PROBRIRW.tcst - skipping
+2025/02/24 14:35:17 empty file <MET-parser-tesdata>tc_data/HMON/2023062606/tc_pairs_al03.dat.tcst - skipping
+2025/02/24 14:35:17 empty file <MET-parser-tesdata>tc_data/HMON/2023062606/tc_pairs_al03.dat_PROBRIRW.tcst - skipping
+2025/02/24 14:35:17 empty file <MET-parser-tesdata>tc_data/HMON/2023062606/tc_pairs_al92.dat.tcst - skipping
+2025/02/24 14:35:18 empty file <MET-parser-tesdata>tc_data/HMON/2024081306/tc_pairs_al05.dat_PROBRIRW.tcst - skipping
+2025/02/24 14:35:18 empty file <MET-parser-tesdata>tc_data/HWRF/2023062606/tc_pairs_al92.dat.tcst - skipping
+2025/02/24 14:35:20 missing VERSION at start of header line - bad header line? for file <MET-parser-tesdata>tcstfiles/PROBRIRW_filter_ee.tcst - skipping rest of file
+2025/02/24 14:35:20 missing VERSION at start of header line - bad header line? for file <MET-parser-tesdata>tcstfiles/PROBRIRW_summary_tk_err.tcst - skipping rest of file
 ```
 
 These messages are expected because of poorly formatted data files, empty files, or data files with missing header lines.
