@@ -11,14 +11,15 @@ import (
 	"compress/gzip"
 	"encoding/json"
 	"fmt"
-	"github.com/NOAA-GSL/MET-parser/pkg/structColumnTypes"
-	"github.com/stretchr/testify/assert"
 	"io"
 	"os"
 	"os/exec"
 	"path/filepath"
 	"strings"
 	"testing"
+
+	"github.com/NOAA-GSL/MET-parser/pkg/structColumnTypes"
+	"github.com/stretchr/testify/assert"
 )
 
 var testdataDir = ""
