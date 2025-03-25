@@ -180,6 +180,79 @@ func TestFindType(t *testing.T) {
 	}
 }
 
+func TestGetLeadFromInitValid(t *testing.T) {
+	tests := []struct {
+		headerFields   []string
+		data           []string
+		dataFieldIndex int
+		want           string
+	}{
+		{
+			headerFields:   []string{"INIT", "LEAD", "VALID"},
+			data:           []string{"20241031_000000", "NA", "20241031_060000"},
+			dataFieldIndex: 1,
+			want:           "060000",
+		},
+		{
+			headerFields:   []string{"INIT", "FCST_LEAD", "VALID"},
+			data:           []string{"20241031_000000", "NA", "20241031_120000"},
+			dataFieldIndex: 1,
+			want:           "120000",
+		},
+		{
+			headerFields:   []string{"INIT", "FCST_LEAD", "VALID"},
+			data:           []string{"20241031_000000", "NA", "20241105_000000"},
+			dataFieldIndex: 1,
+			want:           "1200000",
+		},
+		{
+			headerFields:   []string{"INIT", "LEAD", "VALID"},
+			data:           []string{"20241031_000000", "NA", "20241030_180000"},
+			dataFieldIndex: 1,
+			want:           "-060000",
+		},
+		{
+			headerFields:   []string{"INIT", "LEAD", "VALID"},
+			data:           []string{"INVALID_DATE", "NA", "20241031_060000"},
+			dataFieldIndex: 1,
+			want:           "MISSING",
+		},
+		{
+			headerFields:   []string{"INIT", "LEAD", "VALID"},
+			data:           []string{"20241031_000000", "NA", "INVALID_DATE"},
+			dataFieldIndex: 1,
+			want:           "MISSING",
+		},
+		{
+			headerFields:   []string{"INIT", "LEAD", "VALID"},
+			data:           []string{"20241031_000000", "NA"},
+			dataFieldIndex: 1,
+			want:           "MISSING",
+		},
+		{
+			headerFields:   []string{"INIT", "LEAD", "OTHER"},
+			data:           []string{"20241031_000000", "NA", "20241031_060000"},
+			dataFieldIndex: 1,
+			want:           "MISSING",
+		},
+		{
+			headerFields:   []string{"OTHER", "LEAD", "VALID"},
+			data:           []string{"20241031_000000", "NA", "20241031_060000"},
+			dataFieldIndex: 1,
+			want:           "MISSING",
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run("", func(t *testing.T) {
+			got := getLeadFromInitValid(tt.headerFields, tt.data, tt.dataFieldIndex)
+			if got != tt.want {
+				t.Errorf("getLeadFromInitValid() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
 func equal(a, b []string) bool {
 	if len(a) != len(b) {
 		return false
