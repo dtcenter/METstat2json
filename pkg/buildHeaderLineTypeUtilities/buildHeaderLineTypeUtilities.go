@@ -112,16 +112,44 @@ func dateToEpoch(date string) string {
 }
 
 func getLeadFromInitValid(headerFields []string, data []string, dataFieldIndex int) string {
+	if len(headerFields) != len(data) {
+		return "MISSING"
+	}
+	if len(data) < 3 {
+		return "MISSING"
+	}
 	if (headerFields[dataFieldIndex] != "LEAD" &&
 		headerFields[dataFieldIndex] != "FCST_LEAD") ||
 		headerFields[dataFieldIndex-1] != "INIT" ||
 		headerFields[dataFieldIndex+1] != "VALID" {
 		return "MISSING"
 	}
-	initTime, _ := time.Parse("20060102_150405", data[dataFieldIndex-1])
-	validTime, _ := time.Parse("20060102_150405", data[dataFieldIndex+1])
+	initTime, err := time.Parse("20060102_150405", data[dataFieldIndex-1])
+	if err != nil {
+		return "MISSING"
+	}
+	validTime, err := time.Parse("20060102_150405", data[dataFieldIndex+1])
+	if err != nil {
+		return "MISSING"
+	}
 	lead := validTime.Sub(initTime)
-	return strconv.FormatInt(int64(lead.Hours()), 10)
+	intVal := int64(lead.Hours())
+	// padd for minutes and seconds (4 chars on the end)
+	zeroVal := false
+	if intVal < 0 {
+		zeroVal = true
+		intVal = intVal * -1
+	}
+	var strVal string
+	if intVal < 10 {
+		strVal = fmt.Sprintf("%02d", intVal) // result will be like "01"
+	} else {
+		strVal = fmt.Sprintf("%d", intVal)
+	}
+	if zeroVal {
+		strVal = "-" + strVal
+	}
+	return strVal + "0000" // add the minutes and seconds
 }
 
 /*
