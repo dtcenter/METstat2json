@@ -77,6 +77,7 @@ func ParseLine(headerLine string, dataLine string, docPtr *map[string]interface{
 		// skip the .DS_Store files
 		return *docPtr, fmt.Errorf("skipping .DS_Store file")
 	}
+
 	// get the lineType
 	fileLineType, headerData, dataData, dataKey, descIndex, err := buildHeaderLineTypeUtilities.GetLineType(headerLine, dataLine, fileName)
 	if err != nil {
@@ -84,6 +85,20 @@ func ParseLine(headerLine string, dataLine string, docPtr *map[string]interface{
 		fmt.Println("Error getting line type: ", err)
 		return *docPtr, err
 	}
+	// if there are any disallowed fields in this linetype then add the disallowed data to the dataData array - in order
+	disallowedFields := buildHeaderLineTypeUtilities.DataKeyMap[fileLineType].HeaderDisallow
+	if len(disallowedFields) > 0 {
+		for _, disallowedField := range disallowedFields {
+			disAllowedFieldValue, err := buildHeaderLineTypeUtilities.GetHeaderValue(strings.Fields(headerLine), strings.Fields(dataLine), disallowedField)
+			if err != nil {
+				fmt.Println("Error getting disallowed field: ", err)
+			}
+			// if an err it appends ""
+			dataData = append(dataData, disAllowedFieldValue)
+		}
+	}
+
+	// get the tmpHeaderData without the NA values
 	tmpHeaderData := getTmpHeaderSanNA(headerData, descIndex)
 	if *docPtr == nil {
 		newDoc := make(map[string]interface{})

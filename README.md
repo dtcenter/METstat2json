@@ -71,7 +71,8 @@ The metadata is used to uniquely identify each document and is used to merge doc
 
 This package also defines the DataKeyMap that is used to determine the key data fields for a given line type.
 The key data fields are used to merge documents with the same header field values excluding the key data fields.
-The key data fields can be either from the header or the data section of a record line.
+The key data fields can be either from the header or the data section of a record line. In addition there
+is a headerDisallow field that may have a list of header section fields that must be disallowed from the header structure.
 
 ### header key data field
 
@@ -81,7 +82,7 @@ If the key data field is type header then the associated array of fields must be
 
 If the key data field is type data then the associated array of fields must all be from the data section of the record. The fields will be concatenated in the order that they are defined and separated by an "_". Those fields wont be excluded from the data section but the data section will be partitioned into a map that is indexed by the values from the OBECT_ID field.
 
-When the dataKeyFields above is applied to this document the lines with identical headers will be merged into a single document (as well as the lines with matching headers from other processed files) but because of the dataKeyMap type data definition the data records with the same OBJECT_ID will be mapped into a data map in that single document and that map will be indexed by the OBJECT_ID field.
+When the dataKeyFields above is applied to this document the lines with identical headers will be merged into a single document (as well as the lines with matching headers from other processed files) but because of the dataKeyMap type data definition the data records with the same OBJECT_ID will be mapped into a data map in that single document and that map will be indexed by the OBJECT_ID field. There is also a headerDisallow field and any header fields that are in this list will not be included in the header structure. This allows line definitions that have INIT, VALID, and LEAD times to have multiple data entries e.g. keyed by LEAD.
 
 ### other utilities
 

@@ -43,31 +43,44 @@ type Pattern struct {
 	structType  string
 }
 
-var patterns = make(map[string]Pattern)
-
-var metSrcFiles = []string{
-	"https://raw.githubusercontent.com/dtcenter/MET/refs/heads/main_v12.0/src/libcode/vx_analysis_util/mode_line.cc",
-	"https://raw.githubusercontent.com/dtcenter/MET/refs/heads/main_v12.0/src/libcode/vx_analysis_util/stat_job.cc",
-	"https://raw.githubusercontent.com/dtcenter/MET/refs/heads/main_v12.0/src/libcode/vx_grid/unstructured_grid.cc",
-	"https://raw.githubusercontent.com/dtcenter/MET/refs/heads/main_v12.0/src/libcode/vx_tc_util/prob_info_base.cc",
-	"https://raw.githubusercontent.com/dtcenter/MET/refs/heads/main_v12.0/src/libcode/vx_tc_util/prob_rirw_info.cc",
-	"https://raw.githubusercontent.com/dtcenter/MET/refs/heads/main_v12.0/src/libcode/vx_tc_util/prob_rirw_pair_info.cc",
-	"https://raw.githubusercontent.com/dtcenter/MET/refs/heads/main_v12.0/src/libcode/vx_tc_util/track_pair_info.cc",
-	"https://raw.githubusercontent.com/dtcenter/MET/refs/heads/main_v12.0/src/tools/core/stat_analysis/parse_stat_line.cc",
-	"https://raw.githubusercontent.com/dtcenter/MET/refs/heads/main_v12.0/src/tools/tc_utils/tc_stat/tc_stat_job.cc",
+func setMetVersion(version string) {
+	setMetSrcFiles(version)
+	setMetUserDocFiles(version)
 }
 
-var metUserDocFiles = []string{
-	"https://raw.githubusercontent.com/dtcenter/MET/refs/heads/main_v12.0/docs/Users_Guide/ensemble-stat.rst",
-	"https://raw.githubusercontent.com/dtcenter/MET/refs/heads/main_v12.0/docs/Users_Guide/grid-stat.rst",
-	"https://raw.githubusercontent.com/dtcenter/MET/refs/heads/main_v12.0/docs/Users_Guide/gsi-tools.rst",
-	"https://raw.githubusercontent.com/dtcenter/MET/refs/heads/main_v12.0/docs/Users_Guide/mode-td.rst",
-	"https://raw.githubusercontent.com/dtcenter/MET/refs/heads/main_v12.0/docs/Users_Guide/mode.rst",
-	"https://raw.githubusercontent.com/dtcenter/MET/refs/heads/main_v12.0/docs/Users_Guide/point-stat.rst",
-	"https://raw.githubusercontent.com/dtcenter/MET/refs/heads/main_v12.0/docs/Users_Guide/stat-analysis.rst",
-	"https://raw.githubusercontent.com/dtcenter/MET/refs/heads/main_v12.0/docs/Users_Guide/tc-gen.rst",
-	"https://raw.githubusercontent.com/dtcenter/MET/refs/heads/main_v12.0/docs/Users_Guide/tc-pairs.rst",
-	"https://raw.githubusercontent.com/dtcenter/MET/refs/heads/main_v12.0/docs/Users_Guide/wavelet-stat.rst",
+var patterns = make(map[string]Pattern)
+
+var metSrcFiles []string
+
+var metUserDocFiles []string
+
+func setMetSrcFiles(version string) {
+	metSrcFiles = []string{
+		"https://raw.githubusercontent.com/dtcenter/MET/refs/heads/main_" + version + "/src/libcode/vx_analysis_util/mode_line.cc",
+		"https://raw.githubusercontent.com/dtcenter/MET/refs/heads/main_" + version + "/src/libcode/vx_grid/unstructured_grid.cc",
+		"https://raw.githubusercontent.com/dtcenter/MET/refs/heads/main_" + version + "/src/libcode/vx_tc_util/prob_info_base.cc",
+		"https://raw.githubusercontent.com/dtcenter/MET/refs/heads/main_" + version + "/src/libcode/vx_tc_util/prob_rirw_info.cc",
+		"https://raw.githubusercontent.com/dtcenter/MET/refs/heads/main_" + version + "/src/libcode/vx_tc_util/prob_rirw_pair_info.cc",
+		"https://raw.githubusercontent.com/dtcenter/MET/refs/heads/main_" + version + "/src/libcode/vx_tc_util/track_pair_info.cc",
+		"https://raw.githubusercontent.com/dtcenter/MET/refs/heads/main_" + version + "/src/tools/core/stat_analysis/parse_stat_line.cc",
+		"https://raw.githubusercontent.com/dtcenter/MET/refs/heads/main_" + version + "/src/tools/tc_utils/tc_stat/tc_stat_job.cc",
+	}
+}
+
+func setMetUserDocFiles(version string) {
+	metUserDocFiles = []string{
+		"https://raw.githubusercontent.com/dtcenter/MET/refs/heads/main_" + version + "/docs/Users_Guide/ensemble-stat.rst",
+		"https://raw.githubusercontent.com/dtcenter/MET/refs/heads/main_" + version + "/docs/Users_Guide/grid-stat.rst",
+		"https://raw.githubusercontent.com/dtcenter/MET/refs/heads/main_" + version + "/docs/Users_Guide/gsi-tools.rst",
+		"https://raw.githubusercontent.com/dtcenter/MET/refs/heads/main_" + version + "/docs/Users_Guide/mode-td.rst",
+		"https://raw.githubusercontent.com/dtcenter/MET/refs/heads/main_" + version + "/docs/Users_Guide/mode.rst",
+		"https://raw.githubusercontent.com/dtcenter/MET/refs/heads/main_" + version + "/docs/Users_Guide/point-stat.rst",
+		"https://raw.githubusercontent.com/dtcenter/MET/refs/heads/main_" + version + "/docs/Users_Guide/stat-analysis.rst",
+		"https://raw.githubusercontent.com/dtcenter/MET/refs/heads/main_" + version + "/docs/Users_Guide/tc-gen.rst",
+		"https://raw.githubusercontent.com/dtcenter/MET/refs/heads/main_" + version + "/docs/Users_Guide/tc-pairs.rst",
+		"https://raw.githubusercontent.com/dtcenter/MET/refs/heads/main_" + version + "/docs/Users_Guide/wavelet-stat.rst",
+		"https://raw.githubusercontent.com/dtcenter/MET/refs/heads/main_" + version + "/src/libcode/vx_analysis_util/stat_job.cc",
+	}
 }
 
 var metHeaderColumnsFileUrl = buildHeaderLineTypeUtilities.MetHeaderColumnsFileUrl
@@ -90,6 +103,7 @@ func main() {
 	// to get the stat field types. We create a map of field names to field types. Then we have to re-iterate
 	// over the header definitions to create the structs and functions to fill the structs.
 	// read the header columns file
+	setMetVersion("v12.0")
 	met_header_columns_lines, fieldNameMap := getColumnLinesAndMapForUrl(metHeaderColumnsFileUrl)
 	metDataTypesForLines := make(map[string]string)
 	metDataTypesForLines = fillMetDataMapFromSrcFiles(metDataTypesForLines, fieldNameMap)
@@ -261,12 +275,15 @@ func getHeaderStructureString(fileType string, lineType string, getDocIDString s
 	the MODE and MTD file types do NOT HAVE a LINE_TYPE field in the header definition
 	from the met_header_columns file. A LINE_TYPE can be inferred from
 	a combination of the header fields and the data fields.
+	Also the TCMPR file type has an INIT, a VALID, and a LEAD field in the header, which means that
+	only one forecast can reside in the data section if it is indexed by the LEAD field. The answer
+	to this is to move the INIT field to the data section.
 	*/
-	//TODO - FIX THIS!!
 	docStructName := fmt.Sprintf("%s_%s", fileType, lineType)
 	headerStructName := fmt.Sprintf("%s_header", docStructName)
-
-	keyFields := buildHeaderLineTypeUtilities.DataKeyMap[fileType+"_"+lineType]
+	dataKeyMap := buildHeaderLineTypeUtilities.DataKeyMap[fileType+"_"+lineType]
+	keyFields := dataKeyMap.DataKey
+	headerDisallowed := dataKeyMap.HeaderDisallow // list of disallowed fields
 	headerStructString := fmt.Sprintf("type %s struct {\n", headerStructName)
 	if fileType == "MODE" || fileType == "MTD" {
 		// these file types do not have a LINE_TYPE field in the header definition
@@ -304,8 +321,8 @@ func getHeaderStructureString(fileType string, lineType string, getDocIDString s
 				break
 			}
 		}
-		// skip the dataKeyFields
-		if isDataKey {
+		// skip the dataKeyFields and disallowed fields
+		if isDataKey || slices.Contains(headerDisallowed, term) {
 			continue
 		}
 		// change regex type terms
@@ -345,39 +362,48 @@ func getFillStructureString(docStructName string, dataFields []string, metDataTy
 		}
 	}
 	padding2 := len("map[string]interface{}")
-	//	for index, term := range dataFields {
+	// add disallowed field terms to the dataFields and the associated data to the (embedded) fields array
+	dataFields = append(dataFields, buildHeaderLineTypeUtilities.DataKeyMap[fileType+"_"+lineType].HeaderDisallow...)
+	// iterate through the data fields to create the data struct and the fillStructure function
 	for index := 0; index < len(dataFields); index++ {
 		term := dataFields[index]
-		cleanTerm, dataType := getDataType(term, &metDataTypesForLines)
-		jsonTerm := strings.ToLower(cleanTerm)
-
-		dataStruct += fmt.Sprintf("    %-*s %-*s `json:\"%s\"`\n", padding, cleanTerm, padding2, dataType, jsonTerm)
-		var numFields int
-		var err error
-		var repeatFillStructureString string
-		fillStructureString += "\ti++; if i <= dataLen {"
-		switch dataType {
-		case "int":
-			fillStructureString += fmt.Sprintf("s.%s, _ = strconv.Atoi(fields[%d])", cleanTerm, index)
-		case "float64":
-			fillStructureString += fmt.Sprintf("s.%s, _ = strconv.ParseFloat(fields[%d], 64)", cleanTerm, index)
-		case "map[string]interface{}":
-			// this is a map which means that there are a sequence of fields that are repeated
-			numFields, repeatFillStructureString, err = getRepeatingSequenceStructureString(term, cleanTerm, fileType, lineType, index)
-			if err != nil {
-				fmt.Println("error in getRepeatingSequenceStructureString: ", err)
-			}
-			fillStructureString += repeatFillStructureString
-			index += numFields
-		default:
-			fillStructureString += fmt.Sprintf("s.%s = fields[%d]", cleanTerm, index)
-		}
-		fillStructureString += "}\n"
+		fillStructureString, dataStruct, index = getFillStructureTerm(term, metDataTypesForLines, dataStruct, padding, padding2, fillStructureString, index, fileType, lineType)
 	}
 	fillStructureString += "}\n"
 
 	dataStruct += "}\n"
 	return fillStructureString, dataStruct
+}
+
+func getFillStructureTerm(term string, metDataTypesForLines map[string]string, dataStruct string, padding int, padding2 int, fillStructureString string, index int, fileType string, lineType string) (string, string, int) {
+	_filledStructureString := fillStructureString
+	_dataStruct := dataStruct
+	cleanTerm, dataType := getDataType(term, &metDataTypesForLines)
+	jsonTerm := strings.ToLower(cleanTerm)
+
+	_dataStruct += fmt.Sprintf("    %-*s %-*s `json:\"%s\"`\n", padding, cleanTerm, padding2, dataType, jsonTerm)
+	var numFields int
+	var err error
+	var repeatFillStructureString string
+	_filledStructureString += "\ti++; if i <= dataLen {"
+	switch dataType {
+	case "int":
+		_filledStructureString += fmt.Sprintf("s.%s, _ = strconv.Atoi(fields[%d])", cleanTerm, index)
+	case "float64":
+		_filledStructureString += fmt.Sprintf("s.%s, _ = strconv.ParseFloat(fields[%d], 64)", cleanTerm, index)
+	case "map[string]interface{}":
+		// this is a map which means that there are a sequence of fields that are repeated
+		numFields, repeatFillStructureString, err = getRepeatingSequenceStructureString(term, cleanTerm, fileType, lineType, index)
+		if err != nil {
+			fmt.Println("error in getRepeatingSequenceStructureString: ", err)
+		}
+		_filledStructureString += repeatFillStructureString
+		index += numFields
+	default:
+		_filledStructureString += fmt.Sprintf("s.%s = fields[%d]", cleanTerm, index)
+	}
+	_filledStructureString += "}\n"
+	return _filledStructureString, _dataStruct, index
 }
 
 func getRepeatingSequenceStructureString(term string, cleanTerm string, fileType string, lineType string, index int) (numFields int, structureString string, err error) {

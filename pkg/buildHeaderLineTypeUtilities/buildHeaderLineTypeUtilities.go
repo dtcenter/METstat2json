@@ -11,6 +11,7 @@ The metadata is used to uniquely identify each document and is used to merge doc
 
 This package also defines the DataKeyMap that is used to determine the key data fields for a given line type.
 The key data fields are used to merge documents with the same header field values excluding the key data fields.
+It also defines header keys that are not allowed to be in the header.
 Other utilities exist to convert the date fields to epochs, to get the line type of the data line, to get the key
 data fields for a given line type, and to find the data type of a given field in addition to some other utility functions.
 */
@@ -22,6 +23,7 @@ import (
 	"os"
 	"path/filepath"
 	"regexp"
+	"slices"
 	"strconv"
 	"strings"
 	"time"
@@ -45,50 +47,55 @@ type VxMetadata struct {
 	SubType string `json:"subtype"`
 }
 
+type DataKeyEntry struct {
+	DataKey        []string
+	HeaderDisallow []string
+}
+
 // data key definitions
-var DataKeyMap = map[string][]string{
-	"STAT_CNT":       {"FCST_LEAD"},
-	"STAT_CTC":       {"FCST_LEAD"},
-	"STAT_CTS":       {"FCST_LEAD"},
-	"STAT_FHO":       {"FCST_LEAD"},
-	"STAT_ISC":       {"FCST_LEAD"},
-	"STAT_MCTC":      {"FCST_LEAD"},
-	"STAT_MCTS":      {"FCST_LEAD"},
-	"STAT_MPR":       {"FCST_LEAD"},
-	"STAT_SEEPS":     {"FCST_LEAD"},
-	"STAT_SEEPS_MPR": {"FCST_LEAD"},
-	"STAT_NBRCNT":    {"FCST_LEAD"},
-	"STAT_NBRCTC":    {"FCST_LEAD"},
-	"STAT_NBRCTS":    {"FCST_LEAD"},
-	"STAT_GRAD":      {"FCST_LEAD"},
-	"STAT_DMAP":      {"FCST_LEAD"},
-	"STAT_ORANK":     {"FCST_LEAD"},
-	"STAT_PCT":       {"FCST_LEAD"},
-	"STAT_PJC":       {"FCST_LEAD"},
-	"STAT_PRC":       {"FCST_LEAD"},
-	"STAT_PSTD":      {"FCST_LEAD"},
-	"STAT_ECLV":      {"FCST_LEAD"},
-	"STAT_ECNT":      {"FCST_LEAD"},
-	"STAT_RPS":       {"FCST_LEAD"},
-	"STAT_RHIST":     {"FCST_LEAD"},
-	"STAT_PHIST":     {"FCST_LEAD"},
-	"STAT_RELP":      {"FCST_LEAD"},
-	"STAT_SAL1L2":    {"FCST_LEAD"},
-	"STAT_SL1L2":     {"FCST_LEAD"},
-	"STAT_SSVAR":     {"FCST_LEAD"},
-	"STAT_VAL1L2":    {"FCST_LEAD"},
-	"STAT_VL1L2":     {"FCST_LEAD"},
-	"STAT_VCNT":      {"FCST_LEAD"},
-	"STAT_GENMPR":    {"FCST_LEAD"},
-	"STAT_SSIDX":     {"FCST_LEAD"},
-	"MODE_OBJ":       {"FCST_LEAD", "OBJECT_ID"},
-	"MODE_CTS":       {"FCST_LEAD"},
-	"MTD_2DSINGLE":   {"OBJECT_ID", "TIME_INDEX"},
-	"MTD_3DSINGLE":   {"OBJECT_ID"},
-	"MTD_3DPAIR":     {"OBJECT_ID"},
-	"TCST_TCMPR":     {"LEAD"},
-	"TCST_TCDIAG":    {"LEAD"},
-	"TCST_PROBRIRW":  {"LEAD"},
+var DataKeyMap = map[string]DataKeyEntry{
+	"STAT_CNT":       {DataKey: []string{"FCST_LEAD"}, HeaderDisallow: nil},
+	"STAT_CTC":       {DataKey: []string{"FCST_LEAD"}, HeaderDisallow: nil},
+	"STAT_CTS":       {DataKey: []string{"FCST_LEAD"}, HeaderDisallow: nil},
+	"STAT_FHO":       {DataKey: []string{"FCST_LEAD"}, HeaderDisallow: nil},
+	"STAT_ISC":       {DataKey: []string{"FCST_LEAD"}, HeaderDisallow: nil},
+	"STAT_MCTC":      {DataKey: []string{"FCST_LEAD"}, HeaderDisallow: nil},
+	"STAT_MCTS":      {DataKey: []string{"FCST_LEAD"}, HeaderDisallow: nil},
+	"STAT_MPR":       {DataKey: []string{"FCST_LEAD"}, HeaderDisallow: nil},
+	"STAT_SEEPS":     {DataKey: []string{"FCST_LEAD"}, HeaderDisallow: nil},
+	"STAT_SEEPS_MPR": {DataKey: []string{"FCST_LEAD"}, HeaderDisallow: nil},
+	"STAT_NBRCNT":    {DataKey: []string{"FCST_LEAD"}, HeaderDisallow: nil},
+	"STAT_NBRCTC":    {DataKey: []string{"FCST_LEAD"}, HeaderDisallow: nil},
+	"STAT_NBRCTS":    {DataKey: []string{"FCST_LEAD"}, HeaderDisallow: nil},
+	"STAT_GRAD":      {DataKey: []string{"FCST_LEAD"}, HeaderDisallow: nil},
+	"STAT_DMAP":      {DataKey: []string{"FCST_LEAD"}, HeaderDisallow: nil},
+	"STAT_ORANK":     {DataKey: []string{"FCST_LEAD"}, HeaderDisallow: nil},
+	"STAT_PCT":       {DataKey: []string{"FCST_LEAD"}, HeaderDisallow: nil},
+	"STAT_PJC":       {DataKey: []string{"FCST_LEAD"}, HeaderDisallow: nil},
+	"STAT_PRC":       {DataKey: []string{"FCST_LEAD"}, HeaderDisallow: nil},
+	"STAT_PSTD":      {DataKey: []string{"FCST_LEAD"}, HeaderDisallow: nil},
+	"STAT_ECLV":      {DataKey: []string{"FCST_LEAD"}, HeaderDisallow: nil},
+	"STAT_ECNT":      {DataKey: []string{"FCST_LEAD"}, HeaderDisallow: nil},
+	"STAT_RPS":       {DataKey: []string{"FCST_LEAD"}, HeaderDisallow: nil},
+	"STAT_RHIST":     {DataKey: []string{"FCST_LEAD"}, HeaderDisallow: nil},
+	"STAT_PHIST":     {DataKey: []string{"FCST_LEAD"}, HeaderDisallow: nil},
+	"STAT_RELP":      {DataKey: []string{"FCST_LEAD"}, HeaderDisallow: nil},
+	"STAT_SAL1L2":    {DataKey: []string{"FCST_LEAD"}, HeaderDisallow: nil},
+	"STAT_SL1L2":     {DataKey: []string{"FCST_LEAD"}, HeaderDisallow: nil},
+	"STAT_SSVAR":     {DataKey: []string{"FCST_LEAD"}, HeaderDisallow: nil},
+	"STAT_VAL1L2":    {DataKey: []string{"FCST_LEAD"}, HeaderDisallow: nil},
+	"STAT_VL1L2":     {DataKey: []string{"FCST_LEAD"}, HeaderDisallow: nil},
+	"STAT_VCNT":      {DataKey: []string{"FCST_LEAD"}, HeaderDisallow: nil},
+	"STAT_GENMPR":    {DataKey: []string{"FCST_LEAD"}, HeaderDisallow: nil},
+	"STAT_SSIDX":     {DataKey: []string{"FCST_LEAD"}, HeaderDisallow: nil},
+	"MODE_OBJ":       {DataKey: []string{"FCST_LEAD", "OBJECT_ID"}, HeaderDisallow: nil},
+	"MODE_CTS":       {DataKey: []string{"FCST_LEAD"}, HeaderDisallow: nil},
+	"MTD_2DSINGLE":   {DataKey: []string{"OBJECT_ID", "TIME_INDEX"}, HeaderDisallow: nil},
+	"MTD_3DSINGLE":   {DataKey: []string{"OBJECT_ID"}, HeaderDisallow: nil},
+	"MTD_3DPAIR":     {DataKey: []string{"OBJECT_ID"}, HeaderDisallow: nil},
+	"TCST_TCMPR":     {DataKey: []string{"LEAD"}, HeaderDisallow: []string{"INIT"}},
+	"TCST_TCDIAG":    {DataKey: []string{"LEAD"}, HeaderDisallow: []string{"INIT"}},
+	"TCST_PROBRIRW":  {DataKey: []string{"LEAD"}, HeaderDisallow: []string{"INIT"}},
 }
 
 // these fields will be converted to an int in the header section
@@ -139,16 +146,16 @@ func getLeadFromInitValid(headerFields []string, data []string, dataFieldIndex i
 
 		For stat files the header and data section are delineated by "LINE_TYPE" which is the last field of the header section of the header line.
 		Since this function has to split the line into a header and a data section those fields are returned as well.
-		The dataKey is the concatenation of the dataKeyFields. The desc_index is the index of the DESC field in the headerFields.
-		The dataKeyFields are used to merge documents. A dataKey field may be derived from either header fields or data fields.
-		If the dataKey is derived from header fields they will be removed from the headerFields and the headerData.
-		If the dataKey is derived from data fields they will not be removed from the data element.
+		The DataKey is the concatenation of the DataKeyFields. The desc_index is the index of the DESC field in the headerFields.
+		The DataKeyFields are used to merge documents. A DataKey field may be derived from either header fields or data fields.
+		If the DataKey is derived from header fields they will be removed from the headerFields and the headerData.
+		If the DataKey is derived from data fields they will not be removed from the data element.
 		Any headerData is converted to epochs if the field is a dateField.
 
 		NOTE: Often a stat file will not have a header line that contains data fields, i.e. it will end with the LINE_TYPE.
 		This is when the data file has different types of stat data in the same file.
-		In this case the dataFields cannot be determined and if the dataKeyMap specifies a dataKeyField that is not in the
-		headerFields then the dataKey will be "" and the entire header will be used to generate the id.
+		In this case the dataFields cannot be determined and if the DataKeyMap specifies a DataKeyField that is not in the
+		headerFields then the DataKey will be "" and the entire header will be used to generate the id.
 */
 func GetLineType(headerLine string, dataLine string, fileName string) (string, []string, []string, string, int, error) {
 	// make sure we have the basename here
@@ -224,13 +231,14 @@ func GetLineType(headerLine string, dataLine string, fileName string) (string, [
 			break
 		}
 	}
-	// have to remove the dataKeyFields from the headerFields and the headerData (dataData AND dataFields won't change)
+	// have to remove the DataKeyFields from the headerFields and the headerData (dataData AND dataFields won't change)
 	headerData := []string{}
-	dataKeyFields := []string{}
-	// look for dataKey fields in allData - remove the dataKeyFields from the headerData if the key is in the header
+	DataKeyFields := []string{}
+	// look for DataKey fields in allData - remove the DataKeyFields from the headerData if the key is in the header
+	// or if the key is in the disallowed header fields
 	for fIndex, field := range allHeaderFields {
 		isDataKey := false
-		for _, dk := range DataKeyMap[fileLineType] {
+		for _, dk := range DataKeyMap[fileLineType].DataKey {
 			if field == dk {
 				isDataKey = true
 				if (dk == "LEAD" || dk == "FCST_LEAD") && allData[fIndex] == "NA" {
@@ -245,19 +253,25 @@ func GetLineType(headerLine string, dataLine string, fileName string) (string, [
 					}
 				}
 				if allData[fIndex] != "NA" {
-					// the dataKey is the value that belongs to the associated field
+					// the DataKey is the value that belongs to the associated field
 					// not the field itself. Datakeys deliniate data sections
 					// based on their values
-					dataKeyFields = append(dataKeyFields, allData[fIndex])
+					DataKeyFields = append(DataKeyFields, allData[fIndex])
 				}
 				break
 			}
 		}
-
+		// handle disallowed header fields
+		for _, disDk := range DataKeyMap[fileLineType].HeaderDisallow {
+			if field == disDk {
+				isDataKey = true
+				break
+			}
+		}
 		isHeaderField := fIndex <= lineTypeIndex
 		// iterate through the header fields and
-		// if the field is a header field and a dataKeyField then blank it out
-		// convert header DATE fields that are not dataKeys to epochs
+		// if the field is a header field and a DataKeyField then blank it out
+		// convert header DATE fields that are not DataKeys to epochs
 		// Note: DateFieldNames also get a type of int in getDataType function
 		if isHeaderField {
 			if !isDataKey {
@@ -277,18 +291,18 @@ func GetLineType(headerLine string, dataLine string, fileName string) (string, [
 					headerData = append(headerData, allData[fIndex])
 				}
 			} else {
-				// blank out the dataKeyFields - they will be squeezed out by the join below
+				// blank out the DataKeyFields - they will be squeezed out by the join below
 				headerData = append(headerData, "")
 			}
 		}
 	}
-	dataKey := strings.Join(dataKeyFields, "_")
-	if dataKey == "" {
-		// if the dataKey is empty this is an error
-		return "", nil, nil, "", desc_index, fmt.Errorf("UNPARSABLE_LINE: dataKey is empty")
+	DataKey := strings.Join(DataKeyFields, "_")
+	if DataKey == "" {
+		// if the DataKey is empty this is an error
+		return "", nil, nil, "", desc_index, fmt.Errorf("UNPARSABLE_LINE: DataKey is empty")
 	}
-	// return the lineType, the headerData, the dataData, the dataKey, and the desc_index
-	return fileLineType, headerData, dataData, dataKey, desc_index, nil
+	// return the lineType, the headerData, the dataData, the DataKey, and the desc_index
+	return fileLineType, headerData, dataData, DataKey, desc_index, nil
 }
 
 /*
@@ -297,7 +311,7 @@ for the line. The header fields are the fields that are used to identify the doc
 are the fields that are used to populate the data section of the document. The parts are
 delimited by specific fields for each file type.
 
-NOTE: This is different than the dataKeyFields. The dataKeyFields are used to merge documents. This
+NOTE: This is different than the DataKeyFields. The DataKeyFields are used to merge documents. This
 function is used to split the header and data fields from the line.
 */
 func SplitColumnDefLine(fileLineType string, headerLine string) ([]string, []string) {
@@ -361,6 +375,21 @@ func FindType(name string, data []byte) (string, error) {
 		dataType = "string"
 	}
 	return dataType, nil
+}
+
+// GetHeaderValue returns the value of a header field in the headerData slice.
+// If the field is not found, it returns -1.
+func GetHeaderValue(headerFields []string, headerData []string, field string) (string, error) {
+	for i, h := range headerFields {
+		if h == field {
+			// if the field is a date field then convert it to an epoch
+			if slices.Contains(DateFieldNames, field) {
+				return dateToEpoch(headerData[i]), nil
+			}
+			return headerData[i], nil
+		}
+	}
+	return "", nil
 }
 
 func GetId(tmpHeaderData []string, metaData *VxMetadata) VxMetadata {
