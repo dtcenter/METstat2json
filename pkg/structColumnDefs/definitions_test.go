@@ -139,7 +139,7 @@ func TestParseVAL1L2(t *testing.T) {
 	dataLine2 := "V12.0.0 FCST  NA   120000    20120409_120000 20120409_120000 000000   20120409_113000 20120409_123000 UGRD_VGRD m/s        Z10      UGRD_VGRD NA        Z10      ADPSFC LMV     NEAREST     1           NA          NA         NA         NA    VAL1L2     393   -0.32297       0.32197       -0.79039       0.14006       1.34214     1.86519     3.95307      1.23297    1.78245    393           26.10387   54.98572  4500.31836"
 	dataLine3 := "V12.0.0 FCST  NA   180000    20120409_120000 20120409_120000 000000   20120409_113000 20120409_123000 UGRD_VGRD m/s        Z10      UGRD_VGRD NA        Z10      ADPSFC LMV     NEAREST     1           NA          NA         NA         NA    VAL1L2     393   -0.32297       0.32197       -0.79039       0.14006       1.34214     1.86519     3.95307      1.23297    1.78245    393           26.10387   54.98572  4500.31836"
 	dataLine4 := "V12.0.0 FCST  this_is_a_long_description_field   180000    20120409_120000 20120409_120000 000000   20120409_113000 20120409_123000 UGRD_VGRD m/s        Z10      UGRD_VGRD NA        Z10      ADPSFC LMV     NEAREST     1           NA          NA         NA         NA    VAL1L2     393   -0.32297       0.32197       -0.79039       0.14006       1.34214     1.86519     3.95307      1.23297    1.78245    393           26.10387   54.98572  4500.31836"
-
+	tmpDir := t.TempDir()
 	fName := "grid_stat_ECMWF_TMP_vs_ANLYS_TMP_P1000_anom_360000L_20241031_000000V.stat"
 	var doc map[string]interface{}
 	doc, err := ParseLine(headerLine, dataLine, &doc, fName, getMissingExternalDocForId)
@@ -162,13 +162,13 @@ func TestParseVAL1L2(t *testing.T) {
 	if doc == nil {
 		t.Fatalf("Expected parsed document, got nil")
 	}
-	err = WriteJsonToCompressedFile(doc, "/tmp/test_output.json.gz")
+	err = WriteJsonToCompressedFile(doc, tmpDir+"/test_output.json.gz")
 	if err != nil {
 		t.Fatalf("Expected no error, got %v", err)
 	}
 
 	// read the file back in
-	parsedDoc, err := ReadJsonFromGzipFile("/tmp/test_output.json.gz")
+	parsedDoc, err := ReadJsonFromGzipFile(tmpDir + "/test_output.json.gz")
 	if err != nil {
 		t.Fatalf("Expected no error, got %v", err)
 	}
@@ -205,7 +205,7 @@ func TestParseMODE_OBJ(t *testing.T) {
 	headerLine := "VERSION MODEL N_VALID GRID_RES DESC FCST_LEAD FCST_VALID      FCST_ACCUM OBS_LEAD OBS_VALID       OBS_ACCUM FCST_RAD FCST_THR OBS_RAD OBS_THR FCST_VAR FCST_UNITS FCST_LEV OBS_VAR OBS_UNITS OBS_LEV OBTYPE FIELD  TOTAL FY_OY FY_ON FN_OY FN_ON BASER   FMEAN    ACC     FBIAS  PODY       PODN    POFD     FAR     CSI        GSS       HK        HSS       ODDS      LODDS   ORSS     EDS      SEDS     EDI      SEDI     BAGSS"
 	dataLine := "V12.0.0 FCST  26026   9        NA   300000    20120410_180000 060000     120000   20050807_120000 120000    2        >=5.0    2       >=5.0   APCP_06  kg/m^2     A6       OBS     None      Surface STAGE4    RAW 26026    47  1356  5898 18725 0.22843 0.053908 0.72128 0.236  0.0079058  0.93247 0.067527 0.9665  0.0064375  -0.039178 -0.059621 -0.08155  0.11004   -2.2069 -0.80173 -0.53249 -0.3039  -0.28465 -0.28988 -0.11236"
 	dataLine2 := "V12.0.0 FCST  26026   9        this_is_a_long_description   300000    20120410_180000 060000     120000   20050807_120000 120000    2        >=5.0    2       >=5.0   APCP_06  kg/m^2     A6       OBS     None      Surface STAGE4 OBJECT 26026     4  1315  6322 18385 0.24306 0.05068  0.70656 0.2085 0.00063231 0.93325 0.066751 0.99697 0.00052349 -0.043249 -0.066119 -0.090409 0.0088459 -4.7278 -0.98246 -0.67783 -0.49927 -0.46256 -0.46613 -0.13686"
-
+	tmpDir := t.TempDir()
 	// fileType := "MODE_OBJ"
 	fName := "mode_python_mixed_300000L_20120410_180000V_060000A_cts.txt"
 	var doc map[string]interface{}
@@ -218,12 +218,12 @@ func TestParseMODE_OBJ(t *testing.T) {
 		t.Fatalf("Expected no error, got %v", err)
 	}
 	// write the doc to a file
-	err = WriteJsonToCompressedFile(doc, "/tmp/test_output.json.gz")
+	err = WriteJsonToCompressedFile(doc, tmpDir+"/test_output.json.gz")
 	if err != nil {
 		t.Fatalf("Expected no error, got %v", err)
 	}
 	// read the file back in
-	parsedDoc, err := ReadJsonFromGzipFile("/tmp/test_output.json.gz")
+	parsedDoc, err := ReadJsonFromGzipFile(tmpDir + "/test_output.json.gz")
 	if err != nil {
 		t.Fatalf("Expected no error, got %v", err)
 	}
@@ -255,6 +255,7 @@ func TestParseMODE_OBJ(t *testing.T) {
 
 func TestModeFile(t *testing.T) {
 	var doc map[string]interface{}
+	tmpDir := t.TempDir()
 	dir, err := getTestDataDir()
 	if err != nil {
 		t.Fatal("error getting test data directory", err)
@@ -295,13 +296,13 @@ func TestModeFile(t *testing.T) {
 	if doc == nil {
 		t.Fatalf("Expected parsed document, got nil")
 	}
-	err = WriteJsonToCompressedFile(doc, "/tmp/test_output.json.gz")
+	err = WriteJsonToCompressedFile(doc, tmpDir+"/test_output.json.gz")
 	if err != nil {
 		t.Fatalf("Expected no error, got %v", err)
 	}
 
 	// read the file back in
-	parsedDoc, err := ReadJsonFromGzipFile("/tmp/test_output.json.gz")
+	parsedDoc, err := ReadJsonFromGzipFile(tmpDir + "/test_output.json.gz")
 	if err != nil {
 		t.Fatalf("Expected no error, got %v", err)
 	}
@@ -312,6 +313,7 @@ func TestModeFile(t *testing.T) {
 
 func TestMC_PCP_File(t *testing.T) {
 	var doc map[string]interface{}
+	tmpDir := t.TempDir()
 	dir, err := getTestDataDir()
 	if err != nil {
 		t.Fatal("error getting test data directory", err)
@@ -341,13 +343,13 @@ func TestMC_PCP_File(t *testing.T) {
 	if doc == nil {
 		t.Fatalf("Expected parsed document, got nil")
 	}
-	err = WriteJsonToCompressedFile(doc, "/tmp/test_output.json.gz")
+	err = WriteJsonToCompressedFile(doc, tmpDir+"/test_output.json.gz")
 	if err != nil {
 		t.Fatalf("Expected no error, got %v", err)
 	}
 
 	// read the file back in
-	parsedDoc, err := ReadJsonFromGzipFile("/tmp/test_output.json.gz")
+	parsedDoc, err := ReadJsonFromGzipFile(tmpDir + "/test_output.json.gz")
 	if err != nil {
 		t.Fatalf("Expected no error, got %v", err)
 	}
@@ -358,6 +360,7 @@ func TestMC_PCP_File(t *testing.T) {
 
 func TestTC_CTS_File(t *testing.T) {
 	var doc map[string]interface{}
+	tmpDir := t.TempDir()
 	dir, err := getTestDataDir()
 	if err != nil {
 		t.Fatal("error getting test data directory", err)
@@ -387,13 +390,13 @@ func TestTC_CTS_File(t *testing.T) {
 	if doc == nil {
 		t.Fatalf("Expected parsed document, got nil")
 	}
-	err = WriteJsonToCompressedFile(doc, "/tmp/test_output.json.gz")
+	err = WriteJsonToCompressedFile(doc, tmpDir+"/test_output.json.gz")
 	if err != nil {
 		t.Fatalf("Expected no error, got %v", err)
 	}
 
 	// read the file back in
-	parsedDoc, err := ReadJsonFromGzipFile("/tmp/test_output.json.gz")
+	parsedDoc, err := ReadJsonFromGzipFile(tmpDir + "/test_output.json.gz")
 	if err != nil {
 		t.Fatalf("Expected no error, got %v", err)
 	}
@@ -404,6 +407,7 @@ func TestTC_CTS_File(t *testing.T) {
 
 func TestMC_CTS_File(t *testing.T) {
 	var doc map[string]interface{}
+	tmpDir := t.TempDir()
 	dir, err := getTestDataDir()
 	if err != nil {
 		t.Fatal("error getting test data directory", err)
@@ -433,13 +437,13 @@ func TestMC_CTS_File(t *testing.T) {
 	if doc == nil {
 		t.Fatalf("Expected parsed document, got nil")
 	}
-	err = WriteJsonToCompressedFile(doc, "/tmp/test_output.json.gz")
+	err = WriteJsonToCompressedFile(doc, tmpDir+"/test_output.json.gz")
 	if err != nil {
 		t.Fatalf("Expected no error, got %v", err)
 	}
 
 	// read the file back in
-	parsedDoc, err := ReadJsonFromGzipFile("/tmp/test_output.json.gz")
+	parsedDoc, err := ReadJsonFromGzipFile(tmpDir + "/test_output.json.gz")
 	if err != nil {
 		t.Fatalf("Expected no error, got %v", err)
 	}
@@ -452,6 +456,7 @@ func TestMC_CTS_File(t *testing.T) {
 // testdata/tcstfiles/al022013_interp12_fill.tcst
 func Test_TCST_File(t *testing.T) {
 	var doc map[string]interface{}
+	tmpDir := t.TempDir()
 	dir, err := getTestDataDir()
 	if err != nil {
 		t.Fatal("error getting test data directory", err)
@@ -481,13 +486,13 @@ func Test_TCST_File(t *testing.T) {
 	if doc == nil {
 		t.Fatalf("Expected parsed document, got nil")
 	}
-	err = WriteJsonToCompressedFile(doc, "/tmp/test_output.json.gz")
+	err = WriteJsonToCompressedFile(doc, tmpDir+"/test_output.json.gz")
 	if err != nil {
 		t.Fatalf("Expected no error, got %v", err)
 	}
 
 	// read the file back in
-	parsedDoc, err := ReadJsonFromGzipFile("/tmp/test_output.json.gz")
+	parsedDoc, err := ReadJsonFromGzipFile(tmpDir + "/test_output.json.gz")
 	if err != nil {
 		t.Fatalf("Expected no error, got %v", err)
 	}
@@ -500,6 +505,7 @@ func Test_TCST_File(t *testing.T) {
 // /ttc_data/CMC/2024081306/tc_pairs_ep05.dat_PROBRIRW.tcst
 func Test_TCDATA_File(t *testing.T) {
 	var doc map[string]interface{}
+	tmpDir := t.TempDir()
 	dir, err := getTestDataDir()
 	if err != nil {
 		t.Fatal("error getting test data directory", err)
@@ -529,13 +535,13 @@ func Test_TCDATA_File(t *testing.T) {
 	if doc == nil {
 		t.Fatalf("Expected parsed document, got nil")
 	}
-	err = WriteJsonToCompressedFile(doc, "/tmp/test_output.json.gz")
+	err = WriteJsonToCompressedFile(doc, tmpDir+"/test_output.json.gz")
 	if err != nil {
 		t.Fatalf("Expected no error, got %v", err)
 	}
 
 	// read the file back in
-	parsedDoc, err := ReadJsonFromGzipFile("/tmp/test_output.json.gz")
+	parsedDoc, err := ReadJsonFromGzipFile(tmpDir + "/test_output.json.gz")
 	if err != nil {
 		t.Fatalf("Expected no error, got %v", err)
 	}
@@ -547,6 +553,7 @@ func Test_TCDATA_File(t *testing.T) {
 // tcpairs test
 func Test_TCPAIRS_File(t *testing.T) {
 	var doc map[string]interface{}
+	tmpDir := t.TempDir()
 	dir, err := getTestDataDir()
 	if err != nil {
 		t.Fatal("error getting test data directory", err)
@@ -576,13 +583,13 @@ func Test_TCPAIRS_File(t *testing.T) {
 	if doc == nil {
 		t.Fatalf("Expected parsed document, got nil")
 	}
-	err = WriteJsonToCompressedFile(doc, "/tmp/test_output.json.gz")
+	err = WriteJsonToCompressedFile(doc, tmpDir+"/test_output.json.gz")
 	if err != nil {
 		t.Fatalf("Expected no error, got %v", err)
 	}
 
 	// read the file back in
-	parsedDoc, err := ReadJsonFromGzipFile("/tmp/test_output.json.gz")
+	parsedDoc, err := ReadJsonFromGzipFile(tmpDir + "/test_output.json.gz")
 	if err != nil {
 		t.Fatalf("Expected no error, got %v", err)
 	}
@@ -593,6 +600,7 @@ func Test_TCPAIRS_File(t *testing.T) {
 
 func TestMC_SAL1L2_File(t *testing.T) {
 	var doc map[string]interface{}
+	tmpDir := t.TempDir()
 	dir, err := getTestDataDir()
 	if err != nil {
 		t.Fatal("error getting test data directory", err)
@@ -622,13 +630,13 @@ func TestMC_SAL1L2_File(t *testing.T) {
 	if doc == nil {
 		t.Fatalf("Expected parsed document, got nil")
 	}
-	err = WriteJsonToCompressedFile(doc, "/tmp/test_output.json.gz")
+	err = WriteJsonToCompressedFile(doc, tmpDir+"/test_output.json.gz")
 	if err != nil {
 		t.Fatalf("Expected no error, got %v", err)
 	}
 
 	// read the file back in
-	parsedDoc, err := ReadJsonFromGzipFile("/tmp/test_output.json.gz")
+	parsedDoc, err := ReadJsonFromGzipFile(tmpDir + "/test_output.json.gz")
 	if err != nil {
 		t.Fatalf("Expected no error, got %v", err)
 	}
@@ -640,11 +648,12 @@ func TestMC_SAL1L2_File(t *testing.T) {
 func TestParseRegressionSuite(t *testing.T) {
 	var doc map[string]interface{}
 	var err error
-	path, err := os.Getwd()
+	tmpDir := t.TempDir()
+	dir, err := getTestDataDir()
 	if err != nil {
-		t.Fatal("error getting working directory:", err)
+		t.Fatal("error getting test data directory:", err)
 	}
-	directory := path + "/../../testdata/statfiles/" // The statfiles directory
+	directory := dir + "/statfiles/" // The statfiles directory
 
 	files, err := os.Open(directory) // open the directory to read files in the directory
 	if err != nil {
@@ -693,13 +702,13 @@ func TestParseRegressionSuite(t *testing.T) {
 	if doc == nil {
 		t.Fatalf("Expected parsed document, got nil")
 	}
-	err = WriteJsonToCompressedFile(doc, "/tmp/test_output.json.gz")
+	err = WriteJsonToCompressedFile(doc, tmpDir+"/test_output.json.gz")
 	if err != nil {
 		t.Fatalf("Expected no error, got %v", err)
 	}
 
 	// read the file back in
-	parsedDoc, err := ReadJsonFromGzipFile("/tmp/test_output.json.gz")
+	parsedDoc, err := ReadJsonFromGzipFile(tmpDir + "/test_output.json.gz")
 	if err != nil {
 		t.Fatalf("Expected no error, got %v", err)
 	}
@@ -711,13 +720,12 @@ func TestParseRegressionSuite(t *testing.T) {
 func TestParseG2G_v12_Suite(t *testing.T) {
 	var doc map[string]interface{}
 	var err error
-	var path string
-
-	path, err = os.Getwd()
+	tmpDir := t.TempDir()
+	dir, err := getTestDataDir()
 	if err != nil {
-		t.Fatal("error getting working directory:", err)
+		t.Fatal("error getting test data directory:", err)
 	}
-	directory := path + "/../../testdata/G2G_v12" // The G2G_v12 top level directory
+	directory := dir + "/G2G_v12" // The G2G_v12 top level directory
 
 	err = filepath.Walk(directory,
 		func(path string, fileInfo os.FileInfo, err error) error {
@@ -774,13 +782,13 @@ func TestParseG2G_v12_Suite(t *testing.T) {
 	if doc == nil {
 		t.Fatalf("Expected parsed document, got nil")
 	}
-	err = WriteJsonToCompressedFile(doc, "/tmp/test_output.json.gz")
+	err = WriteJsonToCompressedFile(doc, tmpDir+"/test_output.json.gz")
 	if err != nil {
 		t.Fatalf("Expected no error, got %v", err)
 	}
 
 	// read the file back in
-	parsedDoc, err := ReadJsonFromGzipFile("/tmp/test_output.json.gz")
+	parsedDoc, err := ReadJsonFromGzipFile(tmpDir + "/test_output.json.gz")
 	if err != nil {
 		t.Fatalf("Expected no error, got %v", err)
 	}
@@ -792,13 +800,12 @@ func TestParseG2G_v12_Suite(t *testing.T) {
 func TestParse_tc_data_Suite(t *testing.T) {
 	var doc map[string]interface{}
 	var err error
-	var path string
-
-	path, err = os.Getwd()
+	tmpDir := t.TempDir()
+	dir, err := getTestDataDir()
 	if err != nil {
-		t.Fatal("error getting working directory:", err)
+		t.Fatal("error getting test data directory:", err)
 	}
-	directory := path + "/../../testdata/tc_data" // The tc_data top level directory
+	directory := dir + "/tc_data" // The tc_data top level directory
 
 	err = filepath.Walk(directory,
 		func(path string, fileInfo os.FileInfo, err error) error {
@@ -855,13 +862,13 @@ func TestParse_tc_data_Suite(t *testing.T) {
 	if doc == nil {
 		t.Fatalf("Expected parsed document, got nil")
 	}
-	err = WriteJsonToCompressedFile(doc, "/tmp/test_output.json.gz")
+	err = WriteJsonToCompressedFile(doc, tmpDir+"/test_output.json.gz")
 	if err != nil {
 		t.Fatalf("Expected no error, got %v", err)
 	}
 
 	// read the file back in
-	parsedDoc, err := ReadJsonFromGzipFile("/tmp/test_output.json.gz")
+	parsedDoc, err := ReadJsonFromGzipFile(tmpDir + "/test_output.json.gz")
 	if err != nil {
 		t.Fatalf("Expected no error, got %v", err)
 	}
@@ -873,13 +880,12 @@ func TestParse_tc_data_Suite(t *testing.T) {
 func TestParse_tcst_Suite(t *testing.T) {
 	var doc map[string]interface{}
 	var err error
-	var path string
-
-	path, err = os.Getwd()
+	tmpDir := t.TempDir()
+	dir, err := getTestDataDir()
 	if err != nil {
-		t.Fatal("error getting working directory:", err)
+		t.Fatal("error getting test data directory:", err)
 	}
-	directory := path + "/../../testdata/tcstfiles" // The tc_data top level directory
+	directory := dir + "/tcstfiles" // The tc_data top level directory
 
 	err = filepath.Walk(directory,
 		func(path string, fileInfo os.FileInfo, err error) error {
@@ -940,13 +946,13 @@ func TestParse_tcst_Suite(t *testing.T) {
 	if doc == nil {
 		t.Fatalf("Expected parsed document, got nil")
 	}
-	err = WriteJsonToCompressedFile(doc, "/tmp/test_output.json.gz")
+	err = WriteJsonToCompressedFile(doc, tmpDir+"/test_output.json.gz")
 	if err != nil {
 		t.Fatalf("Expected no error, got %v", err)
 	}
 
 	// read the file back in
-	parsedDoc, err := ReadJsonFromGzipFile("/tmp/test_output.json.gz")
+	parsedDoc, err := ReadJsonFromGzipFile(tmpDir + "/test_output.json.gz")
 	if err != nil {
 		t.Fatalf("Expected no error, got %v", err)
 	}
@@ -958,13 +964,12 @@ func TestParse_tcst_Suite(t *testing.T) {
 func TestParse_textfiles_Suite(t *testing.T) {
 	var doc map[string]interface{}
 	var err error
-	var path string
-
-	path, err = os.Getwd()
+	tmpDir := t.TempDir()
+	dir, err := getTestDataDir()
 	if err != nil {
-		t.Fatal("error getting working directory:", err)
+		t.Fatal("error getting test data directory:", err)
 	}
-	directory := path + "/../../testdata/textfiles" // The tc_data top level directory
+	directory := dir + "/textfiles" // The tc_data top level directory
 
 	err = filepath.Walk(directory,
 		func(path string, fileInfo os.FileInfo, err error) error {
@@ -1021,13 +1026,13 @@ func TestParse_textfiles_Suite(t *testing.T) {
 	if doc == nil {
 		t.Fatalf("Expected parsed document, got nil")
 	}
-	err = WriteJsonToCompressedFile(doc, "/tmp/test_output.json.gz")
+	err = WriteJsonToCompressedFile(doc, tmpDir+"/test_output.json.gz")
 	if err != nil {
 		t.Fatalf("Expected no error, got %v", err)
 	}
 
 	// read the file back in
-	parsedDoc, err := ReadJsonFromGzipFile("/tmp/test_output.json.gz")
+	parsedDoc, err := ReadJsonFromGzipFile(tmpDir + "/test_output.json.gz")
 	if err != nil {
 		t.Fatalf("Expected no error, got %v", err)
 	}

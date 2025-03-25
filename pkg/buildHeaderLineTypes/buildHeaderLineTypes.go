@@ -276,14 +276,14 @@ func getHeaderStructureString(fileType string, lineType string, getDocIDString s
 	from the met_header_columns file. A LINE_TYPE can be inferred from
 	a combination of the header fields and the data fields.
 	Also the TCMPR file type has an INIT, a VALID, and a LEAD field in the header, which means that
-	only one forecast can reside in the data section if it is indexed by the LEAD field. The asnswer
+	only one forecast can reside in the data section if it is indexed by the LEAD field. The answer
 	to this is to move the INIT field to the data section.
 	*/
 	docStructName := fmt.Sprintf("%s_%s", fileType, lineType)
 	headerStructName := fmt.Sprintf("%s_header", docStructName)
 	dataKeyMap := buildHeaderLineTypeUtilities.DataKeyMap[fileType+"_"+lineType]
 	keyFields := dataKeyMap.DataKey
-	headerDisallowed := dataKeyMap.HeaderDisallow // list of dissallowed fields
+	headerDisallowed := dataKeyMap.HeaderDisallow // list of disallowed fields
 	headerStructString := fmt.Sprintf("type %s struct {\n", headerStructName)
 	if fileType == "MODE" || fileType == "MTD" {
 		// these file types do not have a LINE_TYPE field in the header definition
@@ -321,7 +321,7 @@ func getHeaderStructureString(fileType string, lineType string, getDocIDString s
 				break
 			}
 		}
-		// skip the dataKeyFields and dissallowed fields
+		// skip the dataKeyFields and disallowed fields
 		if isDataKey || slices.Contains(headerDisallowed, term) {
 			continue
 		}

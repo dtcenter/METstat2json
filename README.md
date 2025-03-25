@@ -72,7 +72,7 @@ The metadata is used to uniquely identify each document and is used to merge doc
 This package also defines the DataKeyMap that is used to determine the key data fields for a given line type.
 The key data fields are used to merge documents with the same header field values excluding the key data fields.
 The key data fields can be either from the header or the data section of a record line. In addition there
-is a headerDisallow field that may have a list of header section fields that must be dissallowed from the header structure.
+is a headerDisallow field that may have a list of header section fields that must be disallowed from the header structure.
 
 ### header key data field
 
