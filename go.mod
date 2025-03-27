@@ -3,7 +3,6 @@ module github.com/NOAA-GSL/MET-parser
 go 1.23.3
 
 require (
-	github.com/NOAA-GSL/MET-parser v1.0.3
 	github.com/stretchr/testify v1.10.0
 )
 
