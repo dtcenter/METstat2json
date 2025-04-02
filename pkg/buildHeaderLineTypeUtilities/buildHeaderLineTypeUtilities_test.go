@@ -10,6 +10,7 @@ func TestGetLineType(t *testing.T) {
 		dataLine      string
 		fileType      string
 		fileName      string
+		version       string
 		wantType      string
 		wantHeader    []string
 		wantData      []string
@@ -22,6 +23,7 @@ func TestGetLineType(t *testing.T) {
 			dataLine:      "V12.0.0 ECMWF NA   060000    20241031_000000 20241031_000000 000000   20241031_000000 20241031_000000 TMP       K          P1000    TMP       K         P1000   ANLYS  FULL    NEAREST     1           NA          NA         NA         NA    SAL1L2    1038240   0.84332      0.45998         6.19154        7.38574        7.9421     1.02924",
 			fileType:      "STAT",
 			fileName:      "point_stat_360000L_20070331_120000V_sal1l2.txt",
+			version:       "V12.0.0",
 			wantType:      "STAT_SAL1L2",
 			wantHeader:    []string{"V12.0.0", "ECMWF", "NA", "", "1730332800", "1730332800", "000000", "1730332800", "1730332800", "TMP", "K", "P1000", "TMP", "K", "P1000", "ANLYS", "FULL", "NEAREST", "1", "NA", "NA", "NA", "NA", "SAL1L2"},
 			wantData:      []string{"1038240", "0.84332", "0.45998", "6.19154", "7.38574", "7.9421", "1.02924"},
@@ -34,6 +36,7 @@ func TestGetLineType(t *testing.T) {
 			dataLine:      "V12.0.0 ECMWF NA   060000    20241031_000000 20241031_000000 000000   20241031_000000 20241031_000000 TMP       K          P1000    TMP       K         P1000   ANLYS  NAO     NEAREST     1           NA          NA         NA         NA    SAL1L2      18444  -0.56214     -0.71048        12.15072       12.51109       12.28397    0.54932",
 			fileType:      "STAT",
 			fileName:      "point_stat_360000L_20070331_120000V_sal1l2.txt",
+			version:       "V12.0.0",
 			wantType:      "STAT_SAL1L2",
 			wantHeader:    []string{"V12.0.0", "ECMWF", "NA", "", "1730332800", "1730332800", "000000", "1730332800", "1730332800", "TMP", "K", "P1000", "TMP", "K", "P1000", "ANLYS", "NAO", "NEAREST", "1", "NA", "NA", "NA", "NA", "SAL1L2"},
 			wantData:      []string{"18444", "-0.56214", "-0.71048", "12.15072", "12.51109", "12.28397", "0.54932"},
@@ -46,6 +49,7 @@ func TestGetLineType(t *testing.T) {
 			dataLine:      "V12.0.0 ECMWF NA   060000    20241031_000000 20241031_000000 000000   20241031_000000 20241031_000000 TMP       K          P850     TMP       K         P850    ANLYS  FULL    NEAREST     1           NA          NA         NA         NA    SAL1L2    1038240   0.82265      0.63798        11.1637        11.68235       12.24054    0.8205",
 			fileType:      "STAT",
 			fileName:      "point_stat_360000L_20070331_120000V_sal1l2.txt",
+			version:       "V12.0.0",
 			wantType:      "STAT_SAL1L2",
 			wantHeader:    []string{"V12.0.0", "ECMWF", "NA", "", "1730332800", "1730332800", "000000", "1730332800", "1730332800", "TMP", "K", "P850", "TMP", "K", "P850", "ANLYS", "FULL", "NEAREST", "1", "NA", "NA", "NA", "NA", "SAL1L2"},
 			wantData:      []string{"1038240", "0.82265", "0.63798", "11.1637", "11.68235", "12.24054", "0.8205"},
@@ -58,7 +62,7 @@ func TestGetLineType(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.headerLine, func(t *testing.T) {
 			// sometimes (like this one) the gotData is not returned because the header fields for the data are not there
-			gotType, gotHeader, gotData, gotKey, gotDescIndex, err := GetLineType(tt.headerLine, tt.dataLine, tt.fileName)
+			gotType, gotHeader, gotData, gotKey, gotDescIndex, err := GetLineType(tt.headerLine, tt.dataLine, tt.fileName, tt.version)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("GetLineType() error = %v, wantErr %v", err, tt.wantErr)
 				return

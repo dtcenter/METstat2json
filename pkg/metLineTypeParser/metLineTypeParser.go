@@ -1,4 +1,4 @@
-package structColumnDefs
+package metLineTypeParser
 
 import (
 	"bytes"
@@ -9,14 +9,23 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/NOAA-GSL/MET-parser/pkg/buildHeaderLineTypeUtilities"
-	"github.com/NOAA-GSL/MET-parser/pkg/structColumnTypes"
+	metLineTypeDefinitions_v10_0 "github.com/NOAA-GSL/MET-parser/pkg/metLineTypeDefinitions_v10_0"
+	metLineTypeDefinitions_v10_1 "github.com/NOAA-GSL/MET-parser/pkg/metLineTypeDefinitions_v10_1"
+	metLineTypeDefinitions_v11_0 "github.com/NOAA-GSL/MET-parser/pkg/metLineTypeDefinitions_v11_0"
+	metLineTypeDefinitions_v11_1 "github.com/NOAA-GSL/MET-parser/pkg/metLineTypeDefinitions_v11_1"
+	metLineTypeDefinitions_v12_0 "github.com/NOAA-GSL/MET-parser/pkg/metLineTypeDefinitions_v12_0"
+
+	buildHeaderLineTypeUtilities "github.com/NOAA-GSL/MET-parser/pkg/buildHeaderLineTypeUtilities"
 )
 
 /*
+Supportoing versions FYI, these are all the >= 10.0.0 releases of MET that exist: 10.0 10.1 11.0 11.1 12.0
 This package is used to parse the data for MET output files.
-The entry point to this package is the ParseLine function that takes a header line, a data line, a fileType,
-and a map of documents indexed by the document id. The document pointer can be an empty document. The header line
+The entry point to this package is the ParseLine function that takes a data set name, header line, a data line, a fileType,
+and a map of documents indexed by the document id. The document pointer can be an empty document. The data set name is a string that identifies the actual MET dataset.
+For example a MET user may run the same thing multiple times and without a unique data set name for
+each run the id fields of the JSON documents in the parsed output would be the same and the data would
+overwrite itself in the database. So the data set name is required and must be unique. The header line
 is the first line of the file and contains the header field names.  The data line is any subsequent line of the file
 that contains the header and the data fields.
 The fileType is a string that represents the type of file being parsed. The docPtr is a pointer to a map of
@@ -35,11 +44,11 @@ dataKey i.e the concatenated dataKey values, and the descIndex is the ordinal in
 The descIndex is used to trim the desc field to 10 characters.
 
 The parseLine function also uses the
-getId function to determine the id of the data line. The id is derived from the headerData minus the dataKey fields and
-is returned in the form of a VxMetaData struct. The VxMetaData struct is then converted to a map[string]interface{}
-so that it can be passed to the GetDocForId function without the GetDocForId function needing to know the VxMetaData struct type.
+GetId function to determine the id of the data line. The id is derived from the headerData minus the dataKey fields and
+is returned in the form of a VxMetadata struct. The VxMetadata struct is then converted to a map[string]interface{}
+so that it can be passed to the GetDocForId function without the GetDocForId function needing to know the VxMetadata struct type.
 
-There are a couple of utility functions that are used to get the headerData without the NA values and to convert the VxMetaData struct.
+There are a couple of utility functions that are used to get the headerData without the NA values and to convert the VxMetadata struct.
 A document pointer is required as a place to store the parsed data. If the document is nil, a new document is created.
 The header line values (minus the dataKey fields) are used to derive the id, with date fields converted to epochs.
 If the data section of of the document[id] is nil, a new data section is created. The data section is then populated
@@ -50,8 +59,19 @@ is used to get a document from an external source, such as a database, that is i
 is not nil, it is added to the document map. If the external document is nil, a new document is created for the id.
 */
 
-func ParseLine(headerLine string, dataLine string, docPtr *map[string]interface{}, fileName string, getExternalDocForId func(id string) (map[string]interface{}, error)) (map[string]interface{}, error) {
-	_err := error(nil)
+const DOC_NOT_FOUND = "document not found"
+
+func getParserVersion(dataLine string) (string, error) {
+	metVersion := strings.ToLower(strings.Fields(dataLine)[0])
+	metVersionParts := strings.Split(metVersion, ".")
+	if len(metVersionParts) != 3 {
+		return "", fmt.Errorf("invalid MET version format: %s", metVersion)
+	}
+	lineVersion := metVersionParts[0] + "_" + metVersionParts[1]
+	return lineVersion, nil
+}
+
+func ParseLine(dataSetName string, headerLine string, dataLine string, docPtr *map[string]interface{}, fileName string, getExternalDocForId func(id string) (map[string]interface{}, error)) (map[string]interface{}, error) {
 	// recover from unexpected errors
 	defer func() {
 		if r := recover(); r != nil {
@@ -59,11 +79,22 @@ func ParseLine(headerLine string, dataLine string, docPtr *map[string]interface{
 		}
 	}()
 
-	if headerLine == "" || dataLine == "" {
-		return *docPtr, fmt.Errorf("empty line")
+	if dataSetName == "" {
+		return *docPtr, fmt.Errorf("dataSetName is empty")
 	}
-	if !strings.HasPrefix(headerLine, "VERSION") {
-		return *docPtr, fmt.Errorf("missing VERSION at start of header line - bad header line?")
+	if len(dataSetName) > 10 {
+		return *docPtr, fmt.Errorf("dataSetName is too long - must be <= 10 characters")
+	}
+	// get line version e.g. V12.0.0 -> v12_0
+	parserVersion, _err := getParserVersion(dataLine)
+	if _err != nil {
+		return *docPtr, fmt.Errorf("error getting parser version from line %s: %w", dataLine, _err)
+	}
+	if headerLine == "" {
+		return *docPtr, fmt.Errorf("empty header line")
+	}
+	if dataLine == "" {
+		return *docPtr, fmt.Errorf("empty data line")
 	}
 	// make sure we have the basename here
 	fileName = filepath.Base(fileName)
@@ -79,7 +110,7 @@ func ParseLine(headerLine string, dataLine string, docPtr *map[string]interface{
 	}
 
 	// get the lineType
-	fileLineType, headerData, dataData, dataKey, descIndex, err := buildHeaderLineTypeUtilities.GetLineType(headerLine, dataLine, fileName)
+	fileLineType, headerData, dataData, dataKey, descIndex, err := buildHeaderLineTypeUtilities.GetLineType(headerLine, dataLine, fileName, parserVersion)
 	if err != nil {
 		// cannot process this line so return the docPtr as is - it is probably a truncated line
 		fmt.Println("Error getting line type: ", err)
@@ -90,6 +121,7 @@ func ParseLine(headerLine string, dataLine string, docPtr *map[string]interface{
 	if len(disallowedFields) > 0 {
 		for _, disallowedField := range disallowedFields {
 			disAllowedFieldValue, err := buildHeaderLineTypeUtilities.GetHeaderValue(strings.Fields(headerLine), strings.Fields(dataLine), disallowedField)
+			// if there is an error getting the disallowed field, just append "" to the dataData array
 			if err != nil {
 				fmt.Println("Error getting disallowed field: ", err)
 			}
@@ -105,14 +137,19 @@ func ParseLine(headerLine string, dataLine string, docPtr *map[string]interface{
 		docPtr = &newDoc
 	}
 	// GetId will fill in the id field of the metaData struct with the constructed id
-	metaData := buildHeaderLineTypeUtilities.GetId(tmpHeaderData, &buildHeaderLineTypeUtilities.VxMetadata{Subset: "MET", Type: "DD", SubType: "MET"})
+	// metadata doesn't change between versions, we just use the latest one. Same with DOC
+	metaData, _err := buildHeaderLineTypeUtilities.GetId(dataSetName, tmpHeaderData, &buildHeaderLineTypeUtilities.VxMetadata{Subset: "MET", Type: "DD", SubType: "MET"})
+	if _err != nil {
+		return *docPtr, fmt.Errorf("error getting id from line %s: %w", dataLine, _err)
+	}
 	_, exists := (*docPtr)[metaData.ID]
 	if !exists {
 		// check to see if there is an existing external document for this id
 		externalExistingDoc, err := (getExternalDocForId)(metaData.ID)
-		if err != nil && !strings.HasPrefix(err.Error(), structColumnTypes.DOC_NOT_FOUND) {
+		if err != nil && !strings.HasPrefix(err.Error(), DOC_NOT_FOUND) {
 			return *docPtr, _err
 		}
+		// if there is an external document for this id, use it, we will add the data into it
 		if externalExistingDoc != nil {
 			(*docPtr)[metaData.ID] = externalExistingDoc
 		} else {
@@ -123,17 +160,54 @@ func ParseLine(headerLine string, dataLine string, docPtr *map[string]interface{
 			}
 			// create a new document for the new metaData.ID
 			// This function will also fill in the headerData fields
-			// indexed by dataKey value in the document
-			(*docPtr)[metaData.ID], _err = structColumnTypes.GetDocForId(fileLineType, metaDataMap, headerData, dataData, dataKey)
-			if _err != nil || (*docPtr)[metaData.ID] == nil {
-				return *docPtr, fmt.Errorf("Error getting doc for file: %s error: %w", fileName, _err)
+			// indexed by dataKey value in the document.
+			// The document needs to be of the correct version.
+			switch parserVersion {
+			case "v10_0":
+				(*docPtr)[metaData.ID], _err = metLineTypeDefinitions_v10_0.GetDocForId(fileLineType, metaDataMap, headerData, dataData, dataKey)
+			case "v10_1":
+				(*docPtr)[metaData.ID], _err = metLineTypeDefinitions_v10_1.GetDocForId(fileLineType, metaDataMap, headerData, dataData, dataKey)
+			case "v11_0":
+				(*docPtr)[metaData.ID], _err = metLineTypeDefinitions_v11_0.GetDocForId(fileLineType, metaDataMap, headerData, dataData, dataKey)
+			case "v11_1":
+				(*docPtr)[metaData.ID], _err = metLineTypeDefinitions_v11_1.GetDocForId(fileLineType, metaDataMap, headerData, dataData, dataKey)
+			case "v12_0":
+				(*docPtr)[metaData.ID], _err = metLineTypeDefinitions_v12_0.GetDocForId(fileLineType, metaDataMap, headerData, dataData, dataKey)
+			default:
+				return *docPtr, fmt.Errorf("unsupported version %s", parserVersion)
 			}
+			if _err != nil || (*docPtr)[metaData.ID] == nil {
+				return *docPtr, fmt.Errorf("Error creating doc for file: %s error: %w", fileName, _err)
+			}
+			// return the new doc - the doc was created and the data was added to it
+			return *docPtr, _err
 		}
-	}
-	tempDoc := (*docPtr)[metaData.ID].(map[string]interface{})
-	tempDoc, _err = structColumnTypes.AddDataElement(dataKey, fileLineType, dataData, &tempDoc)
-	if _err != nil {
-		return *docPtr, fmt.Errorf("Error getting doc for file: %s error: %w", fileName, _err)
+	} else {
+		// we either had the doc already, got it externally, or created it
+		// now we need to add the data to the document
+		docMap := (*docPtr)[metaData.ID].(map[string]interface{})
+		switch parserVersion {
+		case "v10_0":
+			// add the data to the document
+			(*docPtr)[metaData.ID], _err = metLineTypeDefinitions_v10_0.AddDataElement(dataKey, fileLineType, dataData, &docMap)
+		case "v10_1":
+			// add the data to the document
+			(*docPtr)[metaData.ID], _err = metLineTypeDefinitions_v10_1.AddDataElement(dataKey, fileLineType, dataData, &docMap)
+		case "v11_0":
+			// add the data to the document
+			(*docPtr)[metaData.ID], _err = metLineTypeDefinitions_v11_0.AddDataElement(dataKey, fileLineType, dataData, &docMap)
+		case "v11_1":
+			// add the data to the document
+			(*docPtr)[metaData.ID], _err = metLineTypeDefinitions_v11_1.AddDataElement(dataKey, fileLineType, dataData, &docMap)
+		case "v12_0":
+			// add the data to the document
+			(*docPtr)[metaData.ID], _err = metLineTypeDefinitions_v12_0.AddDataElement(dataKey, fileLineType, dataData, &docMap)
+		default:
+			return *docPtr, fmt.Errorf("unsupported version %s", parserVersion)
+		}
+		if _err != nil {
+			return *docPtr, fmt.Errorf("Error getting doc for file: %s error: %w", fileName, _err)
+		}
 	}
 	return *docPtr, _err
 }

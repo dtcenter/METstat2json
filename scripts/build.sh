@@ -6,11 +6,13 @@ if [ "$root" != `pwd` ]; then
 	exit 1
 fi
 
-echo "formatting primary packages"
-gofumpt -w ./pkg/buildHeaderLineTypeUtilities ./pkg/buildHeaderLineTypes ./pkg/structColumnDefs ./pkg/sample_parser
-
-echo "linting primary packages"
-golangci-lint run --fix ./pkg/buildHeaderLineTypeUtilities/... ./pkg/buildHeaderLineTypes/... ./pkg/structColumnDefs/...  ./pkg/sample_parser/...
+for d in $(find ./pkg -type d -mindepth 1)
+do
+	echo "gofumpt -w $d"
+	gofumpt -w $d
+	echo "golangci-lint run --fix $d"
+	golangci-lint run --fix $d
+done
 
 echo "building package buildHeaderLineTypes"
 mkdir -p bin
@@ -22,17 +24,22 @@ for arch in arm64 amd64; do
 	done
 done
 
-echo "saving current structColumnTypes.go to /tmp/structColumnTypes.go.bak"
-mv pkg/structColumnTypes/structColumnTypes.go pkg/structColumnTypes/structColumnTypes.go.bak
+echo "building new metLineTypeDefinitions.go"
+go run pkg/buildHeaderLineTypes/buildHeaderLineTypes.go -version=v12.0 > pkg/metLineTypeDefinitions_v12_0/metLineTypeDefinitions.go
+go run pkg/buildHeaderLineTypes/buildHeaderLineTypes.go -version=v11.1 > pkg/metLineTypeDefinitions_v11_1/metLineTypeDefinitions.go
+go run pkg/buildHeaderLineTypes/buildHeaderLineTypes.go -version=v11.0 > pkg/metLineTypeDefinitions_v11_0/metLineTypeDefinitions.go
+go run pkg/buildHeaderLineTypes/buildHeaderLineTypes.go -version=v10.1 > pkg/metLineTypeDefinitions_v10_1/metLineTypeDefinitions.go
+go run pkg/buildHeaderLineTypes/buildHeaderLineTypes.go -version=v10.0 > pkg/metLineTypeDefinitions_v10_0/metLineTypeDefinitions.go
 
-echo "building new structColumnTypes.go"
-go run pkg/buildHeaderLineTypes/buildHeaderLineTypes.go > pkg/structColumnTypes/structColumnTypes.go
-
-echo "format and lint structColumnTypes"
-echo "formatting ./pkg/structColumnTypes"
-gofumpt -w ./pkg/structColumnTypes
-echo "linting ./pkg/structColumnTypes"
-golangci-lint run --fix ./pkg/structColumnTypes/...
+echo "format and lint metLinetypeDefinitions"
+echo "formatting ./pkg/metLineTypeDefinitions"
+for f in $(find ./pkg -name metLineTypeDefinitions.go)
+do
+	echo "gofumpt -w $f"
+	gofumpt -w $f
+	echo "golangci-lint run --fix $f"
+	golangci-lint run --fix $f
+done
 
 echo "building sample program"
 for arch in arm64 amd64; do

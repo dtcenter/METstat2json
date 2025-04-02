@@ -12,15 +12,14 @@ import (
 	"runtime"
 	"strings"
 
-	"github.com/NOAA-GSL/MET-parser/pkg/structColumnDefs"
-	"github.com/NOAA-GSL/MET-parser/pkg/structColumnTypes"
+	metLineTypeParser "github.com/NOAA-GSL/MET-parser/pkg/metLineTypeParser"
 )
 
 // dummy function to satisfy the function signature of getExternalDocForId
-func getMissingExternalDocForId(id string) (map[string]interface{}, error) {
+func getExternalDocForId(id string) (map[string]interface{}, error) {
 	// fmt.Println("getExternalDocForId called with id:", id)
 	// Put your own code here in this method but always return this exact error if the document is not found
-	return nil, fmt.Errorf("%s: %s", structColumnTypes.DOC_NOT_FOUND, id)
+	return nil, fmt.Errorf("%s: %s", metLineTypeParser.DOC_NOT_FOUND, id)
 }
 
 func ReadJsonFromGzipFile(filename string) (map[string]interface{}, error) {
@@ -52,16 +51,26 @@ func ParseRegressionSuite() {
 	var doc map[string]interface{}
 	var err error
 	var testdata_directory string
+	var dataSetName string
 	output_directory := "/tmp"
 	Usage := func() {
 		fmt.Fprintf(os.Stderr, "Usage of %s:\n", os.Args[0])
 		flag.PrintDefaults()
 	}
 	flag.StringVar(&testdata_directory, "path", "", "Required - Path to the regression test data")
+	flag.StringVar(&dataSetName, "dataset", "", "Required - Name of the dataset - must be 10 characters or less")
 	flag.StringVar(&output_directory, "outdir", "", "Optional - Path to the output directory - defaults to /tmp")
 	flag.Parse()
 	if testdata_directory == "" {
 		Usage()
+		os.Exit(1)
+	}
+	if dataSetName == "" {
+		Usage()
+		os.Exit(1)
+	}
+	if len(dataSetName) > 10 {
+		log.Printf("dataset name %s is too long - must be 10 characters or less\n", dataSetName)
 		os.Exit(1)
 	}
 	if !strings.HasSuffix(output_directory, "/") {
@@ -75,20 +84,20 @@ func ParseRegressionSuite() {
 		if info.IsDir() { // skip directories - we only want the files
 			return nil
 		}
-		doc = parseFile(path, info, doc)
+		doc = parseFile(dataSetName, path, info, doc)
 		return nil
 	})
 	if err != nil {
 		log.Fatal(err)
 	}
 	// write output to json	gzipped file
-	err = structColumnDefs.WriteJsonToCompressedFile(doc, output_directory+"sample_output.json.gz")
+	err = metLineTypeParser.WriteJsonToCompressedFile(doc, output_directory+dataSetName+".json.gz")
 	if err != nil {
 		log.Fatal(err)
 	}
 }
 
-func parseFile(fPath string, fileInfos os.FileInfo, doc map[string]interface{}) map[string]interface{} {
+func parseFile(dataSetName string, fPath string, fileInfos os.FileInfo, doc map[string]interface{}) map[string]interface{} {
 	file, err := os.Open(fPath) // open the file
 	if err != nil {
 		log.Fatal(err)
@@ -119,7 +128,7 @@ func parseFile(fPath string, fileInfos os.FileInfo, doc map[string]interface{}) 
 			continue
 		}
 		dataLine := lines[line]
-		doc, err = structColumnDefs.ParseLine(headerLine, dataLine, &doc, fName, getMissingExternalDocForId)
+		doc, err = metLineTypeParser.ParseLine(dataSetName, headerLine, dataLine, &doc, fName, getExternalDocForId)
 		if err != nil {
 			log.Printf("Error parsing line: %s for file %s\n", err, fName)
 		}
@@ -129,5 +138,6 @@ func parseFile(fPath string, fileInfos os.FileInfo, doc map[string]interface{}) 
 
 func main() {
 	fmt.Println("environment:" + runtime.GOOS + "_" + runtime.GOARCH)
+
 	ParseRegressionSuite()
 }
