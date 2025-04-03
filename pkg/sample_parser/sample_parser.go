@@ -47,7 +47,7 @@ func ReadJsonFromGzipFile(filename string) (map[string]interface{}, error) {
 	return parsedDoc, nil
 }
 
-func ParseRegressionSuite() {
+func ParseRegressionSuite() error {
 	var doc map[string]interface{}
 	var err error
 	var testdata_directory string
@@ -63,15 +63,17 @@ func ParseRegressionSuite() {
 	flag.Parse()
 	if testdata_directory == "" {
 		Usage()
-		os.Exit(1)
+		log.Printf("testdata_directory is missing\n")
+		return fmt.Errorf("testdata_directory is required")
 	}
 	if dataSetName == "" {
 		Usage()
-		os.Exit(1)
+		log.Printf("dataset name is missing\n")
+		return fmt.Errorf("dataset name is required")
 	}
 	if len(dataSetName) > 10 {
 		log.Printf("dataset name %s is too long - must be 10 characters or less\n", dataSetName)
-		os.Exit(1)
+		return fmt.Errorf("dataset name is too long - must be 10 characters or less")
 	}
 	if !strings.HasSuffix(output_directory, "/") {
 		output_directory += "/"
@@ -88,13 +90,16 @@ func ParseRegressionSuite() {
 		return nil
 	})
 	if err != nil {
-		log.Fatal(err)
+		log.Printf("%v", err)
+		return err
 	}
 	// write output to json	gzipped file
 	err = metLineTypeParser.WriteJsonToCompressedFile(doc, output_directory+dataSetName+".json.gz")
 	if err != nil {
-		log.Fatal(err)
+		log.Printf("%v", err)
+		return err
 	}
+	return nil
 }
 
 func parseFile(dataSetName string, fPath string, fileInfos os.FileInfo, doc map[string]interface{}) map[string]interface{} {
@@ -139,5 +144,12 @@ func parseFile(dataSetName string, fPath string, fileInfos os.FileInfo, doc map[
 func main() {
 	fmt.Println("environment:" + runtime.GOOS + "_" + runtime.GOARCH)
 
-	ParseRegressionSuite()
+	err := ParseRegressionSuite()
+	if err != nil {
+		log.Printf("Error parsing regression suite: %v", err)
+		os.Exit(1)
+	}
+	fmt.Println("Parsing complete. Output written to /tmp")
+	fmt.Println("To view the output, run: gunzip -c /tmp/<dataset_name>.json.gz | jq '.'")
+	fmt.Println("To view the output in a pretty format, run: gunzip -c /tmp/<dataset_name>.json.gz | jq '.' | python3 -m json.tool")
 }
