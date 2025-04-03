@@ -179,6 +179,8 @@ func ParseLine(dataSetName string, headerLine string, dataLine string, docPtr *m
 			if _err != nil || (*docPtr)[metaData.ID] == nil {
 				return *docPtr, fmt.Errorf("Error creating doc for file: %s error: %w", fileName, _err)
 			}
+			// add the dataSetName to the header - dataSetName is not part of the structure
+			(*docPtr)[metaData.ID].(map[string]interface{})["dataSetName"] = dataSetName
 			// return the new doc - the doc was created and the data was added to it
 			return *docPtr, _err
 		}

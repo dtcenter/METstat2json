@@ -1,7 +1,7 @@
 for ds in G2G_v12 MODE_compref statfiles tc_data tcstfiles textfiles; do
     case "$ds" in
     "G2G_v12")
-        bin/darwin/arm64/sample_parser -dataset TcPairsPst -outdir ~/metplusdata -path /tmp/testdata/testdata/${ds}
+        bin/darwin/arm64/sample_parser -dataset G2Gv12 -outdir ~/metplusdata -path /tmp/testdata/testdata/${ds}
         ;;
     "MODE_compref")
         bin/darwin/arm64/sample_parser -dataset ModeCmpRef -outdir ~/metplusdata -path /tmp/testdata/testdata/${ds}
