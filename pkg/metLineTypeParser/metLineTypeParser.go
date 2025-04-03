@@ -147,7 +147,7 @@ func ParseLine(dataSetName string, headerLine string, dataLine string, docPtr *m
 		// check to see if there is an existing external document for this id
 		externalExistingDoc, err := (getExternalDocForId)(metaData.ID)
 		if err != nil && !strings.HasPrefix(err.Error(), DOC_NOT_FOUND) {
-			return *docPtr, _err
+			return *docPtr, err
 		}
 		// if there is an external document for this id, use it, we will add the data into it
 		if externalExistingDoc != nil {
