@@ -75,7 +75,7 @@ func getMissingExternalDocForId(id string) (map[string]interface{}, error) {
 func getExistingExternalDocForId(id string) (map[string]interface{}, error) {
 	// fmt.Println("getExternalDocForId called with id:", id)
 	fileLineType := "STAT_VAL1L2"
-	metaDataMap := map[string]interface{}{"id": "MET:DD:MET:V12.0.0:FCST:1333972800:1333972800:000000:1333971000:1333974600:UGRD_VGRD:m/s:Z10:UGRD_VGRD:Z10:ADPSFC:LAND_L0:NEAREST:1:VAL1L2", "subset": "MET", "type": "DD", "subtype": "MET"}
+	metaDataMap := map[string]interface{}{"id": "MET:DD:MET:test:V12.0.0:FCST:1333972800:1333972800:000000:1333971000:1333974600:UGRD_VGRD:m/s:Z10:UGRD_VGRD:Z10:ADPSFC:LAND_L0:NEAREST:1:VAL1L2", "subset": "MET", "type": "DD", "subtype": "MET"}
 	headerData := []string{"V12.0.0", "FCST", "", "", "1333972800", "1333972800", "000000", "1333971000", "1333974600", "UGRD_VGRD", "m/s", "Z10", "UGRD_VGRD", "", "Z10", "ADPSFC", "LAND_L0", "NEAREST", "1", "", "", "", "", "VAL1L2"}
 	dataData := []string{"4114", "0.022881", "-0.055846", "-0.23975", "0.11316", "1.40894", "2.39774", "6.07755", "1.35071", "2.1488", "4114", "12.11241", "65.18733", "6744.28012"}
 	dataKey := "120000"
@@ -139,6 +139,21 @@ func TestGetMissingExternalDocForId(t *testing.T) {
 	}
 }
 
+func TestUnsupportedVersion(t *testing.T) {
+	headerLine := "VERSION MODEL DESC FCST_LEAD FCST_VALID_BEG FCST_VALID_END OBS_LEAD OBS_VALID_BEG OBS_VALID_END FCST_VAR FCST_UNITS FCST_LEV OBS_VAR OBS_UNITS OBS_LEV OBTYPE VX_MASK INTERP_MTHD INTERP_PNTS FCST_THRESH OBS_THRESH COV_THRESH ALPHA LINE_TYPE"
+	dataLine := "V9.0 FCST NA 120000 20120409_120000 20120409_120000 000000 20120409_113000 20120409_123000 UGRD_VGRD m/s Z10 UGRD_VGRD NA Z10 ADPSFC LAND_L0 NEAREST 1 NA NA NA NA VAL1L2 4114 0.022881 -0.055846 -0.23975 0.11316 1.40894 2.39774 6.07755 1.35071 2.1488 4114 12.11241 65.18733 6744.28012"
+	fName := "grid_stat_NO_WEIGHT_240000L_20120410_000000V.stat"
+	var doc map[string]interface{}
+	doc, err := ParseLine("test", headerLine, dataLine, &doc, fName, getMissingExternalDocForId)
+	if err == nil {
+		t.Fatalf("Expected error, got %v", err)
+	}
+	if !(strings.Contains(err.Error(), "error getting parser version from line") &&
+		strings.Contains(err.Error(), "invalid MET version format: v9.0")) {
+		t.Fatalf("Expected unsupported parser version error, got %v", err)
+	}
+}
+
 func TestGetExistingExternalDocForId(t *testing.T) {
 	headerLine := "VERSION MODEL DESC FCST_LEAD FCST_VALID_BEG  FCST_VALID_END  OBS_LEAD OBS_VALID_BEG   OBS_VALID_END   FCST_VAR  FCST_UNITS FCST_LEV OBS_VAR   OBS_UNITS OBS_LEV  OBTYPE VX_MASK INTERP_MTHD INTERP_PNTS FCST_THRESH OBS_THRESH COV_THRESH ALPHA LINE_TYPE"
 	dataLine := "V12.0.0 FCST  NA   120000    20120409_120000 20120409_120000 000000   20120409_113000 20120409_123000 UGRD_VGRD m/s        Z10      UGRD_VGRD NA        Z10      ADPSFC LAND_L0 NEAREST     1           NA          NA         NA         NA    VAL1L2    4114    0.022881     -0.055846      -0.23975       0.11316       1.40894     2.39774     6.07755      1.35071    2.1488    4114           12.11241   65.18733  6744.28012"
@@ -193,8 +208,8 @@ func TestParseVAL1L2(t *testing.T) {
 
 	assert.NotNil(t, parsedDoc)
 	assert.Equal(t, 3, len(parsedDoc), "expected 3 but got %d", len(parsedDoc)) // two top level elements
-	doc0 := doc["MET:DD:MET:V12.0.0:FCST:1333972800:1333972800:000000:1333971000:1333974600:UGRD_VGRD:m/s:Z10:UGRD_VGRD:Z10:ADPSFC:LAND_L0:NEAREST:1:VAL1L2"].(map[string]interface{})
-	doc2 := doc["MET:DD:MET:V12.0.0:FCST:this_is_a_:1333972800:1333972800:000000:1333971000:1333974600:UGRD_VGRD:m/s:Z10:UGRD_VGRD:Z10:ADPSFC:LMV:NEAREST:1:VAL1L2"].(map[string]interface{})
+	doc0 := doc["MET:DD:MET:test:V12.0.0:FCST:1333972800:1333972800:000000:1333971000:1333974600:UGRD_VGRD:m/s:Z10:UGRD_VGRD:Z10:ADPSFC:LAND_L0:NEAREST:1:VAL1L2"].(map[string]interface{})
+	doc2 := doc["MET:DD:MET:test:V12.0.0:FCST:this_is_a_:1333972800:1333972800:000000:1333971000:1333974600:UGRD_VGRD:m/s:Z10:UGRD_VGRD:Z10:ADPSFC:LMV:NEAREST:1:VAL1L2"].(map[string]interface{})
 	doc0Data := doc0["data"].(map[string]metLineTypeDefinitions_v12_0.STAT_VAL1L2)
 	doc2Data := doc2["data"].(map[string]metLineTypeDefinitions_v12_0.STAT_VAL1L2)
 	doc0Data120000 := doc0Data["120000"]
@@ -203,8 +218,8 @@ func TestParseVAL1L2(t *testing.T) {
 	doc0DataTotal := doc0DataMap.TOTAL
 	doc2DataTotal := doc2Data180000.TOTAL
 
-	parsedDoc0 := parsedDoc["MET:DD:MET:V12.0.0:FCST:1333972800:1333972800:000000:1333971000:1333974600:UGRD_VGRD:m/s:Z10:UGRD_VGRD:Z10:ADPSFC:LAND_L0:NEAREST:1:VAL1L2"].(map[string]interface{})
-	parsedDoc2 := parsedDoc["MET:DD:MET:V12.0.0:FCST:this_is_a_:1333972800:1333972800:000000:1333971000:1333974600:UGRD_VGRD:m/s:Z10:UGRD_VGRD:Z10:ADPSFC:LMV:NEAREST:1:VAL1L2"].(map[string]interface{})
+	parsedDoc0 := parsedDoc["MET:DD:MET:test:V12.0.0:FCST:1333972800:1333972800:000000:1333971000:1333974600:UGRD_VGRD:m/s:Z10:UGRD_VGRD:Z10:ADPSFC:LAND_L0:NEAREST:1:VAL1L2"].(map[string]interface{})
+	parsedDoc2 := parsedDoc["MET:DD:MET:test:V12.0.0:FCST:this_is_a_:1333972800:1333972800:000000:1333971000:1333974600:UGRD_VGRD:m/s:Z10:UGRD_VGRD:Z10:ADPSFC:LMV:NEAREST:1:VAL1L2"].(map[string]interface{})
 	parsedDoc0Data := parsedDoc0["data"].(map[string]interface{})
 	parsedDoc2Data := parsedDoc2["data"].(map[string]interface{})
 	parsedDoc0Data120000 := parsedDoc0Data["120000"].(map[string]interface{})
@@ -251,8 +266,8 @@ func TestParseMODE_OBJ(t *testing.T) {
 
 	assert.NotNil(t, parsedDoc)
 	assert.Equal(t, 2, len(parsedDoc), "expected 3 but got %d", len(parsedDoc)) // two top level elements
-	doc0 := doc["MET:DD:MET:V12.0.0:FCST:26026:9:20120410_180000:060000:120000:20050807_120000:120000:2:>=5.0:2:>=5.0:APCP_06:kg/m^2:A6:OBS:None:Surface:STAGE4"].(map[string]interface{})
-	doc2 := doc["MET:DD:MET:V12.0.0:FCST:26026:9:this_is_a_:20120410_180000:060000:120000:20050807_120000:120000:2:>=5.0:2:>=5.0:APCP_06:kg/m^2:A6:OBS:None:Surface:STAGE4"].(map[string]interface{})
+	doc0 := doc["MET:DD:MET:test:V12.0.0:FCST:26026:9:20120410_180000:060000:120000:20050807_120000:120000:2:>=5.0:2:>=5.0:APCP_06:kg/m^2:A6:OBS:None:Surface:STAGE4"].(map[string]interface{})
+	doc2 := doc["MET:DD:MET:test:V12.0.0:FCST:26026:9:this_is_a_:20120410_180000:060000:120000:20050807_120000:120000:2:>=5.0:2:>=5.0:APCP_06:kg/m^2:A6:OBS:None:Surface:STAGE4"].(map[string]interface{})
 	doc0Data := doc0["data"].(map[string]metLineTypeDefinitions_v12_0.MODE_CTS)
 	doc2Data := doc2["data"].(map[string]metLineTypeDefinitions_v12_0.MODE_CTS)
 	doc0Data120000 := doc0Data["300000"]
@@ -260,8 +275,8 @@ func TestParseMODE_OBJ(t *testing.T) {
 	doc0DataTotal := doc0Data120000.TOTAL
 	doc2DataTotal := doc2Data180000.TOTAL
 
-	parsedDoc0 := parsedDoc["MET:DD:MET:V12.0.0:FCST:26026:9:20120410_180000:060000:120000:20050807_120000:120000:2:>=5.0:2:>=5.0:APCP_06:kg/m^2:A6:OBS:None:Surface:STAGE4"].(map[string]interface{})
-	parsedDoc2 := parsedDoc["MET:DD:MET:V12.0.0:FCST:26026:9:this_is_a_:20120410_180000:060000:120000:20050807_120000:120000:2:>=5.0:2:>=5.0:APCP_06:kg/m^2:A6:OBS:None:Surface:STAGE4"].(map[string]interface{})
+	parsedDoc0 := parsedDoc["MET:DD:MET:test:V12.0.0:FCST:26026:9:20120410_180000:060000:120000:20050807_120000:120000:2:>=5.0:2:>=5.0:APCP_06:kg/m^2:A6:OBS:None:Surface:STAGE4"].(map[string]interface{})
+	parsedDoc2 := parsedDoc["MET:DD:MET:test:V12.0.0:FCST:26026:9:this_is_a_:20120410_180000:060000:120000:20050807_120000:120000:2:>=5.0:2:>=5.0:APCP_06:kg/m^2:A6:OBS:None:Surface:STAGE4"].(map[string]interface{})
 	parsedDoc0Data := parsedDoc0["data"].(map[string]interface{})
 	parsedDoc2Data := parsedDoc2["data"].(map[string]interface{})
 	parsedDoc0Data120000 := parsedDoc0Data["300000"].(map[string]interface{})
@@ -304,11 +319,11 @@ func TestParseMODE_OBJ_V11_1_0(t *testing.T) {
 	}
 
 	assert.NotNil(t, parsedDoc)
-	assert.Equal(t, 2, len(parsedDoc), "expected 3 but got %d", len(parsedDoc)) // two top level elements
-	tmpDoc := doc["MET:DD:MET:V11.1.0:HRRR_OPS:656523:3:E_CONUS:20241201_130000:000000:000000:20241201_125839:000000:1:>=30:1:>=30:REFC:dB:L0:REFC:dB:R1:MRMS"].(map[string]interface{})
-	data := tmpDoc["data"].(map[string]interface{})
-	elem1Data := data["010000_F001"].(metLineTypeDefinitions_v11_1.MODE_OBJ)
-	elem2Data := data["010000_F002"].(metLineTypeDefinitions_v11_1.MODE_OBJ)
+	assert.Equal(t, 1, len(parsedDoc), "expected 1 but got %d", len(parsedDoc)) // two top level elements
+	tmpDoc := doc["MET:DD:MET:test:V11.1.0:HRRR_OPS:656523:3:E_CONUS:20241201_130000:000000:000000:20241201_125839:000000:1:>=30:1:>=30:REFC:dB:L0:REFC:dB:R1:MRMS"].(map[string]interface{})
+	data := tmpDoc["data"].(map[string]metLineTypeDefinitions_v11_1.MODE_OBJ)
+	elem1Data := data["010000_F001"]
+	elem2Data := data["010000_F002"]
 	assert.Equal(t, elem1Data.CENTROID_X, 1191.36111, "expected data[\"010000_F001\"].CENTROID_X to be 1191.36111")
 	assert.Equal(t, elem2Data.CENTROID_X, 1195.86842, "expected data[\"010000_F002\"].CENTROID_X to be 1195.86842")
 	assert.Equal(t, elem1Data.CENTROID_Y, 848.40278, "expected data[\"010000_F001\"].CENTROID_Y to be 848.40278")
