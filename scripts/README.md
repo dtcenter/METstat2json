@@ -12,11 +12,11 @@ building for linux/arm64
 building for darwin/arm64
 building for linux/amd64
 building for darwin/amd64
-saving current structColumnTypes.go to /tmp/structColumnTypes.go.bak
-building new structColumnTypes.go
-format and lint structColumnTypes
-formatting ./pkg/structColumnTypes
-linting ./pkg/structColumnTypes
+saving current metLineTypeDefinitions.go to /tmp/metLineTypeDefinitions.go.bak
+building new metLineTypeDefinitions.go
+format and lint metLineTypeDefinitions
+formatting ./pkg/metLineTypeDefinitions
+linting ./pkg/metLineTypeDefinitions
 building sample program
 building for linux/arm64
 building for darwin/arm64
@@ -26,7 +26,7 @@ finished
 >
 ```
 
-After the above step you should have a complete, generated, formatted, and linted GO package in pkg/structColumnTypes and supporting
+After the above step you should have a complete, generated, formatted, and linted GO package in pkg/metLineTypeDefinitions and supporting
 pks pkg/buildHeaderLineTypeUtilities, pkg/structColumnDefs and pkg/ample_parser.
 
 ## running the parser
@@ -71,4 +71,3 @@ Documents imported: 320952 Documents failed: 0
 ```
 
 In this case there was an existing uncompressed file from a previous run. Whether or not the uncompressed file exists, the compressed file will be imported into the database.
-

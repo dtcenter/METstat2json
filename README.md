@@ -33,9 +33,9 @@ These are the src files that are searched...
 - [tc-pairs.rst](https://raw.githubusercontent.com/dtcenter/MET/refs/heads/main_v12.0/docs/Users_Guide/tc-pairs.rst)
 - [wavelet-stat.rst](https://raw.githubusercontent.com/dtcenter/MET/refs/heads/main_v12.0/docs/Users_Guide/wavelet-stat.rst)
 
-... to derive column definitions and type information which is used to create the GO package "pkg/structColumnTypes" that contains the struct definitions, fill functions, and parse routines necessary to convert MET output files into json documents for use in a GSL AVID Couchbase database, according to the AVID Couchbase data schema.
+... to derive column definitions and type information which is used to create the GO package "pkg/metLineTypeDefinitions" that contains the struct definitions, fill functions, and parse routines necessary to convert MET output files into json documents for use in a GSL AVID Couchbase database, according to the AVID Couchbase data schema.
 
-In addition to the GO pkg "structColumnTypes" there are three other local packages, "structColumnDefs", "buildHeaderLineTypes", and "buildHeaderLineTypeUtilities".
+In addition to the GO pkg "metLineTypeDefinitions" there are three other local packages, "structColumnDefs", "buildHeaderLineTypes", and "buildHeaderLineTypeUtilities".
 
 ### structColumnDefs
 
@@ -49,7 +49,7 @@ The dataKey fields are disallowed from the header id and are not included in the
 The ParseLine function uses the GetLineType function to determine the lineType of the data line, the headerData, dataKey, and descIndex. headerData are the ordered data fields for the header section of the line, the dataKey is the actual dataKey i.e the concatenated dataKey values, and the descIndex is the ordinal index of the desc field.
 The descIndex is used to trim the desc field to 10 characters.
 
-The parseLine function also uses the getId function to determine the id of the data line. The id is derived from the headerData minus the dataKey fields and is returned in the form of a VxMetaDa ta struct. The VxMetaData struct is then converted to a map[string]interface{}
+The parseLine function also uses the GetId function to determine the id of the data line. The id is derived from the headerData minus the dataKey fields and is returned in the form of a VxMetaDa ta struct. The VxMetaData struct is then converted to a map[string]interface{}
 so that it can be passed to the GetDocForId function without the GetDocForId function needing to know the VxMetaData struct type.
 
 There are a couple of utility functions that are used to get the headerData without the NA values and to convert the VxMetaData struct.
@@ -64,7 +64,7 @@ The package exists to avoid some circular dependencies because both the parsing 
 
 The data files are MET output files that contain a header section and a data section. The header section contains the header fields that are used to identify the document. The data section contains the data fields that are used to populate the document.
 
-This package is separate from the structColumnTypes package because the structColumnTypes package is automatically
+This package is separate from the metLineTypeDefinitions package because the metLineTypeDefinitions package is automatically
 generated from the buildHeaderLineTypes.go program and there is a desire to avoid a circular dependency.
 This package defines a VxMetaData struct that is used to store the metadata for the mapped documents.
 The metadata is used to uniquely identify each document and is used to merge documents with the same metadata.
@@ -93,16 +93,16 @@ data fields for a given line type, and to find the data type of a given field in
 
 The output of this program is a series of structs that can be used to define the header
 and data types in the buildHeaderTypes.go file and some parsing routines that are aware of the
-header and data types. The outout is the structColumnTypes.go file which is the sole content of the structColumnTypes package and should never be directly edited.
+header and data types. The outout is the metLineTypeDefinitions.go file which is the sole content of the metLineTypeDefinitions package and should never be directly edited.
 
-This is how to build the structColumnTypes package. It is suggested redirect the output (which is the go program)
+This is how to build the metLineTypeDefinitions package. It is suggested redirect the output (which is the go program)
 to a temporary file and then after looking at it copy it to its proper destination.
-You may have to create the ...pkg/structColumnTypes/ directory, but it probably comes with the repo clone.
+You may have to create the ...pkg/metLineTypeDefinitions/ directory, but it probably comes with the repo clone.
 
 ```text
 ranpierce-mac1:buildHeaderLineTypes randy.pierce$ cd /Users/randy.pierce/metlinetypes/pkg/buildHeaderLineTypes
 ranpierce-mac1:buildHeaderLineTypes randy.pierce$ go run . > /tmp/types.go
-ranpierce-mac1:buildHeaderLineTypes randy.pierce$ cp /tmp/types.go ../structColumnTypes/structColumnTypes.go
+ranpierce-mac1:buildHeaderLineTypes randy.pierce$ cp /tmp/types.go ../metLineTypeDefinitions/metLineTypeDefinitions.go
 ```text
 
 ## Usage
@@ -130,7 +130,7 @@ dataKey i.e the concatenated dataKey values, and the descIndex is the ordinal in
 The descIndex is used to trim the desc field to 10 characters.
 
 The parseLine function also uses the
-getId function to determine the id of the data line. The id is derived from the headerData minus the dataKey fields and
+GetId function to determine the id of the data line. The id is derived from the headerData minus the dataKey fields and
 is returned in the form of a VxMetaData struct. The VxMetaData struct is then converted to a map[string]interface{}
 so that it can be passed to the GetDocForId function without the GetDocForId function needing to know the VxMetaData struct type.
 
@@ -305,8 +305,7 @@ This is an example of how it might be used.
 ```bash
 > scripts/build.sh
 > bin/darwin/arm64/sample_parser -outdir /tmp -path .../testdata
-> gunzip /tmp/sample_output.json.gz 
-> jq . /tmp/sample_output.json > /tmp/sample_output-pretty.json 
+> gunzip /tmp/sample_output.json.gz
+> jq . /tmp/sample_output.json > /tmp/sample_output-pretty.json
 > vim /tmp/sample_output-pretty.json
 ```
-

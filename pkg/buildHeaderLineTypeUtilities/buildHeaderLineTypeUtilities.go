@@ -4,7 +4,7 @@ package buildHeaderLineTypeUtilities
 This package contains the utilities for building the header and line type for the data files. The data files are
 MET output files that contain a header section and a data section. The header section contains the header fields that
 are used to identify the document. The data section contains the data fields that are used to populate the document.
-This package is separate from the structColumnTypes package because the structColumnTypes package is automatically
+This package is separate from the metLineTypeDefinitions package because the metLineTypeDefinitions package is automatically
 generated from the buildHeaderLineTypes.go program and there is a desire to avoid a circular dependency.
 This package defines a VxMetaData struct that is used to store the metadata for the mapped documents.
 The metadata is used to uniquely identify each document and is used to merge documents with the same metadata.
@@ -19,6 +19,7 @@ data fields for a given line type, and to find the data type of a given field in
 import (
 	"fmt"
 	"io"
+	"log"
 	"net/http"
 	"os"
 	"path/filepath"
@@ -37,7 +38,38 @@ type HeaderFields struct {
 	SeparatorField string
 }
 
-var MetHeaderColumnsFileUrl = "https://raw.githubusercontent.com/dtcenter/MET/refs/heads/main_v12.0/data/table_files/met_header_columns_V12.0.txt"
+var (
+	MetHeaderColumnsFileUrl_v12_0 = "https://raw.githubusercontent.com/dtcenter/MET/refs/heads/main_v12.0/data/table_files/met_header_columns_V12.0.txt"
+	MetHeaderColumnsFileUrl_v11_1 = "https://raw.githubusercontent.com/dtcenter/MET/refs/heads/main_v12.0/data/table_files/met_header_columns_V11.1.txt"
+	MetHeaderColumnsFileUrl_v11_0 = "https://raw.githubusercontent.com/dtcenter/MET/refs/heads/main_v12.0/data/table_files/met_header_columns_V11.0.txt"
+	MetHeaderColumnsFileUrl_v10_1 = "https://raw.githubusercontent.com/dtcenter/MET/refs/heads/main_v12.0/data/table_files/met_header_columns_V10.1.txt"
+	MetHeaderColumnsFileUrl_v10_0 = "https://raw.githubusercontent.com/dtcenter/MET/refs/heads/main_v12.0/data/table_files/met_header_columns_V10.0.txt"
+	MetHeaderColumnsFileUrl       = MetHeaderColumnsFileUrl_v12_0
+)
+
+var MetUserDocFiles = []string{
+	"https://raw.githubusercontent.com/dtcenter/MET/refs/heads/main_v12.0/docs/Users_Guide/ensemble-stat.rst",
+	"https://raw.githubusercontent.com/dtcenter/MET/refs/heads/main_v12.0/docs/Users_Guide/grid-stat.rst",
+	"https://raw.githubusercontent.com/dtcenter/MET/refs/heads/main_v12.0/docs/Users_Guide/gsi-tools.rst",
+	"https://raw.githubusercontent.com/dtcenter/MET/refs/heads/main_v12.0/docs/Users_Guide/mode-td.rst",
+	"https://raw.githubusercontent.com/dtcenter/MET/refs/heads/main_v12.0/docs/Users_Guide/mode.rst",
+	"https://raw.githubusercontent.com/dtcenter/MET/refs/heads/main_v12.0/docs/Users_Guide/point-stat.rst",
+	"https://raw.githubusercontent.com/dtcenter/MET/refs/heads/main_v12.0/docs/Users_Guide/stat-analysis.rst",
+	"https://raw.githubusercontent.com/dtcenter/MET/refs/heads/main_v12.0/docs/Users_Guide/tc-gen.rst",
+	"https://raw.githubusercontent.com/dtcenter/MET/refs/heads/main_v12.0/docs/Users_Guide/tc-pairs.rst",
+	"https://raw.githubusercontent.com/dtcenter/MET/refs/heads/main_v12.0/docs/Users_Guide/wavelet-stat.rst",
+}
+
+var MetSrcFiles = []string{
+	"https://raw.githubusercontent.com/dtcenter/MET/refs/heads/main_v12.0/src/libcode/vx_analysis_util/mode_line.cc",
+	"https://raw.githubusercontent.com/dtcenter/MET/refs/heads/main_v12.0/src/libcode/vx_grid/unstructured_grid.cc",
+	"https://raw.githubusercontent.com/dtcenter/MET/refs/heads/main_v12.0/src/libcode/vx_tc_util/prob_info_base.cc",
+	"https://raw.githubusercontent.com/dtcenter/MET/refs/heads/main_v12.0/src/libcode/vx_tc_util/prob_rirw_info.cc",
+	"https://raw.githubusercontent.com/dtcenter/MET/refs/heads/main_v12.0/src/libcode/vx_tc_util/prob_rirw_pair_info.cc",
+	"https://raw.githubusercontent.com/dtcenter/MET/refs/heads/main_v12.0/src/libcode/vx_tc_util/track_pair_info.cc",
+	"https://raw.githubusercontent.com/dtcenter/MET/refs/heads/main_v12.0/src/tools/core/stat_analysis/parse_stat_line.cc",
+	"https://raw.githubusercontent.com/dtcenter/MET/refs/heads/main_v12.0/src/tools/tc_utils/tc_stat/tc_stat_job.cc",
+}
 
 // vxMetadata struct definition
 type VxMetadata struct {
@@ -185,7 +217,7 @@ func getLeadFromInitValid(headerFields []string, data []string, dataFieldIndex i
 		In this case the dataFields cannot be determined and if the DataKeyMap specifies a DataKeyField that is not in the
 		headerFields then the DataKey will be "" and the entire header will be used to generate the id.
 */
-func GetLineType(headerLine string, dataLine string, fileName string) (string, []string, []string, string, int, error) {
+func GetLineType(headerLine string, dataLine string, fileName string, version string) (string, []string, []string, string, int, error) {
 	// make sure we have the basename here
 	fileName = filepath.Base(fileName)
 	desc_index := -1
@@ -231,7 +263,7 @@ func GetLineType(headerLine string, dataLine string, fileName string) (string, [
 		// there appear to be some files that aren't named like the others
 		// Check the header line to see if it matches a line in the column defs file
 		// if it does then we can use the line type from the column defs file
-		columnDefHeaderFields, err := getLineTypeFromColumnDefsFile(headerLine)
+		columnDefHeaderFields, err := getLineTypeFromColumnDefsFile(headerLine, version)
 		if err == nil {
 			fileLineType = columnDefHeaderFields.FileType + "_" + columnDefHeaderFields.LineType
 			separatorField = columnDefHeaderFields.SeparatorField
@@ -420,19 +452,38 @@ func GetHeaderValue(headerFields []string, headerData []string, field string) (s
 	return "", nil
 }
 
-func GetId(tmpHeaderData []string, metaData *VxMetadata) VxMetadata {
-	idElems := []string{metaData.Subset, metaData.Type, metaData.SubType}
+func GetId(dataSetName string, tmpHeaderData []string, metaData *VxMetadata) (VxMetadata, error) {
+	idElems := []string{metaData.Subset, metaData.Type, metaData.SubType, dataSetName}
 	idElems = append(idElems, tmpHeaderData...)
 	id := strings.Join(idElems, ":")
+	if len(id) > 250 {
+		return VxMetadata{}, fmt.Errorf("Calculated ID is too long: %d - id:\"%s\"", len(id), id)
+	}
 	metaData.ID = id
-	return *metaData
+	return *metaData, nil
 }
 
-func getLineTypeFromColumnDefsFile(headerLine string) (HeaderFields, error) {
+func getLineTypeFromColumnDefsFile(headerLine string, version string) (HeaderFields, error) {
 	// this function will read the column definitions file and return the line type for the header line
 	// if it is found in the column definitions file
 	// If the columnsDefinition file is not present then the file will be downloaded from the
-	// structColumnTypes.MetHeaderColumnsFileUrl
+	// metLineTypeDefinitions.MetHeaderColumnsFileUrl
+	switch version {
+	case "v12_0":
+		MetHeaderColumnsFileUrl = MetHeaderColumnsFileUrl_v12_0
+	case "v11_1":
+		MetHeaderColumnsFileUrl = MetHeaderColumnsFileUrl_v11_1
+	case "v11_0":
+		MetHeaderColumnsFileUrl = MetHeaderColumnsFileUrl_v11_0
+	case "v10_1":
+		MetHeaderColumnsFileUrl = MetHeaderColumnsFileUrl_v10_1
+	case "v10_0":
+		MetHeaderColumnsFileUrl = MetHeaderColumnsFileUrl_v10_0
+	default:
+		log.Printf("version not found, %s - using v12.0", version)
+		return HeaderFields{}, fmt.Errorf("Unsupported version %s", version)
+	}
+
 	var columnDefHeaderFields HeaderFields
 	var trimmedColumnDefsLine string
 	var lines []string
@@ -488,7 +539,7 @@ func getLineTypeFromColumnDefsFile(headerLine string) (HeaderFields, error) {
 	// and find the line type for the header line by looking line by line in the column definitions file.
 	// The column definitions file is a text file that contains the line type for each header line.
 	// If the column definitions file is not present then the file will be downloaded from the
-	// structColumnTypes.MetHeaderColumnsFileUrl.
+	// metLineTypeDefinitions.MetHeaderColumnsFileUrl.
 	columnDefsFilePath := wd + "/" + "./column_defs.txt"
 	_, err := os.Stat(columnDefsFilePath)
 	if os.IsNotExist(err) {

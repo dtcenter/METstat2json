@@ -1,6 +1,7 @@
 package main
 
 import (
+	"flag"
 	"fmt"
 	"io"
 	"net/http"
@@ -9,7 +10,7 @@ import (
 	"slices"
 	"strings"
 
-	"github.com/NOAA-GSL/MET-parser/pkg/buildHeaderLineTypeUtilities"
+	buildHeaderLineTypeUtilities "github.com/NOAA-GSL/MET-parser/pkg/buildHeaderLineTypeUtilities"
 )
 
 /*
@@ -43,47 +44,31 @@ type Pattern struct {
 	structType  string
 }
 
-func setMetVersion(version string) {
-	setMetSrcFiles(version)
-	setMetUserDocFiles(version)
+var metHeaderColumnsFileUrl = buildHeaderLineTypeUtilities.MetHeaderColumnsFileUrl_v12_0
+
+var metSrcFiles = buildHeaderLineTypeUtilities.MetSrcFiles
+
+var metUserDocFiles = buildHeaderLineTypeUtilities.MetUserDocFiles
+
+func setMetVersion(parserVersion string) error {
+	switch parserVersion {
+	case "v12_0":
+		metHeaderColumnsFileUrl = buildHeaderLineTypeUtilities.MetHeaderColumnsFileUrl_v12_0
+	case "v11_1":
+		metHeaderColumnsFileUrl = buildHeaderLineTypeUtilities.MetHeaderColumnsFileUrl_v11_1
+	case "v11_0":
+		metHeaderColumnsFileUrl = buildHeaderLineTypeUtilities.MetHeaderColumnsFileUrl_v11_0
+	case "v10_1":
+		metHeaderColumnsFileUrl = buildHeaderLineTypeUtilities.MetHeaderColumnsFileUrl_v10_1
+	case "v10_0":
+		metHeaderColumnsFileUrl = buildHeaderLineTypeUtilities.MetHeaderColumnsFileUrl_v10_0
+	default:
+		return fmt.Errorf("unsupported MET parserVersion: %s - supported are v12_0, v11_1, v11_0, v10_1, v10_0", parserVersion)
+	}
+	return nil
 }
 
 var patterns = make(map[string]Pattern)
-
-var metSrcFiles []string
-
-var metUserDocFiles []string
-
-func setMetSrcFiles(version string) {
-	metSrcFiles = []string{
-		"https://raw.githubusercontent.com/dtcenter/MET/refs/heads/main_" + version + "/src/libcode/vx_analysis_util/mode_line.cc",
-		"https://raw.githubusercontent.com/dtcenter/MET/refs/heads/main_" + version + "/src/libcode/vx_grid/unstructured_grid.cc",
-		"https://raw.githubusercontent.com/dtcenter/MET/refs/heads/main_" + version + "/src/libcode/vx_tc_util/prob_info_base.cc",
-		"https://raw.githubusercontent.com/dtcenter/MET/refs/heads/main_" + version + "/src/libcode/vx_tc_util/prob_rirw_info.cc",
-		"https://raw.githubusercontent.com/dtcenter/MET/refs/heads/main_" + version + "/src/libcode/vx_tc_util/prob_rirw_pair_info.cc",
-		"https://raw.githubusercontent.com/dtcenter/MET/refs/heads/main_" + version + "/src/libcode/vx_tc_util/track_pair_info.cc",
-		"https://raw.githubusercontent.com/dtcenter/MET/refs/heads/main_" + version + "/src/tools/core/stat_analysis/parse_stat_line.cc",
-		"https://raw.githubusercontent.com/dtcenter/MET/refs/heads/main_" + version + "/src/tools/tc_utils/tc_stat/tc_stat_job.cc",
-	}
-}
-
-func setMetUserDocFiles(version string) {
-	metUserDocFiles = []string{
-		"https://raw.githubusercontent.com/dtcenter/MET/refs/heads/main_" + version + "/docs/Users_Guide/ensemble-stat.rst",
-		"https://raw.githubusercontent.com/dtcenter/MET/refs/heads/main_" + version + "/docs/Users_Guide/grid-stat.rst",
-		"https://raw.githubusercontent.com/dtcenter/MET/refs/heads/main_" + version + "/docs/Users_Guide/gsi-tools.rst",
-		"https://raw.githubusercontent.com/dtcenter/MET/refs/heads/main_" + version + "/docs/Users_Guide/mode-td.rst",
-		"https://raw.githubusercontent.com/dtcenter/MET/refs/heads/main_" + version + "/docs/Users_Guide/mode.rst",
-		"https://raw.githubusercontent.com/dtcenter/MET/refs/heads/main_" + version + "/docs/Users_Guide/point-stat.rst",
-		"https://raw.githubusercontent.com/dtcenter/MET/refs/heads/main_" + version + "/docs/Users_Guide/stat-analysis.rst",
-		"https://raw.githubusercontent.com/dtcenter/MET/refs/heads/main_" + version + "/docs/Users_Guide/tc-gen.rst",
-		"https://raw.githubusercontent.com/dtcenter/MET/refs/heads/main_" + version + "/docs/Users_Guide/tc-pairs.rst",
-		"https://raw.githubusercontent.com/dtcenter/MET/refs/heads/main_" + version + "/docs/Users_Guide/wavelet-stat.rst",
-		"https://raw.githubusercontent.com/dtcenter/MET/refs/heads/main_" + version + "/src/libcode/vx_analysis_util/stat_job.cc",
-	}
-}
-
-var metHeaderColumnsFileUrl = buildHeaderLineTypeUtilities.MetHeaderColumnsFileUrl
 
 /*
 The output of this program is a series of structs that can be used to define the header
@@ -103,7 +88,15 @@ func main() {
 	// to get the stat field types. We create a map of field names to field types. Then we have to re-iterate
 	// over the header definitions to create the structs and functions to fill the structs.
 	// read the header columns file
-	setMetVersion("v12.0")
+	var version string
+	flag.StringVar(&version, "version", "", "Specify the parser version (e.g., -version=v12.0|v11.1|v11.0|v10.1|v10.0)")
+	flag.Parse()
+	parserVersion := strings.Replace(version, ".", "_", -1)
+	err := setMetVersion(parserVersion)
+	if err != nil {
+		fmt.Println("error setting MET version: ", err)
+		os.Exit(1)
+	}
 	met_header_columns_lines, fieldNameMap := getColumnLinesAndMapForUrl(metHeaderColumnsFileUrl)
 	metDataTypesForLines := make(map[string]string)
 	metDataTypesForLines = fillMetDataMapFromSrcFiles(metDataTypesForLines, fieldNameMap)
@@ -145,14 +138,14 @@ func main() {
 	addDataElementString += "\tdefault:\n\t\treturn nil, errors.New(\"AddDataElement: Unknown file_line type:\" + fileLineType)\n\t}\n\treturn *doc, nil\n}\n"
 
 	// print the package - header structs, fillHeader functions, data structs, fillStructure functions, getDocForId functions, addDataElement functions
-	fmt.Println("package structColumnTypes")
+	fmt.Println("package metLineTypeDefinitions" + "_" + parserVersion)
 	fmt.Println("")
 	fmt.Println("import (\n\t\"strconv\"\n\t\"errors\"\n\t\"fmt\"\n\t\"time\"\n)")
 	fmt.Println("\n/*\nTHIS CODE IS AUTOMATICALLY GENERATED - DO NOT EDIT THIS CODE")
 	fmt.Println("To modify this code - modify the buildHeaderLineTypes.go file and run the buildHeaderLineTypes.go program")
 	fmt.Println("cd  <repo path>/metlinetypes/pkg/buildHeaderLineTypes")
 	fmt.Println("go run . > /tmp/types.go")
-	fmt.Println("cp /tmp/types.go ../structColumnTypes/structColumnTypes.go\n*/")
+	fmt.Println("cp /tmp/types.go ../metLineTypeDefinitions/metLineTypeDefinitions.go\n*/")
 	fmt.Println("")
 
 	// print some utility funcs
@@ -197,10 +190,7 @@ func main() {
 				return
 			}
 		}
-	}
-	`)
-
-	fmt.Println("const DOC_NOT_FOUND = \"Document not found:\"")
+	}`)
 	// print the header structs
 	fmt.Println("")
 	fmt.Println("//Header struct definitions")
@@ -381,7 +371,7 @@ func getFillStructureTerm(term string, metDataTypesForLines map[string]string, d
 	cleanTerm, dataType := getDataType(term, &metDataTypesForLines)
 	jsonTerm := strings.ToLower(cleanTerm)
 
-	_dataStruct += fmt.Sprintf("    %-*s %-*s `json:\"%s\"`\n", padding, cleanTerm, padding2, dataType, jsonTerm)
+	_dataStruct += fmt.Sprintf("    %-*s %-*s `json:\"%s,omitempty\"`\n", padding, cleanTerm, padding2, dataType, jsonTerm)
 	var numFields int
 	var err error
 	var repeatFillStructureString string
