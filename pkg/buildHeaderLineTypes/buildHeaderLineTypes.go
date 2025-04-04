@@ -390,7 +390,7 @@ func getFillStructureTerm(term string, metDataTypesForLines map[string]string, d
 		_filledStructureString += repeatFillStructureString
 		index += numFields
 	default:
-		_filledStructureString += fmt.Sprintf("s.%s = fields[%d]", cleanTerm, index)
+		_filledStructureString += fmt.Sprintf("if fields[%d] != \"NA\" {\n\ts.%s = fields[%d]\n}", index, cleanTerm, index)
 	}
 	_filledStructureString += "}\n"
 	return _filledStructureString, _dataStruct, index
