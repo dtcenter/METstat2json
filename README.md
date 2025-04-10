@@ -4,9 +4,8 @@ This is a parser for MET output files.
 
 ## Approach
 
-The approach is to use a [GO program](https://github.com/ian-noaa/metlinetypes/blob/82d936b3aed5128676fed135bfda65897deb2c5a/pkg/buildHeaderLineTypes/buildHeaderLineTypes.go) that uses several files from the MET repo (which is versioned) to create a GO package that can then be
-used to create a GO package that can be used for parsing MET output files.
-The file [column defs](https://raw.githubusercontent.com/dtcenter/MET/refs/heads/main_v12.0/data/table_files/met_header_columns_V12.0.txt) is used to get a list of required terms that need to be type defined. Then several source code files are searched for type conversion statements for those terms. If the type of a term cannot be determined from source code an attempt is made to look up the term in the MET user guide.
+The approach is to use a [GO program](https://github.com/NOAA-GSL/MET-parser/blob/main/pkg/buildHeaderLineTypes/buildHeaderLineTypes.go) that uses several files from the MET repo (which is versioned by METplus) to generate another GO package that can then be imported to a GO program that can be used for parsing MET output files. The MET output file versions that are supported are v10.0.0 and later.
+The file [column defs](https://raw.githubusercontent.com/dtcenter/MET/refs/heads/main_v12.0/data/table_files/met_header_columns_V12.0.txt) as well as met_header_columns_v11.1.0, ..._v11.0.0, ..._v10.1.0, and ..._v10.0.0 are used to get a list of required terms that need to be type defined for eacg respective version. Then several source code files are searched for type conversion statements for those terms. If the type of a term cannot be determined from source code an attempt is made to look up the term in the MET user guide.
 
 These are the src files that are searched...
 
@@ -20,7 +19,7 @@ These are the src files that are searched...
 - [parse_stat_line.cc](https://raw.githubusercontent.com/dtcenter/MET/refs/heads/main_v12.0/src/tools/core/stat_analysis/parse_stat_line.cc)
 - [tc_stat_job.cc](https://raw.githubusercontent.com/dtcenter/MET/refs/heads/main_v12.0/src/tools/tc_utils/tc_stat/tc_stat_job.cc)
 
-... and these are the usr guide files that are searched ...
+... and these are the user guide files that are searched ...
 
 - [ensemble-stat.rst](https://raw.githubusercontent.com/dtcenter/MET/refs/heads/main_v12.0/docs/Users_Guide/ensemble-stat.rst)
 - [grid-stat.rst](https://raw.githubusercontent.com/dtcenter/MET/refs/heads/main_v12.0/docs/Users_Guide/grid-stat.rst)
@@ -33,15 +32,25 @@ These are the src files that are searched...
 - [tc-pairs.rst](https://raw.githubusercontent.com/dtcenter/MET/refs/heads/main_v12.0/docs/Users_Guide/tc-pairs.rst)
 - [wavelet-stat.rst](https://raw.githubusercontent.com/dtcenter/MET/refs/heads/main_v12.0/docs/Users_Guide/wavelet-stat.rst)
 
-... to derive column definitions and type information which is used to create the GO package "pkg/metLineTypeDefinitions" that contains the struct definitions, fill functions, and parse routines necessary to convert MET output files into json documents for use in a GSL AVID Couchbase database, according to the AVID Couchbase data schema.
+... in order to derive column definitions and type information that is used to create the GO packages ...
 
-In addition to the GO pkg "metLineTypeDefinitions" there are three other local packages, "structColumnDefs", "buildHeaderLineTypes", and "buildHeaderLineTypeUtilities".
+- [metLineTypeDefinitions_v10_0](https://github.com/NOAA-GSL/MET-parser/tree/main/pkg/metLineTypeDefinitions_v10_0)
+- [metLineTypeDefinitions_v10_1](https://github.com/NOAA-GSL/MET-parser/tree/main/pkg/metLineTypeDefinitions_v10_1)
+- [metLineTypeDefinitions_v11_0](https://github.com/NOAA-GSL/MET-parser/tree/main/pkg/metLineTypeDefinitions_v11_0)
+- [metLineTypeDefinitions_v11_0](https://github.com/NOAA-GSL/MET-parser/tree/main/pkg/metLineTypeDefinitions_v11_0)
+- [metLineTypeDefinitions_v11_1](https://github.com/NOAA-GSL/MET-parser/tree/main/pkg/metLineTypeDefinitions_v11_1)
+- [metLineTypeDefinitions_v12_0](https://github.com/NOAA-GSL/MET-parser/tree/main/pkg/metLineTypeDefinitions_v12_0)
 
-### structColumnDefs
+ These packages contain the struct definitions, fill functions for each MET line type, and parse routines necessary to convert MET output files into json documents for use in a GSL AVID Couchbase database, according to the AVID Couchbase data schema.
+
+In addition to the "metLineTypeDefinitions_v..." packages there are several other local packages, "metLineTypeParser", "sample_parser", "buildHeaderLineTypes", and "buildHeaderLineTypeUtilities".
+The "sample_parser" package demonstrates how to use the [metLineTypeParser](https://github.com/NOAA-GSL/MET-parser/tree/main/pkg/metLineTypeParser) package. The metLineTypeParser is the only package that is required to parse MET output files.
+
+### metLineTypeParser
 
 This package is used to parse the data for MET output files.
-The entry point to this package is the ParseLine function that takes a header line, a data line, a fileType, and a map of documents indexed by the document id. The document pointer can be an empty document. The header line is the first line of the file and contains the header field names.  The data line is any subsequent line of the file that contains the header and the data fields.
-The fileType is a string that represents the type of file being parsed. The docPtr is a pointer to a map of documents that are indexed by an id that is derived from the header fields minus the dataKey fields.
+The entry point to this package is the ParseLine function that takes a header line, a data line, a fileType, a dataSetName, and a pointer to a map of documents indexed by the document id. The document pointer can be an empty document. The header line is the first line of the file and contains the header field names.  The data line is any subsequent line of the file that contains the header and the data fields.
+The fileType is a string that represents the type of file being parsed. The dataSetName is a required user defined string that will identify the particular group of data that is being parsed. This allows the database to keep seperate copies of data that have the same Line type, the same header fields and the same vlaid or init times e.g. output from multiple MET runs of the same data set. The docPtr is a pointer to a map of documents that are indexed by an id that is derived from the header fields minus the dataKey fields and the additional dataSetName.
 
 A dataKey is an array of header field values. For example most line types have a dataKey of {"Fcst_lead"} which would have a string representation of the value of the "Fcst_lead" element in the header string.
 The dataKey fields are disallowed from the header id and are not included in the headerData. These keys serve the purpose of actually merging line data with the same dataKey values into a single document. The dataKey is used to index the data section of the document, which is a map[string]interface{}, where the interface is a specific concrete data type.
