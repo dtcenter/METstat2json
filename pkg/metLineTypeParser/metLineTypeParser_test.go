@@ -20,11 +20,11 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	metLineTypeDefinitions_v10_0 "github.com/NOAA-GSL/MET-parser/pkg/metLineTypeDefinitions_v10_0"
-	metLineTypeDefinitions_v10_1 "github.com/NOAA-GSL/MET-parser/pkg/metLineTypeDefinitions_v10_1"
-	metLineTypeDefinitions_v11_0 "github.com/NOAA-GSL/MET-parser/pkg/metLineTypeDefinitions_v11_0"
-	metLineTypeDefinitions_v11_1 "github.com/NOAA-GSL/MET-parser/pkg/metLineTypeDefinitions_v11_1"
-	metLineTypeDefinitions_v12_0 "github.com/NOAA-GSL/MET-parser/pkg/metLineTypeDefinitions_v12_0"
+	metLineTypeDefinitions_v10_0 "github.com/NOAA-GSL/METstat2json/pkg/metLineTypeDefinitions_v10_0"
+	metLineTypeDefinitions_v10_1 "github.com/NOAA-GSL/METstat2json/pkg/metLineTypeDefinitions_v10_1"
+	metLineTypeDefinitions_v11_0 "github.com/NOAA-GSL/METstat2json/pkg/metLineTypeDefinitions_v11_0"
+	metLineTypeDefinitions_v11_1 "github.com/NOAA-GSL/METstat2json/pkg/metLineTypeDefinitions_v11_1"
+	metLineTypeDefinitions_v12_0 "github.com/NOAA-GSL/METstat2json/pkg/metLineTypeDefinitions_v12_0"
 )
 
 var testdataDir = ""
