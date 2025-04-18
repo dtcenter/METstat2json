@@ -1,4 +1,4 @@
-module github.com/NOAA-GSL/MET-parser
+module github.com/NOAA-GSL/METstat2json
 
 go 1.23.3
 

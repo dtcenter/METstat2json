@@ -4,8 +4,9 @@ This is a parser for MET output files.
 
 ## Approach
 
-The approach is to use a [GO program](https://github.com/NOAA-GSL/MET-parser/blob/main/pkg/buildHeaderLineTypes/buildHeaderLineTypes.go) that uses several files from the MET repo (which is versioned by METplus) to generate another GO package that can then be imported to a GO program that can be used for parsing MET output files. The MET output file versions that are supported are v10.0.0 and later.
-The file [column defs](https://raw.githubusercontent.com/dtcenter/MET/refs/heads/main_v12.0/data/table_files/met_header_columns_V12.0.txt) as well as met_header_columns_v11.1.0, ..._v11.0.0, ..._v10.1.0, and ..._v10.0.0 are used to get a list of required terms that need to be type defined for eacg respective version. Then several source code files are searched for type conversion statements for those terms. If the type of a term cannot be determined from source code an attempt is made to look up the term in the MET user guide.
+The approach is to use a [Go program](https://github.com/NOAA-GSL/METstat2json/blob/main/pkg/buildHeaderLineTypes/buildHeaderLineTypes.go) that uses several files from the MET repo (which is versioned by METplus) to generate another GO package that can then be imported to a GO program that can be used for parsing MET output files. The MET output file versions that are supported are v10.0.0 and later.
+
+The file [column defs](https://raw.githubusercontent.com/dtcenter/MET/refs/heads/main_v12.0/data/table_files/met_header_columns_V12.0.txt) as well as met_header_columns_v11.1.0, ...\_v11.0.0, ...\_v10.1.0, and ...\_v10.0.0 are used to get a list of required terms that need to be type defined for eacg respective version. Then several source code files are searched for type conversion statements for those terms. If the type of a term cannot be determined from source code an attempt is made to look up the term in the MET user guide.
 
 These are the src files that are searched...
 
@@ -34,32 +35,35 @@ These are the src files that are searched...
 
 ... in order to derive column definitions and type information that is used to create the GO packages ...
 
-- [metLineTypeDefinitions_v10_0](https://github.com/NOAA-GSL/MET-parser/tree/main/pkg/metLineTypeDefinitions_v10_0)
-- [metLineTypeDefinitions_v10_1](https://github.com/NOAA-GSL/MET-parser/tree/main/pkg/metLineTypeDefinitions_v10_1)
-- [metLineTypeDefinitions_v11_0](https://github.com/NOAA-GSL/MET-parser/tree/main/pkg/metLineTypeDefinitions_v11_0)
-- [metLineTypeDefinitions_v11_0](https://github.com/NOAA-GSL/MET-parser/tree/main/pkg/metLineTypeDefinitions_v11_0)
-- [metLineTypeDefinitions_v11_1](https://github.com/NOAA-GSL/MET-parser/tree/main/pkg/metLineTypeDefinitions_v11_1)
-- [metLineTypeDefinitions_v12_0](https://github.com/NOAA-GSL/MET-parser/tree/main/pkg/metLineTypeDefinitions_v12_0)
+- [metLineTypeDefinitions_v10_0](https://github.com/NOAA-GSL/METstat2json/tree/main/pkg/metLineTypeDefinitions_v10_0)
+- [metLineTypeDefinitions_v10_1](https://github.com/NOAA-GSL/METstat2json/tree/main/pkg/metLineTypeDefinitions_v10_1)
+- [metLineTypeDefinitions_v11_0](https://github.com/NOAA-GSL/METstat2json/tree/main/pkg/metLineTypeDefinitions_v11_0)
+- [metLineTypeDefinitions_v11_0](https://github.com/NOAA-GSL/METstat2json/tree/main/pkg/metLineTypeDefinitions_v11_0)
+- [metLineTypeDefinitions_v11_1](https://github.com/NOAA-GSL/METstat2json/tree/main/pkg/metLineTypeDefinitions_v11_1)
+- [metLineTypeDefinitions_v12_0](https://github.com/NOAA-GSL/METstat2json/tree/main/pkg/metLineTypeDefinitions_v12_0)
 
- These packages contain the struct definitions, fill functions for each MET line type, and parse routines necessary to convert MET output files into json documents for use in a GSL AVID Couchbase database, according to the AVID Couchbase data schema.
+These packages contain the struct definitions, fill functions for each MET line type, and parse routines necessary to convert MET output files into json documents for use in a GSL AVID Couchbase database, according to the AVID Couchbase data schema.
 
 In addition to the "metLineTypeDefinitions_v..." packages there are several other local packages, "metLineTypeParser", "sample_parser", "buildHeaderLineTypes", and "buildHeaderLineTypeUtilities".
-The "sample_parser" package demonstrates how to use the [metLineTypeParser](https://github.com/NOAA-GSL/MET-parser/tree/main/pkg/metLineTypeParser) package. The metLineTypeParser is the only package that is required to parse MET output files.
+The "sample_parser" package demonstrates how to use the [metLineTypeParser](https://github.com/NOAA-GSL/METstat2json/tree/main/pkg/metLineTypeParser) package. The metLineTypeParser is the only package that is required to parse MET output files.
 
 ### metLineTypeParser
 
 This package is used to parse the data for MET output files.
-The entry point to this package is the ParseLine function that takes a header line, a data line, a fileType, a dataSetName, and a pointer to a map of documents indexed by the document id. The document pointer can be an empty document. The header line is the first line of the file and contains the header field names.  The data line is any subsequent line of the file that contains the header and the data fields.
+
+The entry point to this package is the ParseLine function that takes a header line, a data line, a fileType, a dataSetName, and a pointer to a map of documents indexed by the document id. The document pointer can be an empty document. The header line is the first line of the file and contains the header field names. The data line is any subsequent line of the file that contains the header and the data fields.
+
 The fileType is a string that represents the type of file being parsed. The dataSetName is a required user defined string that will identify the particular group of data that is being parsed. This allows the database to keep seperate copies of data that have the same Line type, the same header fields and the same vlaid or init times e.g. output from multiple MET runs of the same data set. The docPtr is a pointer to a map of documents that are indexed by an id that is derived from the header fields minus the dataKey fields and the additional dataSetName.
 
 A dataKey is an array of header field values. For example most line types have a dataKey of {"Fcst_lead"} which would have a string representation of the value of the "Fcst_lead" element in the header string.
+
 The dataKey fields are disallowed from the header id and are not included in the headerData. These keys serve the purpose of actually merging line data with the same dataKey values into a single document. The dataKey is used to index the data section of the document, which is a map[string]interface{}, where the interface is a specific concrete data type.
 
 The ParseLine function uses the GetLineType function to determine the lineType of the data line, the headerData, dataKey, and descIndex. headerData are the ordered data fields for the header section of the line, the dataKey is the actual dataKey i.e the concatenated dataKey values, and the descIndex is the ordinal index of the desc field.
+
 The descIndex is used to trim the desc field to 10 characters.
 
-The parseLine function also uses the GetId function to determine the id of the data line. The id is derived from the headerData minus the dataKey fields and is returned in the form of a VxMetaDa ta struct. The VxMetaData struct is then converted to a map[string]interface{}
-so that it can be passed to the GetDocForId function without the GetDocForId function needing to know the VxMetaData struct type.
+The parseLine function also uses the GetId function to determine the id of the data line. The id is derived from the headerData minus the dataKey fields and is returned in the form of a VxMetaDa ta struct. The VxMetaData struct is then converted to a map[string]interface{} so that it can be passed to the GetDocForId function without the GetDocForId function needing to know the VxMetaData struct type.
 
 There are a couple of utility functions that are used to get the headerData without the NA values and to convert the VxMetaData struct.
 A document pointer is required as a place to store the parsed data. If the document is nil, a new document is created.
@@ -73,30 +77,23 @@ The package exists to avoid some circular dependencies because both the parsing 
 
 The data files are MET output files that contain a header section and a data section. The header section contains the header fields that are used to identify the document. The data section contains the data fields that are used to populate the document.
 
-This package is separate from the metLineTypeDefinitions package because the metLineTypeDefinitions package is automatically
-generated from the buildHeaderLineTypes.go program and there is a desire to avoid a circular dependency.
-This package defines a VxMetaData struct that is used to store the metadata for the mapped documents.
-The metadata is used to uniquely identify each document and is used to merge documents with the same metadata.
+This package is separate from the metLineTypeDefinitions package because the metLineTypeDefinitions package is automatically generated from the buildHeaderLineTypes.go program and there is a desire to avoid a circular dependency. This package defines a VxMetaData struct that is used to store the metadata for the mapped documents. The metadata is used to uniquely identify each document and is used to merge documents with the same metadata.
 
-This package also defines the DataKeyMap that is used to determine the key data fields for a given line type.
-The key data fields are used to merge documents with the same header field values excluding the key data fields.
-The key data fields can be either from the header or the data section of a record line. In addition there
-is a headerDisallow field that may have a list of header section fields that must be disallowed from the header structure.
+This package also defines the DataKeyMap that is used to determine the key data fields for a given line type. The key data fields are used to merge documents with the same header field values excluding the key data fields. The key data fields can be either from the header or the data section of a record line. In addition there is a headerDisallow field that may have a list of header section fields that must be disallowed from the header structure.
 
 ### header key data field
 
-If the key data field is type header then the associated array of fields must be from the header section. The fields will be concatenated in the order that they are defined and separated by "_". The fields will be excluded from the header and the resultant key string will be used to index the data map. Each data map entry will represent a different data record from the source file resulting in the merging of all the records that have the same header keys minus the key data fields.
+If the key data field is type header then the associated array of fields must be from the header section. The fields will be concatenated in the order that they are defined and separated by "\_". The fields will be excluded from the header and the resultant key string will be used to index the data map. Each data map entry will represent a different data record from the source file resulting in the merging of all the records that have the same header keys minus the key data fields.
 
 ### data key data field
 
-If the key data field is type data then the associated array of fields must all be from the data section of the record. The fields will be concatenated in the order that they are defined and separated by an "_". Those fields wont be excluded from the data section but the data section will be partitioned into a map that is indexed by the values from the OBECT_ID field.
+If the key data field is type data then the associated array of fields must all be from the data section of the record. The fields will be concatenated in the order that they are defined and separated by an "\_". Those fields wont be excluded from the data section but the data section will be partitioned into a map that is indexed by the values from the OBECT_ID field.
 
 When the dataKeyFields above is applied to this document the lines with identical headers will be merged into a single document (as well as the lines with matching headers from other processed files) but because of the dataKeyMap type data definition the data records with the same OBJECT_ID will be mapped into a data map in that single document and that map will be indexed by the OBJECT_ID field. There is also a headerDisallow field and any header fields that are in this list will not be included in the header structure. This allows line definitions that have INIT, VALID, and LEAD times to have multiple data entries e.g. keyed by LEAD.
 
 ### other utilities
 
-Other utilities exist to convert the date fields to epochs, to get the line type of the data line, to get the key
-data fields for a given line type, and to find the data type of a given field in addition to some other utility functions.
+Other utilities exist to convert the date fields to epochs, to get the line type of the data line, to get the key data fields for a given line type, and to find the data type of a given field in addition to some other utility functions.
 
 ## buildHeaderLineTypes
 
@@ -104,50 +101,31 @@ The output of this program is a series of structs that can be used to define the
 and data types in the buildHeaderTypes.go file and some parsing routines that are aware of the
 header and data types. The outout is the metLineTypeDefinitions.go file which is the sole content of the metLineTypeDefinitions package and should never be directly edited.
 
-This is how to build the metLineTypeDefinitions package. It is suggested redirect the output (which is the go program)
-to a temporary file and then after looking at it copy it to its proper destination.
-You may have to create the ...pkg/metLineTypeDefinitions/ directory, but it probably comes with the repo clone.
+This is how to build the metLineTypeDefinitions package. It is suggested redirect the output (which is the go program) to a temporary file and then after looking at it copy it to its proper destination. You may have to create the ...pkg/metLineTypeDefinitions/ directory, but it probably comes with the repo clone.
 
 ```text
 ranpierce-mac1:buildHeaderLineTypes randy.pierce$ cd /Users/randy.pierce/metlinetypes/pkg/buildHeaderLineTypes
 ranpierce-mac1:buildHeaderLineTypes randy.pierce$ go run . > /tmp/types.go
 ranpierce-mac1:buildHeaderLineTypes randy.pierce$ cp /tmp/types.go ../metLineTypeDefinitions/metLineTypeDefinitions.go
-```text
+```
 
 ## Usage
 
 This package is used to parse the data for MET output files.
-The entry point to this package is the ParseLine function that takes a header line, a data line, a fileType,
-and a map of documents indexed by the document id. The document pointer can be an empty document. The header line
-is the first line of the file and contains the header field names.  The data line is any subsequent line of the file
-that contains the header and the data fields.
-The fileType is a string that represents the type of file being parsed. The docPtr is a pointer to a map of
-documents that are indexed by an id that is derived from the header fields minus the dataKey fields.
 
-A dataKey is an array of either header or data field values. For example most line types have a dataKey of {"Fcst_lead"}
-from the header section which would have a string representation of the value of the "Fcst_lead" element in the header string.
-The dataKey fields are disallowed from the header id and are not included in the headerData. These keys serve
-the purpose of actually merging line data with the same dataKey values into a single document. The dataKey is used
-to index the data section of the document, which is a map[string]interface{}, where the interface is a specific concrete
-data type.
+The entry point to this package is the ParseLine function that takes a header line, a data line, a fileType, and a map of documents indexed by the document id. The document pointer can be an empty document. The header line is the first line of the file and contains the header field names.  The data line is any subsequent line of the file that contains the header and the data fields. The fileType is a string that represents the type of file being parsed. The docPtr is a pointer to a map of documents that are indexed by an id that is derived from the header fields minus the dataKey fields.
+
+A dataKey is an array of either header or data field values. For example most line types have a dataKey of {"Fcst_lead"} from the header section which would have a string representation of the value of the "Fcst_lead" element in the header string. The dataKey fields are disallowed from the header id and are not included in the headerData. These keys serve the purpose of actually merging line data with the same dataKey values into a single document. The dataKey is used to index the data section of the document, which is a map[string]interface{}, where the interface is a specific concrete data type.
 
 A dataKey can also be a data field name. In that case the data section of a single document will be divided into a map based on that dataKey.
 
-The ParseLine function uses the GetLineType function to determine the lineType of the data line, the headerData,
-dataKey, and descIndex. headerData are the ordered data fields for the header section of the line, the dataKey is the actual
-dataKey i.e the concatenated dataKey values, and the descIndex is the ordinal index of the desc field.
+The ParseLine function uses the GetLineType function to determine the lineType of the data line, the headerData, dataKey, and descIndex. headerData are the ordered data fields for the header section of the line, the dataKey is the actual dataKey i.e the concatenated dataKey values, and the descIndex is the ordinal index of the desc field.
+
 The descIndex is used to trim the desc field to 10 characters.
 
-The parseLine function also uses the
-GetId function to determine the id of the data line. The id is derived from the headerData minus the dataKey fields and
-is returned in the form of a VxMetaData struct. The VxMetaData struct is then converted to a map[string]interface{}
-so that it can be passed to the GetDocForId function without the GetDocForId function needing to know the VxMetaData struct type.
+The parseLine function also uses the GetId function to determine the id of the data line. The id is derived from the headerData minus the dataKey fields and is returned in the form of a VxMetaData struct. The VxMetaData struct is then converted to a map[string]interface{} so that it can be passed to the GetDocForId function without the GetDocForId function needing to know the VxMetaData struct type.
 
-There are a couple of utility functions that are used to get the headerData without the NA values and to convert the VxMetaData struct.
-A document pointer is required as a place to store the parsed data. If the document is nil, a new document is created.
-The header line values (minus the dataKey fields) are used to derive the id, with date fields converted to epochs.
-If the data section of of the document[id] is nil, a new data section is created. The data section is then populated
-with the data fields from the data line. If the data section is not nil, the data fields are added to the existing data map.
+There are a couple of utility functions that are used to get the headerData without the NA values and to convert the VxMetaData struct. A document pointer is required as a place to store the parsed data. If the document is nil, a new document is created. The header line values (minus the dataKey fields) are used to derive the id, with date fields converted to epochs. If the data section of of the document[id] is nil, a new data section is created. The data section is then populated with the data fields from the data line. If the data section is not nil, the data fields are added to the existing data map.
 
 ### Formatting the generated structColumnDefs
 
@@ -156,8 +134,7 @@ There is a scripts directory at the top of the repo with a format-lint.sh script
 ## Testing
 
 There are unit tests in the buildHeaderLineTypeUtilities package in the file buildHeaderLineTypeUtilities_test.go. You can run these in vscode or on the command line.
-In vscode there is usually a link above the test case function name that allows you to run or debug the test case.
-For the command line this is how I do it
+In vscode there is usually a link above the test case function name that allows you to run or debug the test case. For the command line this is how I do it
 
 There are also integration level tests in the structColumnDefs/definitions_test.go file. These tests use the testdata directory. That test directory has its own repo [testdata](https://github.com/NOAA-GSL/MET-parser-testdata). It has most (if not all) of the various output file formats from the 12.0 version of MET, and enough data to get a good feel for performance. As more kinds of data are added to subsequent releases of MET this testdata directory can be modified to include sample data for new ouputfile versions. These tests are good examples of how to use the parser.
 
@@ -302,7 +279,7 @@ To run this program you must provide a path to a data directory...
 ## build and install
 
 see [build and install](https://go.dev/doc/tutorial/compile-install)
-GO build ignores test files (files that end in "_test").
+Go build ignores test files (files that end in "\_test").
 The repo includes a bin directory. builTypkg/buildHeaderLineTypes/buildHeaderLineTypes.go
 
 the pkg/sample/regression.go file. This can be built into an executible using the script

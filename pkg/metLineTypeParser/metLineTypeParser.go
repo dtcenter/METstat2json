@@ -9,13 +9,13 @@ import (
 	"path/filepath"
 	"strings"
 
-	metLineTypeDefinitions_v10_0 "github.com/NOAA-GSL/MET-parser/pkg/metLineTypeDefinitions_v10_0"
-	metLineTypeDefinitions_v10_1 "github.com/NOAA-GSL/MET-parser/pkg/metLineTypeDefinitions_v10_1"
-	metLineTypeDefinitions_v11_0 "github.com/NOAA-GSL/MET-parser/pkg/metLineTypeDefinitions_v11_0"
-	metLineTypeDefinitions_v11_1 "github.com/NOAA-GSL/MET-parser/pkg/metLineTypeDefinitions_v11_1"
-	metLineTypeDefinitions_v12_0 "github.com/NOAA-GSL/MET-parser/pkg/metLineTypeDefinitions_v12_0"
+	metLineTypeDefinitions_v10_0 "github.com/NOAA-GSL/METstat2json/pkg/metLineTypeDefinitions_v10_0"
+	metLineTypeDefinitions_v10_1 "github.com/NOAA-GSL/METstat2json/pkg/metLineTypeDefinitions_v10_1"
+	metLineTypeDefinitions_v11_0 "github.com/NOAA-GSL/METstat2json/pkg/metLineTypeDefinitions_v11_0"
+	metLineTypeDefinitions_v11_1 "github.com/NOAA-GSL/METstat2json/pkg/metLineTypeDefinitions_v11_1"
+	metLineTypeDefinitions_v12_0 "github.com/NOAA-GSL/METstat2json/pkg/metLineTypeDefinitions_v12_0"
 
-	buildHeaderLineTypeUtilities "github.com/NOAA-GSL/MET-parser/pkg/buildHeaderLineTypeUtilities"
+	buildHeaderLineTypeUtilities "github.com/NOAA-GSL/METstat2json/pkg/buildHeaderLineTypeUtilities"
 )
 
 /*

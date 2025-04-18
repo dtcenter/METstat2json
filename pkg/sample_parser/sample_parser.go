@@ -12,7 +12,7 @@ import (
 	"runtime"
 	"strings"
 
-	metLineTypeParser "github.com/NOAA-GSL/MET-parser/pkg/metLineTypeParser"
+	metLineTypeParser "github.com/NOAA-GSL/METstat2json/pkg/metLineTypeParser"
 )
 
 // dummy function to satisfy the function signature of getExternalDocForId

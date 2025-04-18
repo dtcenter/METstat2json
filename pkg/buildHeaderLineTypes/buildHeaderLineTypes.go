@@ -10,7 +10,7 @@ import (
 	"slices"
 	"strings"
 
-	buildHeaderLineTypeUtilities "github.com/NOAA-GSL/MET-parser/pkg/buildHeaderLineTypeUtilities"
+	buildHeaderLineTypeUtilities "github.com/NOAA-GSL/METstat2json/pkg/buildHeaderLineTypeUtilities"
 )
 
 /*
