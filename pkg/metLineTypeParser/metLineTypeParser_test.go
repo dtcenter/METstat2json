@@ -80,7 +80,7 @@ func getExistingExternalDocForId(id string) (map[string]interface{}, error) {
 	dataData := []string{"4114", "0.022881", "-0.055846", "-0.23975", "0.11316", "1.40894", "2.39774", "6.07755", "1.35071", "2.1488", "4114", "12.11241", "65.18733", "6744.28012"}
 	dataKey := "120000"
 	var _err error
-	metVersion := strings.Replace(strings.ToLower(strings.Fields(id)[3]), ".", "_", -1)
+	metVersion := strings.ReplaceAll(strings.ToLower(strings.Fields(id)[3]), ".", "_")
 	parserVersion := strings.Join(strings.Split(metVersion, `_`)[0:1], "_")
 	var doc map[string]interface{}
 	switch parserVersion {
@@ -148,8 +148,7 @@ func TestUnsupportedVersion(t *testing.T) {
 	if err == nil {
 		t.Fatalf("Expected error, got %v", err)
 	}
-	if !(strings.Contains(err.Error(), "error getting parser version from line") &&
-		strings.Contains(err.Error(), "invalid MET version format: v9.0")) {
+	if !strings.Contains(err.Error(), "error getting parser version from line") || !strings.Contains(err.Error(), "invalid MET version format: v9.0") {
 		t.Fatalf("Expected unsupported parser version error, got %v", err)
 	}
 }

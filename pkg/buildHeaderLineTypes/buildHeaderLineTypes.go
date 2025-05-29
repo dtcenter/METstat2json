@@ -91,7 +91,7 @@ func main() {
 	var version string
 	flag.StringVar(&version, "version", "", "Specify the parser version (e.g., -version=v12.0|v11.1|v11.0|v10.1|v10.0)")
 	flag.Parse()
-	parserVersion := strings.Replace(version, ".", "_", -1)
+	parserVersion := strings.ReplaceAll(version, ".", "_")
 	err := setMetVersion(parserVersion)
 	if err != nil {
 		fmt.Println("error setting MET version: ", err)
@@ -316,9 +316,9 @@ func getHeaderStructureString(fileType string, lineType string, getDocIDString s
 			continue
 		}
 		// change regex type terms
-		term = strings.Replace(term, "(", "", -1)
-		term = strings.Replace(term, ")", "", -1)
-		term = strings.Replace(term, "[0-9]*", "i", -1)
+		term = strings.ReplaceAll(term, "(", "")
+		term = strings.ReplaceAll(term, ")", "")
+		term = strings.ReplaceAll(term, "[0-9]*", "i")
 		name := strings.ToUpper(term)
 		_, dataType := getDataType(term, &metDataTypesForLines)
 		jsonName := strings.ToLower(name)
@@ -506,17 +506,18 @@ func getFillStructureSequenceString(keyPrefixes []string, cleanTerm string, elem
 	var convStr string
 	// sometimes we need to do a nilCheck (if it is a conversion to an int) - otherwise we will get a panic
 	keyPrefixesStr := `"` + strings.Join(keyPrefixes, `","`) + `"`
-	if elemType == "float64" {
+	switch elemType {
+	case "float64":
 		convStr = `value, err = strconv.ParseFloat(fields[index],64)
 					if err != nil { // sometimes there can be these NA values in the data, which will be left out of json
 						value = "NA"
 					}`
-	} else if elemType == "int" {
+	case "int":
 		convStr = `value, err = strconv.Atoi(fields[index])
 					if err != nil { // sometimes there can be these NA values in the data, which will be left out of json
 						value = "NA"
 					}`
-	} else {
+	default:
 		convStr = "value = fields[index]"
 	}
 	str := `    // the first field of the repeating fields is the TOTAL, the second field is the 1st dimenSion of the 1st sequence (there might be only one sequence)
@@ -664,19 +665,19 @@ func fillMetDataMapFromUserGuide(metDataTypesForLines, fieldNameMap map[string]s
 					i++
 					line = docFileLines[i]
 					// remove possible embedded html - ugh!
-					line = strings.Replace(line, ":raw-html:`<br />`", "", -1)
-					line = strings.Replace(line, `\`, "", -1)
+					line = strings.ReplaceAll(line, ":raw-html:`<br />`", "")
+					line = strings.ReplaceAll(line, `\`, "")
 					if line == "    -" {
 						break // this table is formatted poorly (empty fieldName), go to the next one.
 					}
 					parts = linePrefix.Split(line, -1)
-					fieldName := strings.Replace(parts[1], " ", "", -1) // remove extra spaces
-					parts := strings.Split(fieldName, "/")              // remove any front slashes
+					fieldName := strings.ReplaceAll(parts[1], " ", "") // remove extra spaces
+					parts := strings.Split(fieldName, "/")             // remove any front slashes
 					if len(parts) > 1 {
 						fieldName = parts[1]
 					}
 					// It seems that the actual fieldNames that are specified in the doc as abc_i are labeled as abc_[0-9]* in the code
-					fieldName = strings.Replace(fieldName, `_i`, `_[0-9]*`, -1) // replace _i with _[0-9]
+					fieldName = strings.ReplaceAll(fieldName, `_i`, `_[0-9]*`) // replace _i with _[0-9]
 					// skip the description line
 					i = i + 2
 					line = docFileLines[i]
@@ -722,7 +723,7 @@ func fillMetDataMapFromUserGuide(metDataTypesForLines, fieldNameMap map[string]s
 						if len(majorFields) > 1 {
 							for _, majorField := range majorFields {
 								// remove any  remaining spaces - some fields have nonsense spaces in them
-								subfield := strings.Replace(majorField, " ", "", -1)
+								subfield := strings.ReplaceAll(majorField, " ", "")
 								fields = append(fields, subfield)
 							}
 						} else {
@@ -792,7 +793,7 @@ func overRideDefinedMetDataTypes(metDataTypesForLines map[string]string, fieldNa
 
 	// Uncomment the following to look for missing data types in the MET user guide files.
 	var found bool
-	var undefineds []string = []string{}
+	undefineds := []string{}
 	for k, v := range fieldNameMap {
 		if v == "UNDEFINED" {
 			found = false

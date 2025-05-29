@@ -378,11 +378,8 @@ func SplitColumnDefLine(fileLineType string, headerLine string) ([]string, []str
 	var headerString string
 	var dataString string
 	var parts []string
-	switch {
-	case fileLineType == "MTD",
-		fileLineType == "MTD_2DSINGLE",
-		fileLineType == "MTD_3DSINGLE",
-		fileLineType == "MTD_3DPAIR":
+	switch fileLineType {
+	case "MTD", "MTD_2DSINGLE", "MTD_3DSINGLE", "MTD_3DPAIR":
 		parts = strings.Split(headerLine, " OBS_LEV ")
 		if len(parts) > 1 {
 			headerString = parts[0] + " OBS_LEV"
@@ -391,8 +388,7 @@ func SplitColumnDefLine(fileLineType string, headerLine string) ([]string, []str
 			headerString = parts[0]
 			dataString = ""
 		}
-	case fileLineType == "MODE_OBJ",
-		fileLineType == "MODE_CTS":
+	case "MODE_OBJ", "MODE_CTS":
 		parts = strings.Split(headerLine, " OBTYPE ")
 		if len(parts) > 1 {
 			headerString = parts[0] + " OBTYPE"
@@ -457,7 +453,7 @@ func GetId(dataSetName string, tmpHeaderData []string, metaData *VxMetadata) (Vx
 	idElems = append(idElems, tmpHeaderData...)
 	id := strings.Join(idElems, ":")
 	if len(id) > 250 {
-		return VxMetadata{}, fmt.Errorf("Calculated ID is too long: %d - id:\"%s\"", len(id), id)
+		return VxMetadata{}, fmt.Errorf("calculated ID is too long: %d - id:\"%s\"", len(id), id)
 	}
 	metaData.ID = id
 	return *metaData, nil
@@ -481,7 +477,7 @@ func getLineTypeFromColumnDefsFile(headerLine string, version string) (HeaderFie
 		MetHeaderColumnsFileUrl = MetHeaderColumnsFileUrl_v10_0
 	default:
 		log.Printf("version not found, %s - using v12.0", version)
-		return HeaderFields{}, fmt.Errorf("Unsupported version %s", version)
+		return HeaderFields{}, fmt.Errorf("unsupported version %s", version)
 	}
 
 	var columnDefHeaderFields HeaderFields
