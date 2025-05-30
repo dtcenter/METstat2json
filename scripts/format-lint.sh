@@ -6,8 +6,8 @@ if [ "$root" != $(pwd) ]; then
 	exit 1
 fi
 echo "formatting"
-gofumpt -w ./pkg/buildHeaderLineTypeUtilities ./pkg/buildHeaderLineTypes ./pkg/structColumnDefs ./pkg/metLineTypeDefinitions
+golangci-lint fmt ./...
 echo "linting"
-golangci-lint run --fix ./pkg/buildHeaderLineTypeUtilities/... ./pkg/buildHeaderLineTypes/... ./pkg/structColumnDefs/... ./pkg/metLineTypeDefinitions/...
+golangci-lint run --fix ./...
 echo "finished"
 exit 0

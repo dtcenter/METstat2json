@@ -8,8 +8,8 @@ fi
 
 for d in $(find ./pkg -type d -mindepth 1)
 do
-	echo "gofumpt -w $d"
-	gofumpt -w $d
+	echo "golangci-lint fmt $d"
+	golangci-lint fmt $d
 	echo "golangci-lint run --fix $d"
 	golangci-lint run --fix $d
 done
@@ -35,8 +35,8 @@ echo "format and lint metLinetypeDefinitions"
 echo "formatting ./pkg/metLineTypeDefinitions"
 for f in $(find ./pkg -name metLineTypeDefinitions.go)
 do
-	echo "gofumpt -w $f"
-	gofumpt -w $f
+	echo "golangci-lint fmt $f"
+	golangci-lint fmt $f
 	echo "golangci-lint run --fix $f"
 	golangci-lint run --fix $f
 done
