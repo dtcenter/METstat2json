@@ -124,7 +124,7 @@ linters:
         rules:
           avro: snake
           bson: camel
-          json: snake 
+          json: camel
           mapstructure: kebab
           xml: camel
           yaml: snake
