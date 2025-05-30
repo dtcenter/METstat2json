@@ -11,6 +11,8 @@ import (
 	"strings"
 
 	buildHeaderLineTypeUtilities "github.com/NOAA-GSL/METstat2json/pkg/buildHeaderLineTypeUtilities"
+	"golang.org/x/text/cases"
+	"golang.org/x/text/language"
 )
 
 /*
@@ -239,8 +241,10 @@ func main() {
 	fmt.Println("")
 }
 
+// private functions
+
+// returns the keys of the map, sorted alphabetically
 func getSortedKeys(m map[string]string) []string {
-	// returns the keys of the map, sorted alphabetically
 	keys := make([]string, 0, len(m))
 	for k := range m {
 		keys = append(keys, k)
@@ -249,7 +253,29 @@ func getSortedKeys(m map[string]string) []string {
 	return keys
 }
 
-// private functions
+// rewrites strings to camelCase format.
+func toCamelCase(s string) string {
+	// Remove all characters that are not alphanumeric, spaces, hyphens or underscores
+	s = regexp.MustCompile("[^a-zA-Z0-9-_ ]+").ReplaceAllString(s, "")
+
+	// Replace all underscores & hyphens with spaces
+	s = strings.ReplaceAll(s, "_", " ")
+	s = strings.ReplaceAll(s, "-", " ")
+
+	// Title case s. As part of that, switch from UPPER to lower case
+	s = cases.Title(language.AmericanEnglish).String(s)
+
+	// Remove all spaces
+	s = strings.ReplaceAll(s, " ", "")
+
+	// Lowercase the first letter
+	if len(s) > 0 {
+		s = strings.ToLower(s[:1]) + s[1:]
+	}
+
+	return s
+}
+
 func getFileLineType(line string) (string, string, string, error) {
 	parts := strings.Split(line, ": VERSION")
 	if len(parts) < 2 {
@@ -333,7 +359,7 @@ func getHeaderStructureString(fileType string, lineType string, getDocIDString s
 		term = strings.ReplaceAll(term, "[0-9]*", "i")
 		name := strings.ToUpper(term)
 		_, dataType := getDataType(term, &metDataTypesForLines)
-		jsonName := strings.ToLower(name)
+		jsonName := toCamelCase(name)
 		headerStructString += fmt.Sprintf("    %-*s %s `json:\"%s\"`\n", padding, name, dataType, jsonName)
 		if term == "LINE_TYPE" && (fileType == "MODE" || fileType == "MTD") {
 			// these file types do not have a LINE_TYPE field in the header definition
@@ -381,7 +407,7 @@ func getFillStructureTerm(term string, metDataTypesForLines map[string]string, d
 	_filledStructureString := fillStructureString
 	_dataStruct := dataStruct
 	cleanTerm, dataType := getDataType(term, &metDataTypesForLines)
-	jsonTerm := strings.ToLower(cleanTerm)
+	jsonTerm := toCamelCase(cleanTerm)
 
 	_dataStruct += fmt.Sprintf("    %-*s %-*s `json:\"%s,omitempty\"`\n", padding, cleanTerm, padding2, dataType, jsonTerm)
 	var numFields int
