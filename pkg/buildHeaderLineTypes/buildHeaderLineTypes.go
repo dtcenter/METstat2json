@@ -191,34 +191,36 @@ func main() {
 			}
 		}
 	}`)
-	// print the header structs
+	// print the header structs in order
 	fmt.Println("")
 	fmt.Println("//Header struct definitions")
-	for _, headerStruct := range headerStructs {
-		// print the struct
-		fmt.Println(headerStruct)
+	hsKeys := getSortedKeys(headerStructs)
+	for _, key := range hsKeys {
+		fmt.Println(headerStructs[key])
 	}
-	// print the fillHeader functions
+	// print the fillHeader functions in order
 	fmt.Println("")
 	fmt.Println("//fillHeader functions")
-	for _, fillHeaderFunc := range fillHeaderFuncs {
-		// print the function
-		fmt.Println(fillHeaderFunc)
+	fhKeys := getSortedKeys(fillHeaderFuncs)
+	for _, key := range fhKeys {
+		fmt.Println(fillHeaderFuncs[key])
 	}
 
-	// print the data structs
+	// print the data structs in order
 	fmt.Println("")
 	fmt.Println("//line data struct definitions")
-	for _, dataStruct := range dataStructs {
-		fmt.Println(dataStruct)
+	dsKeys := getSortedKeys(dataStructs)
+	for _, key := range dsKeys {
+		fmt.Println(dataStructs[key])
 	}
 
-	// print the fillStructure functions
+	// print the fillStructure functions in order
 	fmt.Println("")
 	fmt.Println("//fillStructure functions")
-	for _, fillStructureFunc := range fillDataFuncs {
+	fdfKeys := getSortedKeys(fillDataFuncs)
+	for _, key := range fdfKeys {
 		// print the function
-		fmt.Println(fillStructureFunc)
+		fmt.Println(fillDataFuncs[key])
 	}
 
 	// print the getDocForId functions
@@ -235,6 +237,16 @@ func main() {
 	fmt.Println("")
 	fmt.Println("var MetHeaderColumnsFileUrl = \"" + metHeaderColumnsFileUrl + "\"")
 	fmt.Println("")
+}
+
+func getSortedKeys(m map[string]string) []string {
+	// returns the keys of the map, sorted alphabetically
+	keys := make([]string, 0, len(m))
+	for k := range m {
+		keys = append(keys, k)
+	}
+	slices.Sort(keys)
+	return keys
 }
 
 // private functions
