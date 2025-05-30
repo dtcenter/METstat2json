@@ -821,7 +821,10 @@ func overRideDefinedMetDataTypes(metDataTypesForLines map[string]string, fieldNa
 		}
 	}
 	if len(undefineds) > 0 {
-		fmt.Printf("\n/*undefined: %v*/\n", undefineds)
+		slices.Sort(undefineds)
+		fmt.Printf("\n/*\nThe following data types were not found in the MET user guide files or the MET source code files.\n")
+		fmt.Printf("\n TODO - add an actionable message.\n")
+		fmt.Printf("\nUndefined data types: %v*/\n", undefineds)
 	}
 	return metDataTypesForLines, fieldNameMap
 }
