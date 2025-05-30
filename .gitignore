@@ -49,3 +49,6 @@ go.work.sum
 
 # IDEs
 .vscode
+
+# Text files
+*.txt
