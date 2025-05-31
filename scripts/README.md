@@ -27,7 +27,7 @@ finished
 ```
 
 After the above step you should have a complete, generated, formatted, and linted GO package in pkg/metLineTypeDefinitions and supporting
-pks pkg/buildHeaderLineTypeUtilities, pkg/structColumnDefs and pkg/ample_parser.
+pks pkg/util, pkg/structColumnDefs and pkg/ample_parser.
 
 ## running the parser
 

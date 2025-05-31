@@ -44,7 +44,7 @@ These are the src files that are searched...
 
 These packages contain the struct definitions, fill functions for each MET line type, and parse routines necessary to convert MET output files into json documents for use in a GSL AVID Couchbase database, according to the AVID Couchbase data schema.
 
-In addition to the "metLineTypeDefinitions_v..." packages there are several other local packages, "metLineTypeParser", "sample_parser", "generator", and "buildHeaderLineTypeUtilities".
+In addition to the "metLineTypeDefinitions_v..." packages there are several other local packages, "metLineTypeParser", "sample_parser", "generator", and "pkg/util".
 The "sample_parser" package demonstrates how to use the [metLineTypeParser](https://github.com/NOAA-GSL/METstat2json/tree/main/pkg/metLineTypeParser) package. The metLineTypeParser is the only package that is required to parse MET output files.
 
 ### metLineTypeParser
@@ -70,7 +70,7 @@ A document pointer is required as a place to store the parsed data. If the docum
 The header line values (minus the dataKey fields) are used to derive the id, with date fields converted to epochs.
 If the data section of of the document[id] is nil, a new data section is created. The data section is then populated with the data fields from the data line. If the data section is not nil, the data fields are added to the existing data map
 
-### buildHeaderLineTypeUtilities
+### pkg/util
 
 This package contains the utilities for building the header and line type for the data files.
 The package exists to avoid some circular dependencies because both the parsing and the "generator" generation program depend on these utilities.
@@ -131,69 +131,21 @@ There is a scripts directory at the top of the repo with a format-lint.sh script
 
 ## Testing
 
-There are unit tests in the buildHeaderLineTypeUtilities package in the file buildHeaderLineTypeUtilities_test.go. You can run these in vscode or on the command line.
+There are unit tests in the util package in the file util_test.go. You can run these in vscode or on the command line.
 In vscode there is usually a link above the test case function name that allows you to run or debug the test case. For the command line this is how I do it
 
 There are also integration level tests in the structColumnDefs/definitions_test.go file. These tests use the testdata directory. That test directory has its own repo [testdata](https://github.com/NOAA-GSL/MET-parser-testdata). It has most (if not all) of the various output file formats from the 12.0 version of MET, and enough data to get a good feel for performance. As more kinds of data are added to subsequent releases of MET this testdata directory can be modified to include sample data for new ouputfile versions. These tests are good examples of how to use the parser.
 
 ```text
-ranpierce-mac1:buildHeaderLineTypeUtilities randy.pierce$ cd /Users/randy.pierce/metlinetypes/pkg/buildHeaderLineTypeUtilities/
-ranpierce-mac1:buildHeaderLineTypeUtilities randy.pierce$ go clean --testcache
-ranpierce-mac1:buildHeaderLineTypeUtilities randy.pierce$ go test ./...
-ok   parser/pkg/buildHeaderLineTypeUtilities 0.185s
-ranpierce-mac1:buildHeaderLineTypeUtilities randy.pierce$ cd /Users/randy.pierce/metlinetypes/pkg/structColumnDefs
-ranpierce-mac1:buildHeaderLineTypeUtilities randy.pierce$ go clean --testcache
-ranpierce-mac1:structColumnDefs randy.pierce$ go test ./...
-ok  parser/pkg/structColumnDefs 15.705s
-
+cd <repo_root>
+go test ./...
 ```
 
 or if I want more log output....
 
 ```text
-ranpierce-mac1:buildHeaderLineTypeUtilities randy.pierce$ cd /Users/randy.pierce/metlinetypes/pkg/buildHeaderLineTypeUtilities/
-ranpierce-mac1:buildHeaderLineTypeUtilities randy.pierce$ go clean --testcache
-ranpierce-mac1:buildHeaderLineTypeUtilities randy.pierce$ go test -v ./...
-=== RUN   TestGetLineType
-=== RUN   TestGetLineType/VERSION_MODEL_DESC_FCST_LEAD_FCST_VALID_BEG__FCST_VALID_END__OBS_LEAD_OBS_VALID_BEG___OBS_VALID_END___FCST_VAR__FCST_UNITS_FCST_LEV_OBS_VAR___OBS_UNITS_OBS_LEV_OBTYPE_VX_MASK_INTERP_MTHD_INTERP_PNTS_FCST_THRESH_OBS_THRESH_COV_THRESH_ALPHA_LINE_TYPE
-=== RUN   TestGetLineType/VERSION_MODEL_DESC_FCST_LEAD_FCST_VALID_BEG__FCST_VALID_END__OBS_LEAD_OBS_VALID_BEG___OBS_VALID_END___FCST_VAR__FCST_UNITS_FCST_LEV_OBS_VAR___OBS_UNITS_OBS_LEV_OBTYPE_VX_MASK_INTERP_MTHD_INTERP_PNTS_FCST_THRESH_OBS_THRESH_COV_THRESH_ALPHA_LINE_TYPE#01
-=== RUN   TestGetLineType/VERSION_MODEL_DESC_FCST_LEAD_FCST_VALID_BEG__FCST_VALID_END__OBS_LEAD_OBS_VALID_BEG___OBS_VALID_END___FCST_VAR__FCST_UNITS_FCST_LEV_OBS_VAR___OBS_UNITS_OBS_LEV_OBTYPE_VX_MASK_INTERP_MTHD_INTERP_PNTS_FCST_THRESH_OBS_THRESH_COV_THRESH_ALPHA_LINE_TYPE#02
---- PASS: TestGetLineType (0.00s)
-    --- PASS: TestGetLineType/VERSION_MODEL_DESC_FCST_LEAD_FCST_VALID_BEG__FCST_VALID_END__OBS_LEAD_OBS_VALID_BEG___OBS_VALID_END___FCST_VAR__FCST_UNITS_FCST_LEV_OBS_VAR___OBS_UNITS_OBS_LEV_OBTYPE_VX_MASK_INTERP_MTHD_INTERP_PNTS_FCST_THRESH_OBS_THRESH_COV_THRESH_ALPHA_LINE_TYPE (0.00s)
-    --- PASS: TestGetLineType/VERSION_MODEL_DESC_FCST_LEAD_FCST_VALID_BEG__FCST_VALID_END__OBS_LEAD_OBS_VALID_BEG___OBS_VALID_END___FCST_VAR__FCST_UNITS_FCST_LEV_OBS_VAR___OBS_UNITS_OBS_LEV_OBTYPE_VX_MASK_INTERP_MTHD_INTERP_PNTS_FCST_THRESH_OBS_THRESH_COV_THRESH_ALPHA_LINE_TYPE#01 (0.00s)
-    --- PASS: TestGetLineType/VERSION_MODEL_DESC_FCST_LEAD_FCST_VALID_BEG__FCST_VALID_END__OBS_LEAD_OBS_VALID_BEG___OBS_VALID_END___FCST_VAR__FCST_UNITS_FCST_LEV_OBS_VAR___OBS_UNITS_OBS_LEV_OBTYPE_VX_MASK_INTERP_MTHD_INTERP_PNTS_FCST_THRESH_OBS_THRESH_COV_THRESH_ALPHA_LINE_TYPE#02 (0.00s)
-=== RUN   TestSplitColumnDefLine
-=== RUN   TestSplitColumnDefLine/MODE
-=== RUN   TestSplitColumnDefLine/MTD
-=== RUN   TestSplitColumnDefLine/STAT
-=== RUN   TestSplitColumnDefLine/STAT#01
---- PASS: TestSplitColumnDefLine (0.00s)
-    --- PASS: TestSplitColumnDefLine/MODE (0.00s)
-    --- PASS: TestSplitColumnDefLine/MTD (0.00s)
-    --- PASS: TestSplitColumnDefLine/STAT (0.00s)
-    --- PASS: TestSplitColumnDefLine/STAT#01 (0.00s)
-=== RUN   TestGetKeyDataFieldsForLineType
-=== RUN   TestGetKeyDataFieldsForLineType/MODE
-=== RUN   TestGetKeyDataFieldsForLineType/MTD
-=== RUN   TestGetKeyDataFieldsForLineType/STAT
-=== RUN   TestGetKeyDataFieldsForLineType/unknown
---- PASS: TestGetKeyDataFieldsForLineType (0.00s)
-    --- PASS: TestGetKeyDataFieldsForLineType/MODE (0.00s)
-    --- PASS: TestGetKeyDataFieldsForLineType/MTD (0.00s)
-    --- PASS: TestGetKeyDataFieldsForLineType/STAT (0.00s)
-    --- PASS: TestGetKeyDataFieldsForLineType/unknown (0.00s)
-=== RUN   TestFindType
-=== RUN   TestFindType/item1
-=== RUN   TestFindType/item2
-=== RUN   TestFindType/item3
-=== RUN   TestFindType/item4
---- PASS: TestFindType (0.00s)
-    --- PASS: TestFindType/item1 (0.00s)
-    --- PASS: TestFindType/item2 (0.00s)
-    --- PASS: TestFindType/item3 (0.00s)
-    --- PASS: TestFindType/item4 (0.00s)
-PASS
-ok   parser/pkg/buildHeaderLineTypeUtilities 0.184s
+cd <repo_root>
+go test -v ./...
 ```
 
 There are more comprehensive tests in the structColumnDefs pkg.

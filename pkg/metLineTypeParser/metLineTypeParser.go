@@ -14,8 +14,7 @@ import (
 	"github.com/NOAA-GSL/METstat2json/pkg/metLineTypeDefinitions_v11_0"
 	"github.com/NOAA-GSL/METstat2json/pkg/metLineTypeDefinitions_v11_1"
 	"github.com/NOAA-GSL/METstat2json/pkg/metLineTypeDefinitions_v12_0"
-
-	"github.com/NOAA-GSL/METstat2json/pkg/buildHeaderLineTypeUtilities"
+	"github.com/NOAA-GSL/METstat2json/pkg/util"
 )
 
 /*
@@ -110,17 +109,17 @@ func ParseLine(dataSetName string, headerLine string, dataLine string, docPtr *m
 	}
 
 	// get the lineType
-	fileLineType, headerData, dataData, dataKey, descIndex, err := buildHeaderLineTypeUtilities.GetLineType(headerLine, dataLine, fileName, parserVersion)
+	fileLineType, headerData, dataData, dataKey, descIndex, err := util.GetLineType(headerLine, dataLine, fileName, parserVersion)
 	if err != nil {
 		// cannot process this line so return the docPtr as is - it is probably a truncated line
 		fmt.Println("Error getting line type: ", err)
 		return *docPtr, err
 	}
 	// if there are any disallowed fields in this linetype then add the disallowed data to the dataData array - in order
-	disallowedFields := buildHeaderLineTypeUtilities.DataKeyMap[fileLineType].HeaderDisallow
+	disallowedFields := util.DataKeyMap[fileLineType].HeaderDisallow
 	if len(disallowedFields) > 0 {
 		for _, disallowedField := range disallowedFields {
-			disAllowedFieldValue, err := buildHeaderLineTypeUtilities.GetHeaderValue(strings.Fields(headerLine), strings.Fields(dataLine), disallowedField)
+			disAllowedFieldValue, err := util.GetHeaderValue(strings.Fields(headerLine), strings.Fields(dataLine), disallowedField)
 			// if there is an error getting the disallowed field, just append "" to the dataData array
 			if err != nil {
 				fmt.Println("Error getting disallowed field: ", err)
@@ -138,7 +137,7 @@ func ParseLine(dataSetName string, headerLine string, dataLine string, docPtr *m
 	}
 	// GetId will fill in the id field of the metaData struct with the constructed id
 	// metadata doesn't change between versions, we just use the latest one. Same with DOC
-	metaData, _err := buildHeaderLineTypeUtilities.GetId(dataSetName, tmpHeaderData, &buildHeaderLineTypeUtilities.VxMetadata{Subset: "MET", Type: "DD", SubType: "MET"})
+	metaData, _err := util.GetId(dataSetName, tmpHeaderData, &util.VxMetadata{Subset: "MET", Type: "DD", SubType: "MET"})
 	if _err != nil {
 		return *docPtr, fmt.Errorf("error getting id from line %s: %w", dataLine, _err)
 	}
@@ -217,7 +216,7 @@ func ParseLine(dataSetName string, headerLine string, dataLine string, docPtr *m
 /*
 convert the fields of the metaData to a map[string]interface{} so it can be added to the doc without needing the VxMetadata struct type definition
 */
-func getMetaDataMap(metaData buildHeaderLineTypeUtilities.VxMetadata) (map[string]interface{}, error) {
+func getMetaDataMap(metaData util.VxMetadata) (map[string]interface{}, error) {
 	var metaDataMap map[string]interface{}
 	jsonBytes, err := json.Marshal(metaData)
 	if err != nil {

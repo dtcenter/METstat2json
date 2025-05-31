@@ -10,7 +10,7 @@ import (
 	"slices"
 	"strings"
 
-	buildHeaderLineTypeUtilities "github.com/NOAA-GSL/METstat2json/pkg/buildHeaderLineTypeUtilities"
+	"github.com/NOAA-GSL/METstat2json/pkg/util"
 	"golang.org/x/text/cases"
 	"golang.org/x/text/language"
 )
@@ -46,24 +46,24 @@ type Pattern struct {
 	structType  string
 }
 
-var metHeaderColumnsFileUrl = buildHeaderLineTypeUtilities.MetHeaderColumnsFileUrl_v12_0
+var metHeaderColumnsFileUrl = util.MetHeaderColumnsFileUrl_v12_0
 
-var metSrcFiles = buildHeaderLineTypeUtilities.MetSrcFiles
+var metSrcFiles = util.MetSrcFiles
 
-var metUserDocFiles = buildHeaderLineTypeUtilities.MetUserDocFiles
+var metUserDocFiles = util.MetUserDocFiles
 
 func setMetVersion(parserVersion string) error {
 	switch parserVersion {
 	case "v12_0":
-		metHeaderColumnsFileUrl = buildHeaderLineTypeUtilities.MetHeaderColumnsFileUrl_v12_0
+		metHeaderColumnsFileUrl = util.MetHeaderColumnsFileUrl_v12_0
 	case "v11_1":
-		metHeaderColumnsFileUrl = buildHeaderLineTypeUtilities.MetHeaderColumnsFileUrl_v11_1
+		metHeaderColumnsFileUrl = util.MetHeaderColumnsFileUrl_v11_1
 	case "v11_0":
-		metHeaderColumnsFileUrl = buildHeaderLineTypeUtilities.MetHeaderColumnsFileUrl_v11_0
+		metHeaderColumnsFileUrl = util.MetHeaderColumnsFileUrl_v11_0
 	case "v10_1":
-		metHeaderColumnsFileUrl = buildHeaderLineTypeUtilities.MetHeaderColumnsFileUrl_v10_1
+		metHeaderColumnsFileUrl = util.MetHeaderColumnsFileUrl_v10_1
 	case "v10_0":
-		metHeaderColumnsFileUrl = buildHeaderLineTypeUtilities.MetHeaderColumnsFileUrl_v10_0
+		metHeaderColumnsFileUrl = util.MetHeaderColumnsFileUrl_v10_0
 	default:
 		return fmt.Errorf("unsupported MET parserVersion: %s - supported are v12_0, v11_1, v11_0, v10_1, v10_0", parserVersion)
 	}
@@ -123,7 +123,7 @@ func main() {
 		}
 		fileLineType := fileType + "_" + lineType
 		// split the line into header and data fields
-		headerFields, dataFields := buildHeaderLineTypeUtilities.SplitColumnDefLine(fileLineType, fieldStr)
+		headerFields, dataFields := util.SplitColumnDefLine(fileLineType, fieldStr)
 		// create the header struct string and the fillHeader function string
 		docStructName, headerStructName, headerStructString, fillHeaderString, docIDString, addDataElementString = getHeaderStructureString(fileType, lineType, docIDString, addDataElementString, headerFields, metDataTypesForLines)
 		// add the header struct string to the map for printing later
@@ -308,7 +308,7 @@ func getHeaderStructureString(fileType string, lineType string, getDocIDString s
 	*/
 	docStructName := fmt.Sprintf("%s_%s", fileType, lineType)
 	headerStructName := fmt.Sprintf("%s_header", docStructName)
-	dataKeyMap := buildHeaderLineTypeUtilities.DataKeyMap[fileType+"_"+lineType]
+	dataKeyMap := util.DataKeyMap[fileType+"_"+lineType]
 	keyFields := dataKeyMap.DataKey
 	headerDisallowed := dataKeyMap.HeaderDisallow // list of disallowed fields
 	headerStructString := fmt.Sprintf("type %s struct {\n", headerStructName)
@@ -390,7 +390,7 @@ func getFillStructureString(docStructName string, dataFields []string, metDataTy
 	}
 	padding2 := len("map[string]interface{}")
 	// add disallowed field terms to the dataFields and the associated data to the (embedded) fields array
-	dataFields = append(dataFields, buildHeaderLineTypeUtilities.DataKeyMap[fileType+"_"+lineType].HeaderDisallow...)
+	dataFields = append(dataFields, util.DataKeyMap[fileType+"_"+lineType].HeaderDisallow...)
 	// iterate through the data fields to create the data struct and the fillStructure function
 	for index := 0; index < len(dataFields); index++ {
 		term := dataFields[index]
@@ -989,11 +989,11 @@ func getDataType(name string, metDataTypesLines *map[string]string) (key string,
 		dataType = "string"
 	}
 	// convert the type of a field that is a date to "int"
-	if slices.Contains(buildHeaderLineTypeUtilities.DateFieldNames, uName) {
+	if slices.Contains(util.DateFieldNames, uName) {
 		dataType = "int"
 	}
 	// convert the type of a field that is an int to "int"
-	if slices.Contains(buildHeaderLineTypeUtilities.IntFieldNames, uName) {
+	if slices.Contains(util.IntFieldNames, uName) {
 		dataType = "int"
 	}
 	return uName, dataType

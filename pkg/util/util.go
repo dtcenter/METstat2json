@@ -1,4 +1,4 @@
-package buildHeaderLineTypeUtilities
+package util
 
 /*
 This package contains the utilities for building the header and line type for the data files. The data files are
