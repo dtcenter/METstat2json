@@ -44,10 +44,10 @@ These are the src files that are searched...
 
 These packages contain the struct definitions, fill functions for each MET line type, and parse routines necessary to convert MET output files into json documents for use in a GSL AVID Couchbase database, according to the AVID Couchbase data schema.
 
-In addition to the "metLineTypeDefinitions_v..." packages there are several other local packages, "metLineTypeParser", "sample_parser", "generator", and "pkg/util".
-The "sample_parser" package demonstrates how to use the [metLineTypeParser](https://github.com/NOAA-GSL/METstat2json/tree/main/pkg/metLineTypeParser) package. The metLineTypeParser is the only package that is required to parse MET output files.
+In addition to the "metLineTypeDefinitions_v..." packages there are several other local packages, "parser", "sample_parser", "generator", and "pkg/util".
+The "sample_parser" package demonstrates how to use the [parser](https://github.com/NOAA-GSL/METstat2json/tree/main/pkg/parser) package. The parser is the only package that is required to parse MET output files.
 
-### metLineTypeParser
+### parser
 
 This package is used to parse the data for MET output files.
 

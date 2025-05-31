@@ -1,4 +1,4 @@
-package metLineTypeParser
+package parser
 
 /*
 For profiling -
