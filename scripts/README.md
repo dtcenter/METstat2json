@@ -7,7 +7,7 @@
 >./scripts/build.sh
 formatting primary packages
 linting primary packages
-building package buildHeaderLineTypes
+building package generator
 building for linux/arm64
 building for darwin/arm64
 building for linux/amd64

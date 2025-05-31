@@ -16,10 +16,9 @@ import (
 
 /*
 THIS CODE IS AUTOMATICALLY GENERATED - DO NOT EDIT THIS CODE
-To modify this code - modify the buildHeaderLineTypes.go file and run the buildHeaderLineTypes.go program
-cd  <repo path>/metlinetypes/pkg/buildHeaderLineTypes
-go run . > /tmp/types.go
-cp /tmp/types.go ../metLineTypeDefinitions/metLineTypeDefinitions.go
+To modify this code - modify the generator.go file and run the generator.go program
+cd  <repo_root>
+go run generator -version=v12.0 > metLineTypeDefinitions_v12_0/metLineTypeDefinitions.go
 */
 
 func GetLeadFromInitValid(data []string, dataFieldIndex int) string {

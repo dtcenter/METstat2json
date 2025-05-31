@@ -14,22 +14,23 @@ do
 	golangci-lint run --fix $d
 done
 
-echo "building package buildHeaderLineTypes"
+echo "building package generator"
 mkdir -p bin
 for arch in arm64 amd64; do
 	for os in linux darwin; do
 		mkdir -p bin/linux/${os}/${arch}
 		echo "building for ${os}/${arch}"
-		env GOOS=${os} GOARCH=${arch} go build -o "./bin/${os}/${arch}/buildHeaderLineTypes" pkg/buildHeaderLineTypes/buildHeaderLineTypes.go
+		env GOOS=${os} GOARCH=${arch} go build -o "./bin/${os}/${arch}/generator" generator/generator.go
 	done
 done
 
 echo "building new metLineTypeDefinitions.go"
-go run pkg/buildHeaderLineTypes/buildHeaderLineTypes.go -version=v12.0 > pkg/metLineTypeDefinitions_v12_0/metLineTypeDefinitions.go
-go run pkg/buildHeaderLineTypes/buildHeaderLineTypes.go -version=v11.1 > pkg/metLineTypeDefinitions_v11_1/metLineTypeDefinitions.go
-go run pkg/buildHeaderLineTypes/buildHeaderLineTypes.go -version=v11.0 > pkg/metLineTypeDefinitions_v11_0/metLineTypeDefinitions.go
-go run pkg/buildHeaderLineTypes/buildHeaderLineTypes.go -version=v10.1 > pkg/metLineTypeDefinitions_v10_1/metLineTypeDefinitions.go
-go run pkg/buildHeaderLineTypes/buildHeaderLineTypes.go -version=v10.0 > pkg/metLineTypeDefinitions_v10_0/metLineTypeDefinitions.go
+go run ./generator -version=v12.0 > pkg/metLineTypeDefinitions_v12_0/metLineTypeDefinitions.go \
+  && go run ./generator -version=v11.1 > pkg/metLineTypeDefinitions_v11_1/metLineTypeDefinitions.go \
+  && go run ./generator -version=v11.0 > pkg/metLineTypeDefinitions_v11_0/metLineTypeDefinitions.go \
+  && go run ./generator -version=v10.1 > pkg/metLineTypeDefinitions_v10_1/metLineTypeDefinitions.go \
+  && go run ./generator -version=v10.0 > pkg/metLineTypeDefinitions_v10_0/metLineTypeDefinitions.go \
+  && golangci-lint fmt ./...
 
 echo "format and lint metLinetypeDefinitions"
 echo "formatting ./pkg/metLineTypeDefinitions"
@@ -45,7 +46,7 @@ echo "building sample program"
 for arch in arm64 amd64; do
 	for os in linux darwin; do
 		echo "building for ${os}/${arch}"
-		env GOOS=${os} GOARCH=${arch} go build -o "./bin/${os}/${arch}/sample_parser" pkg/sample_parser/sample_parser.go
+		env GOOS=${os} GOARCH=${arch} go build -o "./bin/${os}/${arch}/sample_parser" examples/sample_parser/sample_parser.go
 	done
 done
 

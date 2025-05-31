@@ -4,7 +4,7 @@ This is a parser for MET output files.
 
 ## Approach
 
-The approach is to use a [Go program](https://github.com/NOAA-GSL/METstat2json/blob/main/pkg/buildHeaderLineTypes/buildHeaderLineTypes.go) that uses several files from the MET repo (which is versioned by METplus) to generate another GO package that can then be imported to a GO program that can be used for parsing MET output files. The MET output file versions that are supported are v10.0.0 and later.
+The approach is to use a [Go program](https://github.com/NOAA-GSL/METstat2json/blob/main/generator/generator.go) that uses several files from the MET repo (which is versioned by METplus) to generate another GO package that can then be imported to a GO program that can be used for parsing MET output files. The MET output file versions that are supported are v10.0.0 and later.
 
 The file [column defs](https://raw.githubusercontent.com/dtcenter/MET/refs/heads/main_v12.0/data/table_files/met_header_columns_V12.0.txt) as well as met_header_columns_v11.1.0, ...\_v11.0.0, ...\_v10.1.0, and ...\_v10.0.0 are used to get a list of required terms that need to be type defined for eacg respective version. Then several source code files are searched for type conversion statements for those terms. If the type of a term cannot be determined from source code an attempt is made to look up the term in the MET user guide.
 
@@ -44,7 +44,7 @@ These are the src files that are searched...
 
 These packages contain the struct definitions, fill functions for each MET line type, and parse routines necessary to convert MET output files into json documents for use in a GSL AVID Couchbase database, according to the AVID Couchbase data schema.
 
-In addition to the "metLineTypeDefinitions_v..." packages there are several other local packages, "metLineTypeParser", "sample_parser", "buildHeaderLineTypes", and "buildHeaderLineTypeUtilities".
+In addition to the "metLineTypeDefinitions_v..." packages there are several other local packages, "metLineTypeParser", "sample_parser", "generator", and "buildHeaderLineTypeUtilities".
 The "sample_parser" package demonstrates how to use the [metLineTypeParser](https://github.com/NOAA-GSL/METstat2json/tree/main/pkg/metLineTypeParser) package. The metLineTypeParser is the only package that is required to parse MET output files.
 
 ### metLineTypeParser
@@ -73,11 +73,11 @@ If the data section of of the document[id] is nil, a new data section is created
 ### buildHeaderLineTypeUtilities
 
 This package contains the utilities for building the header and line type for the data files.
-The package exists to avoid some circular dependencies because both the parsing and the buildHeaderLineTypes generation program depend on these utilities.
+The package exists to avoid some circular dependencies because both the parsing and the "generator" generation program depend on these utilities.
 
 The data files are MET output files that contain a header section and a data section. The header section contains the header fields that are used to identify the document. The data section contains the data fields that are used to populate the document.
 
-This package is separate from the metLineTypeDefinitions package because the metLineTypeDefinitions package is automatically generated from the buildHeaderLineTypes.go program and there is a desire to avoid a circular dependency. This package defines a VxMetaData struct that is used to store the metadata for the mapped documents. The metadata is used to uniquely identify each document and is used to merge documents with the same metadata.
+This package is separate from the metLineTypeDefinitions package because the metLineTypeDefinitions package is automatically generated from the generator.go program and there is a desire to avoid a circular dependency. This package defines a VxMetaData struct that is used to store the metadata for the mapped documents. The metadata is used to uniquely identify each document and is used to merge documents with the same metadata.
 
 This package also defines the DataKeyMap that is used to determine the key data fields for a given line type. The key data fields are used to merge documents with the same header field values excluding the key data fields. The key data fields can be either from the header or the data section of a record line. In addition there is a headerDisallow field that may have a list of header section fields that must be disallowed from the header structure.
 
@@ -95,7 +95,7 @@ When the dataKeyFields above is applied to this document the lines with identica
 
 Other utilities exist to convert the date fields to epochs, to get the line type of the data line, to get the key data fields for a given line type, and to find the data type of a given field in addition to some other utility functions.
 
-## buildHeaderLineTypes
+## generator
 
 The output of this program is a series of structs that can be used to define the header
 and data types in the buildHeaderTypes.go file and some parsing routines that are aware of the
@@ -103,10 +103,8 @@ header and data types. The outout is the metLineTypeDefinitions.go file which is
 
 This is how to build the metLineTypeDefinitions package. It is suggested redirect the output (which is the go program) to a temporary file and then after looking at it copy it to its proper destination. You may have to create the ...pkg/metLineTypeDefinitions/ directory, but it probably comes with the repo clone.
 
-```text
-ranpierce-mac1:buildHeaderLineTypes randy.pierce$ cd /Users/randy.pierce/metlinetypes/pkg/buildHeaderLineTypes
-ranpierce-mac1:buildHeaderLineTypes randy.pierce$ go run . > /tmp/types.go
-ranpierce-mac1:buildHeaderLineTypes randy.pierce$ cp /tmp/types.go ../metLineTypeDefinitions/metLineTypeDefinitions.go
+```console
+go run generator -version=v12.0 > /pkg/metLineTypeDefinitions_v12_0/metLineTypeDefinitions.go
 ```
 
 ## Usage
@@ -278,20 +276,14 @@ To run this program you must provide a path to a data directory...
 
 ## build and install
 
-see [build and install](https://go.dev/doc/tutorial/compile-install)
-Go build ignores test files (files that end in "\_test").
-The repo includes a bin directory. builTypkg/buildHeaderLineTypes/buildHeaderLineTypes.go
+See [Go's build and install tutorial](https://go.dev/doc/tutorial/compile-install).
 
-the pkg/sample/regression.go file. This can be built into an executible using the script
-"scripts/buildRegression.sh". This script builds the regression sample
+There is a sample build script for the sample_parser in scripts/build.sh. This is an example of how it might be used.
 
-There is a sample build script for the sample_parser in scripts/build.sh.
-This is an example of how it might be used.
-
-```bash
-> scripts/build.sh
-> bin/darwin/arm64/sample_parser -outdir /tmp -path .../testdata
-> gunzip /tmp/sample_output.json.gz
-> jq . /tmp/sample_output.json > /tmp/sample_output-pretty.json
-> vim /tmp/sample_output-pretty.json
+```console
+scripts/build.sh
+bin/darwin/arm64/sample_parser -outdir /tmp -path .../testdata
+gunzip /tmp/sample_output.json.gz
+jq . /tmp/sample_output.json > /tmp/sample_output-pretty.json
+vim /tmp/sample_output-pretty.json
 ```

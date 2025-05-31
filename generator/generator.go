@@ -144,10 +144,9 @@ func main() {
 	fmt.Println("")
 	fmt.Println("import (\n\t\"strconv\"\n\t\"errors\"\n\t\"fmt\"\n\t\"time\"\n)")
 	fmt.Println("\n/*\nTHIS CODE IS AUTOMATICALLY GENERATED - DO NOT EDIT THIS CODE")
-	fmt.Println("To modify this code - modify the buildHeaderLineTypes.go file and run the buildHeaderLineTypes.go program")
-	fmt.Println("cd  <repo path>/metlinetypes/pkg/buildHeaderLineTypes")
-	fmt.Println("go run . > /tmp/types.go")
-	fmt.Println("cp /tmp/types.go ../metLineTypeDefinitions/metLineTypeDefinitions.go\n*/")
+	fmt.Println("To modify this code - modify the generator.go file and run the generator.go program")
+	fmt.Println("cd  <repo_root>")
+	fmt.Println("go run generator -version=v12.0 > metLineTypeDefinitions_v12_0/metLineTypeDefinitions.go\n*/")
 	fmt.Println("")
 
 	// print some utility funcs
