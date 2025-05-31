@@ -11,7 +11,7 @@ import (
 THIS CODE IS AUTOMATICALLY GENERATED - DO NOT EDIT THIS CODE
 To modify this code - modify the generator.go file and run the generator.go program
 cd  <repo_root>
-go run generator -version=v12.0 > linetypes/v12_0/linetypes.go
+go run generator -version=v12.0 > pkg/linetypes/v12_0/linetypes.go
 */
 
 func GetLeadFromInitValid(data []string, dataFieldIndex int) string {
