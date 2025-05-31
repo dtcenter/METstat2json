@@ -35,16 +35,16 @@ These are the src files that are searched...
 
 ... in order to derive column definitions and type information that is used to create the GO packages ...
 
-- [metLineTypeDefinitions_v10_0](https://github.com/NOAA-GSL/METstat2json/tree/main/pkg/metLineTypeDefinitions_v10_0)
-- [metLineTypeDefinitions_v10_1](https://github.com/NOAA-GSL/METstat2json/tree/main/pkg/metLineTypeDefinitions_v10_1)
-- [metLineTypeDefinitions_v11_0](https://github.com/NOAA-GSL/METstat2json/tree/main/pkg/metLineTypeDefinitions_v11_0)
-- [metLineTypeDefinitions_v11_0](https://github.com/NOAA-GSL/METstat2json/tree/main/pkg/metLineTypeDefinitions_v11_0)
-- [metLineTypeDefinitions_v11_1](https://github.com/NOAA-GSL/METstat2json/tree/main/pkg/metLineTypeDefinitions_v11_1)
-- [metLineTypeDefinitions_v12_0](https://github.com/NOAA-GSL/METstat2json/tree/main/pkg/metLineTypeDefinitions_v12_0)
+- [linetypes/v10_0](https://github.com/NOAA-GSL/METstat2json/tree/main/pkg/linetypes/v10_0)
+- [linetypes/v10_1](https://github.com/NOAA-GSL/METstat2json/tree/main/pkg/linetypes/v10_1)
+- [linetypes/v11_0](https://github.com/NOAA-GSL/METstat2json/tree/main/pkg/linetypes/v11_0)
+- [linetypes/v11_0](https://github.com/NOAA-GSL/METstat2json/tree/main/pkg/linetypes/v11_0)
+- [linetypes/v11_1](https://github.com/NOAA-GSL/METstat2json/tree/main/pkg/linetypes/v11_1)
+- [linetypes/v12_0](https://github.com/NOAA-GSL/METstat2json/tree/main/pkg/linetypes/v12_0)
 
 These packages contain the struct definitions, fill functions for each MET line type, and parse routines necessary to convert MET output files into json documents for use in a GSL AVID Couchbase database, according to the AVID Couchbase data schema.
 
-In addition to the "metLineTypeDefinitions_v..." packages there are several other local packages, "parser", "sample_parser", "generator", and "pkg/util".
+In addition to the "pkg/linetypes/*" packages there are several other local packages, "pkg/parser", "examples/sample_parser", "generator", and "pkg/util".
 The "sample_parser" package demonstrates how to use the [parser](https://github.com/NOAA-GSL/METstat2json/tree/main/pkg/parser) package. The parser is the only package that is required to parse MET output files.
 
 ### parser
@@ -77,7 +77,7 @@ The package exists to avoid some circular dependencies because both the parsing 
 
 The data files are MET output files that contain a header section and a data section. The header section contains the header fields that are used to identify the document. The data section contains the data fields that are used to populate the document.
 
-This package is separate from the metLineTypeDefinitions package because the metLineTypeDefinitions package is automatically generated from the generator.go program and there is a desire to avoid a circular dependency. This package defines a VxMetaData struct that is used to store the metadata for the mapped documents. The metadata is used to uniquely identify each document and is used to merge documents with the same metadata.
+This package is separate from the linetypes package because the linetypes package is automatically generated from the generator.go program and there is a desire to avoid a circular dependency. This package defines a VxMetaData struct that is used to store the metadata for the mapped documents. The metadata is used to uniquely identify each document and is used to merge documents with the same metadata.
 
 This package also defines the DataKeyMap that is used to determine the key data fields for a given line type. The key data fields are used to merge documents with the same header field values excluding the key data fields. The key data fields can be either from the header or the data section of a record line. In addition there is a headerDisallow field that may have a list of header section fields that must be disallowed from the header structure.
 
@@ -99,12 +99,12 @@ Other utilities exist to convert the date fields to epochs, to get the line type
 
 The output of this program is a series of structs that can be used to define the header
 and data types in the buildHeaderTypes.go file and some parsing routines that are aware of the
-header and data types. The outout is the metLineTypeDefinitions.go file which is the sole content of the metLineTypeDefinitions package and should never be directly edited.
+header and data types. The outout is the linetypes.go file which is the sole content of the linetypes/* packages and should never be directly edited.
 
-This is how to build the metLineTypeDefinitions package. It is suggested redirect the output (which is the go program) to a temporary file and then after looking at it copy it to its proper destination. You may have to create the ...pkg/metLineTypeDefinitions/ directory, but it probably comes with the repo clone.
+This is how to build the linetypes package. It is suggested redirect the output (which is the go program) to a temporary file and then after looking at it copy it to its proper destination. 
 
 ```console
-go run generator -version=v12.0 > /pkg/metLineTypeDefinitions_v12_0/metLineTypeDefinitions.go
+go run generator -version=v12.0 > /pkg/linetypes/v12_0/linetypes.go
 ```
 
 ## Usage

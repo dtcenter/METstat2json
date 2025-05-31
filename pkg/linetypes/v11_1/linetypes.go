@@ -1,4 +1,11 @@
-package metLineTypeDefinitions_v10_0
+/*
+The following data types were not found in the MET user guide files or the MET source code files.
+
+	TODO - add an actionable message.
+
+Undefined data types: [S12 S13 S21 S23 S31 S32]
+*/
+package v11_1
 
 import (
 	"errors"
@@ -11,7 +18,7 @@ import (
 THIS CODE IS AUTOMATICALLY GENERATED - DO NOT EDIT THIS CODE
 To modify this code - modify the generator.go file and run the generator.go program
 cd  <repo_root>
-go run generator -version=v12.0 > metLineTypeDefinitions_v12_0/metLineTypeDefinitions.go
+go run generator -version=v12.0 > pkg/linetypes/v12_0/linetypes.go
 */
 
 func GetLeadFromInitValid(data []string, dataFieldIndex int) string {
@@ -783,7 +790,85 @@ type STAT_SAL1L2_header struct {
 	LINE_TYPE      string  `json:"lineType"`
 }
 
+type STAT_SEEPS_MPR_header struct {
+	VERSION        string  `json:"version"`
+	MODEL          string  `json:"model"`
+	DESC           string  `json:"desc"`
+	FCST_VALID_BEG int     `json:"fcstValidBeg"`
+	FCST_VALID_END int     `json:"fcstValidEnd"`
+	OBS_LEAD       int     `json:"obsLead"`
+	OBS_VALID_BEG  int     `json:"obsValidBeg"`
+	OBS_VALID_END  int     `json:"obsValidEnd"`
+	FCST_VAR       string  `json:"fcstVar"`
+	FCST_UNITS     string  `json:"fcstUnits"`
+	FCST_LEV       string  `json:"fcstLev"`
+	OBS_VAR        string  `json:"obsVar"`
+	OBS_UNITS      string  `json:"obsUnits"`
+	OBS_LEV        string  `json:"obsLev"`
+	OBTYPE         string  `json:"obtype"`
+	VX_MASK        string  `json:"vxMask"`
+	INTERP_MTHD    string  `json:"interpMthd"`
+	INTERP_PNTS    int     `json:"interpPnts"`
+	FCST_THRESH    string  `json:"fcstThresh"`
+	OBS_THRESH     string  `json:"obsThresh"`
+	COV_THRESH     string  `json:"covThresh"`
+	ALPHA          float64 `json:"alpha"`
+	LINE_TYPE      string  `json:"lineType"`
+}
+
+type STAT_SEEPS_header struct {
+	VERSION        string  `json:"version"`
+	MODEL          string  `json:"model"`
+	DESC           string  `json:"desc"`
+	FCST_VALID_BEG int     `json:"fcstValidBeg"`
+	FCST_VALID_END int     `json:"fcstValidEnd"`
+	OBS_LEAD       int     `json:"obsLead"`
+	OBS_VALID_BEG  int     `json:"obsValidBeg"`
+	OBS_VALID_END  int     `json:"obsValidEnd"`
+	FCST_VAR       string  `json:"fcstVar"`
+	FCST_UNITS     string  `json:"fcstUnits"`
+	FCST_LEV       string  `json:"fcstLev"`
+	OBS_VAR        string  `json:"obsVar"`
+	OBS_UNITS      string  `json:"obsUnits"`
+	OBS_LEV        string  `json:"obsLev"`
+	OBTYPE         string  `json:"obtype"`
+	VX_MASK        string  `json:"vxMask"`
+	INTERP_MTHD    string  `json:"interpMthd"`
+	INTERP_PNTS    int     `json:"interpPnts"`
+	FCST_THRESH    string  `json:"fcstThresh"`
+	OBS_THRESH     string  `json:"obsThresh"`
+	COV_THRESH     string  `json:"covThresh"`
+	ALPHA          float64 `json:"alpha"`
+	LINE_TYPE      string  `json:"lineType"`
+}
+
 type STAT_SL1L2_header struct {
+	VERSION        string  `json:"version"`
+	MODEL          string  `json:"model"`
+	DESC           string  `json:"desc"`
+	FCST_VALID_BEG int     `json:"fcstValidBeg"`
+	FCST_VALID_END int     `json:"fcstValidEnd"`
+	OBS_LEAD       int     `json:"obsLead"`
+	OBS_VALID_BEG  int     `json:"obsValidBeg"`
+	OBS_VALID_END  int     `json:"obsValidEnd"`
+	FCST_VAR       string  `json:"fcstVar"`
+	FCST_UNITS     string  `json:"fcstUnits"`
+	FCST_LEV       string  `json:"fcstLev"`
+	OBS_VAR        string  `json:"obsVar"`
+	OBS_UNITS      string  `json:"obsUnits"`
+	OBS_LEV        string  `json:"obsLev"`
+	OBTYPE         string  `json:"obtype"`
+	VX_MASK        string  `json:"vxMask"`
+	INTERP_MTHD    string  `json:"interpMthd"`
+	INTERP_PNTS    int     `json:"interpPnts"`
+	FCST_THRESH    string  `json:"fcstThresh"`
+	OBS_THRESH     string  `json:"obsThresh"`
+	COV_THRESH     string  `json:"covThresh"`
+	ALPHA          float64 `json:"alpha"`
+	LINE_TYPE      string  `json:"lineType"`
+}
+
+type STAT_SSIDX_header struct {
 	VERSION        string  `json:"version"`
 	MODEL          string  `json:"model"`
 	DESC           string  `json:"desc"`
@@ -914,6 +999,21 @@ type STAT_VL1L2_header struct {
 }
 
 type TCST_PROBRIRW_header struct {
+	VERSION    string `json:"version"`
+	AMODEL     string `json:"amodel"`
+	BMODEL     string `json:"bmodel"`
+	DESC       string `json:"desc"`
+	STORM_ID   string `json:"stormId"`
+	BASIN      string `json:"basin"`
+	CYCLONE    string `json:"cyclone"`
+	STORM_NAME string `json:"stormName"`
+	VALID      int    `json:"valid"`
+	INIT_MASK  string `json:"initMask"`
+	VALID_MASK string `json:"validMask"`
+	LINE_TYPE  string `json:"lineType"`
+}
+
+type TCST_TCDIAG_header struct {
 	VERSION    string `json:"version"`
 	AMODEL     string `json:"amodel"`
 	BMODEL     string `json:"bmodel"`
@@ -2394,7 +2494,163 @@ func (s *STAT_SAL1L2) fill_STAT_SAL1L2_Header(fields []string, doc *map[string]i
 	SetValueForField(doc, "STAT", "LINE_TYPE", i, dataLen, fields, 23, "string")
 }
 
+func (s *STAT_SEEPS_MPR) fill_STAT_SEEPS_MPR_Header(fields []string, doc *map[string]interface{}) {
+	dataLen := len(fields)
+	i := -1
+	// fill the met fields leaving out "" and NA values
+	i++
+	SetValueForField(doc, "STAT", "VERSION", i, dataLen, fields, 0, "string")
+	i++
+	SetValueForField(doc, "STAT", "MODEL", i, dataLen, fields, 1, "string")
+	i++
+	SetValueForField(doc, "STAT", "DESC", i, dataLen, fields, 2, "string")
+	i++
+	SetValueForField(doc, "STAT", "FCST_VALID_BEG", i, dataLen, fields, 4, "int")
+	i++
+	SetValueForField(doc, "STAT", "FCST_VALID_END", i, dataLen, fields, 5, "int")
+	i++
+	SetValueForField(doc, "STAT", "OBS_LEAD", i, dataLen, fields, 6, "int")
+	i++
+	SetValueForField(doc, "STAT", "OBS_VALID_BEG", i, dataLen, fields, 7, "int")
+	i++
+	SetValueForField(doc, "STAT", "OBS_VALID_END", i, dataLen, fields, 8, "int")
+	i++
+	SetValueForField(doc, "STAT", "FCST_VAR", i, dataLen, fields, 9, "string")
+	i++
+	SetValueForField(doc, "STAT", "FCST_UNITS", i, dataLen, fields, 10, "string")
+	i++
+	SetValueForField(doc, "STAT", "FCST_LEV", i, dataLen, fields, 11, "string")
+	i++
+	SetValueForField(doc, "STAT", "OBS_VAR", i, dataLen, fields, 12, "string")
+	i++
+	SetValueForField(doc, "STAT", "OBS_UNITS", i, dataLen, fields, 13, "string")
+	i++
+	SetValueForField(doc, "STAT", "OBS_LEV", i, dataLen, fields, 14, "string")
+	i++
+	SetValueForField(doc, "STAT", "OBTYPE", i, dataLen, fields, 15, "string")
+	i++
+	SetValueForField(doc, "STAT", "VX_MASK", i, dataLen, fields, 16, "string")
+	i++
+	SetValueForField(doc, "STAT", "INTERP_MTHD", i, dataLen, fields, 17, "string")
+	i++
+	SetValueForField(doc, "STAT", "INTERP_PNTS", i, dataLen, fields, 18, "int")
+	i++
+	SetValueForField(doc, "STAT", "FCST_THRESH", i, dataLen, fields, 19, "string")
+	i++
+	SetValueForField(doc, "STAT", "OBS_THRESH", i, dataLen, fields, 20, "string")
+	i++
+	SetValueForField(doc, "STAT", "COV_THRESH", i, dataLen, fields, 21, "string")
+	i++
+	SetValueForField(doc, "STAT", "ALPHA", i, dataLen, fields, 22, "float64")
+	i++
+	SetValueForField(doc, "STAT", "LINE_TYPE", i, dataLen, fields, 23, "string")
+}
+
+func (s *STAT_SEEPS) fill_STAT_SEEPS_Header(fields []string, doc *map[string]interface{}) {
+	dataLen := len(fields)
+	i := -1
+	// fill the met fields leaving out "" and NA values
+	i++
+	SetValueForField(doc, "STAT", "VERSION", i, dataLen, fields, 0, "string")
+	i++
+	SetValueForField(doc, "STAT", "MODEL", i, dataLen, fields, 1, "string")
+	i++
+	SetValueForField(doc, "STAT", "DESC", i, dataLen, fields, 2, "string")
+	i++
+	SetValueForField(doc, "STAT", "FCST_VALID_BEG", i, dataLen, fields, 4, "int")
+	i++
+	SetValueForField(doc, "STAT", "FCST_VALID_END", i, dataLen, fields, 5, "int")
+	i++
+	SetValueForField(doc, "STAT", "OBS_LEAD", i, dataLen, fields, 6, "int")
+	i++
+	SetValueForField(doc, "STAT", "OBS_VALID_BEG", i, dataLen, fields, 7, "int")
+	i++
+	SetValueForField(doc, "STAT", "OBS_VALID_END", i, dataLen, fields, 8, "int")
+	i++
+	SetValueForField(doc, "STAT", "FCST_VAR", i, dataLen, fields, 9, "string")
+	i++
+	SetValueForField(doc, "STAT", "FCST_UNITS", i, dataLen, fields, 10, "string")
+	i++
+	SetValueForField(doc, "STAT", "FCST_LEV", i, dataLen, fields, 11, "string")
+	i++
+	SetValueForField(doc, "STAT", "OBS_VAR", i, dataLen, fields, 12, "string")
+	i++
+	SetValueForField(doc, "STAT", "OBS_UNITS", i, dataLen, fields, 13, "string")
+	i++
+	SetValueForField(doc, "STAT", "OBS_LEV", i, dataLen, fields, 14, "string")
+	i++
+	SetValueForField(doc, "STAT", "OBTYPE", i, dataLen, fields, 15, "string")
+	i++
+	SetValueForField(doc, "STAT", "VX_MASK", i, dataLen, fields, 16, "string")
+	i++
+	SetValueForField(doc, "STAT", "INTERP_MTHD", i, dataLen, fields, 17, "string")
+	i++
+	SetValueForField(doc, "STAT", "INTERP_PNTS", i, dataLen, fields, 18, "int")
+	i++
+	SetValueForField(doc, "STAT", "FCST_THRESH", i, dataLen, fields, 19, "string")
+	i++
+	SetValueForField(doc, "STAT", "OBS_THRESH", i, dataLen, fields, 20, "string")
+	i++
+	SetValueForField(doc, "STAT", "COV_THRESH", i, dataLen, fields, 21, "string")
+	i++
+	SetValueForField(doc, "STAT", "ALPHA", i, dataLen, fields, 22, "float64")
+	i++
+	SetValueForField(doc, "STAT", "LINE_TYPE", i, dataLen, fields, 23, "string")
+}
+
 func (s *STAT_SL1L2) fill_STAT_SL1L2_Header(fields []string, doc *map[string]interface{}) {
+	dataLen := len(fields)
+	i := -1
+	// fill the met fields leaving out "" and NA values
+	i++
+	SetValueForField(doc, "STAT", "VERSION", i, dataLen, fields, 0, "string")
+	i++
+	SetValueForField(doc, "STAT", "MODEL", i, dataLen, fields, 1, "string")
+	i++
+	SetValueForField(doc, "STAT", "DESC", i, dataLen, fields, 2, "string")
+	i++
+	SetValueForField(doc, "STAT", "FCST_VALID_BEG", i, dataLen, fields, 4, "int")
+	i++
+	SetValueForField(doc, "STAT", "FCST_VALID_END", i, dataLen, fields, 5, "int")
+	i++
+	SetValueForField(doc, "STAT", "OBS_LEAD", i, dataLen, fields, 6, "int")
+	i++
+	SetValueForField(doc, "STAT", "OBS_VALID_BEG", i, dataLen, fields, 7, "int")
+	i++
+	SetValueForField(doc, "STAT", "OBS_VALID_END", i, dataLen, fields, 8, "int")
+	i++
+	SetValueForField(doc, "STAT", "FCST_VAR", i, dataLen, fields, 9, "string")
+	i++
+	SetValueForField(doc, "STAT", "FCST_UNITS", i, dataLen, fields, 10, "string")
+	i++
+	SetValueForField(doc, "STAT", "FCST_LEV", i, dataLen, fields, 11, "string")
+	i++
+	SetValueForField(doc, "STAT", "OBS_VAR", i, dataLen, fields, 12, "string")
+	i++
+	SetValueForField(doc, "STAT", "OBS_UNITS", i, dataLen, fields, 13, "string")
+	i++
+	SetValueForField(doc, "STAT", "OBS_LEV", i, dataLen, fields, 14, "string")
+	i++
+	SetValueForField(doc, "STAT", "OBTYPE", i, dataLen, fields, 15, "string")
+	i++
+	SetValueForField(doc, "STAT", "VX_MASK", i, dataLen, fields, 16, "string")
+	i++
+	SetValueForField(doc, "STAT", "INTERP_MTHD", i, dataLen, fields, 17, "string")
+	i++
+	SetValueForField(doc, "STAT", "INTERP_PNTS", i, dataLen, fields, 18, "int")
+	i++
+	SetValueForField(doc, "STAT", "FCST_THRESH", i, dataLen, fields, 19, "string")
+	i++
+	SetValueForField(doc, "STAT", "OBS_THRESH", i, dataLen, fields, 20, "string")
+	i++
+	SetValueForField(doc, "STAT", "COV_THRESH", i, dataLen, fields, 21, "string")
+	i++
+	SetValueForField(doc, "STAT", "ALPHA", i, dataLen, fields, 22, "float64")
+	i++
+	SetValueForField(doc, "STAT", "LINE_TYPE", i, dataLen, fields, 23, "string")
+}
+
+func (s *STAT_SSIDX) fill_STAT_SSIDX_Header(fields []string, doc *map[string]interface{}) {
 	dataLen := len(fields)
 	i := -1
 	// fill the met fields leaving out "" and NA values
@@ -2684,6 +2940,36 @@ func (s *TCST_PROBRIRW) fill_TCST_PROBRIRW_Header(fields []string, doc *map[stri
 	SetValueForField(doc, "TCST", "LINE_TYPE", i, dataLen, fields, 13, "string")
 }
 
+func (s *TCST_TCDIAG) fill_TCST_TCDIAG_Header(fields []string, doc *map[string]interface{}) {
+	dataLen := len(fields)
+	i := -1
+	// fill the met fields leaving out "" and NA values
+	i++
+	SetValueForField(doc, "TCST", "VERSION", i, dataLen, fields, 0, "string")
+	i++
+	SetValueForField(doc, "TCST", "AMODEL", i, dataLen, fields, 1, "string")
+	i++
+	SetValueForField(doc, "TCST", "BMODEL", i, dataLen, fields, 2, "string")
+	i++
+	SetValueForField(doc, "TCST", "DESC", i, dataLen, fields, 3, "string")
+	i++
+	SetValueForField(doc, "TCST", "STORM_ID", i, dataLen, fields, 4, "string")
+	i++
+	SetValueForField(doc, "TCST", "BASIN", i, dataLen, fields, 5, "string")
+	i++
+	SetValueForField(doc, "TCST", "CYCLONE", i, dataLen, fields, 6, "string")
+	i++
+	SetValueForField(doc, "TCST", "STORM_NAME", i, dataLen, fields, 7, "string")
+	i++
+	SetValueForField(doc, "TCST", "VALID", i, dataLen, fields, 10, "int")
+	i++
+	SetValueForField(doc, "TCST", "INIT_MASK", i, dataLen, fields, 11, "string")
+	i++
+	SetValueForField(doc, "TCST", "VALID_MASK", i, dataLen, fields, 12, "string")
+	i++
+	SetValueForField(doc, "TCST", "LINE_TYPE", i, dataLen, fields, 13, "string")
+}
+
 func (s *TCST_TCMPR) fill_TCST_TCMPR_Header(fields []string, doc *map[string]interface{}) {
 	dataLen := len(fields)
 	i := -1
@@ -2874,134 +3160,145 @@ type STAT_CNT struct {
 	ANOM_CORR_UNCNTR     float64 `json:"anomCorrUncntr,omitempty"`
 	ANOM_CORR_UNCNTR_BCL float64 `json:"anomCorrUncntrBcl,omitempty"`
 	ANOM_CORR_UNCNTR_BCU float64 `json:"anomCorrUncntrBcu,omitempty"`
+	SI                   float64 `json:"si,omitempty"`
+	SI_BCL               float64 `json:"siBcl,omitempty"`
+	SI_BCU               float64 `json:"siBcu,omitempty"`
 }
 
 type STAT_CTC struct {
-	TOTAL int     `json:"total,omitempty"`
-	FY_OY float64 `json:"fyOy,omitempty"`
-	FY_ON float64 `json:"fyOn,omitempty"`
-	FN_OY float64 `json:"fnOy,omitempty"`
-	FN_ON float64 `json:"fnOn,omitempty"`
+	TOTAL    int     `json:"total,omitempty"`
+	FY_OY    float64 `json:"fyOy,omitempty"`
+	FY_ON    float64 `json:"fyOn,omitempty"`
+	FN_OY    float64 `json:"fnOy,omitempty"`
+	FN_ON    float64 `json:"fnOn,omitempty"`
+	EC_VALUE float64 `json:"ecValue,omitempty"`
 }
 
 type STAT_CTS struct {
-	TOTAL     int     `json:"total,omitempty"`
-	BASER     float64 `json:"baser,omitempty"`
-	BASER_NCL float64 `json:"baserNcl,omitempty"`
-	BASER_NCU float64 `json:"baserNcu,omitempty"`
-	BASER_BCL float64 `json:"baserBcl,omitempty"`
-	BASER_BCU float64 `json:"baserBcu,omitempty"`
-	FMEAN     float64 `json:"fmean,omitempty"`
-	FMEAN_NCL float64 `json:"fmeanNcl,omitempty"`
-	FMEAN_NCU float64 `json:"fmeanNcu,omitempty"`
-	FMEAN_BCL float64 `json:"fmeanBcl,omitempty"`
-	FMEAN_BCU float64 `json:"fmeanBcu,omitempty"`
-	ACC       float64 `json:"acc,omitempty"`
-	ACC_NCL   float64 `json:"accNcl,omitempty"`
-	ACC_NCU   float64 `json:"accNcu,omitempty"`
-	ACC_BCL   float64 `json:"accBcl,omitempty"`
-	ACC_BCU   float64 `json:"accBcu,omitempty"`
-	FBIAS     float64 `json:"fbias,omitempty"`
-	FBIAS_BCL float64 `json:"fbiasBcl,omitempty"`
-	FBIAS_BCU float64 `json:"fbiasBcu,omitempty"`
-	PODY      float64 `json:"pody,omitempty"`
-	PODY_NCL  float64 `json:"podyNcl,omitempty"`
-	PODY_NCU  float64 `json:"podyNcu,omitempty"`
-	PODY_BCL  float64 `json:"podyBcl,omitempty"`
-	PODY_BCU  float64 `json:"podyBcu,omitempty"`
-	PODN      float64 `json:"podn,omitempty"`
-	PODN_NCL  float64 `json:"podnNcl,omitempty"`
-	PODN_NCU  float64 `json:"podnNcu,omitempty"`
-	PODN_BCL  float64 `json:"podnBcl,omitempty"`
-	PODN_BCU  float64 `json:"podnBcu,omitempty"`
-	POFD      float64 `json:"pofd,omitempty"`
-	POFD_NCL  float64 `json:"pofdNcl,omitempty"`
-	POFD_NCU  float64 `json:"pofdNcu,omitempty"`
-	POFD_BCL  float64 `json:"pofdBcl,omitempty"`
-	POFD_BCU  float64 `json:"pofdBcu,omitempty"`
-	FAR       float64 `json:"far,omitempty"`
-	FAR_NCL   float64 `json:"farNcl,omitempty"`
-	FAR_NCU   float64 `json:"farNcu,omitempty"`
-	FAR_BCL   float64 `json:"farBcl,omitempty"`
-	FAR_BCU   float64 `json:"farBcu,omitempty"`
-	CSI       float64 `json:"csi,omitempty"`
-	CSI_NCL   float64 `json:"csiNcl,omitempty"`
-	CSI_NCU   float64 `json:"csiNcu,omitempty"`
-	CSI_BCL   float64 `json:"csiBcl,omitempty"`
-	CSI_BCU   float64 `json:"csiBcu,omitempty"`
-	GSS       float64 `json:"gss,omitempty"`
-	GSS_BCL   float64 `json:"gssBcl,omitempty"`
-	GSS_BCU   float64 `json:"gssBcu,omitempty"`
-	HK        float64 `json:"hk,omitempty"`
-	HK_NCL    float64 `json:"hkNcl,omitempty"`
-	HK_NCU    float64 `json:"hkNcu,omitempty"`
-	HK_BCL    float64 `json:"hkBcl,omitempty"`
-	HK_BCU    float64 `json:"hkBcu,omitempty"`
-	HSS       float64 `json:"hss,omitempty"`
-	HSS_BCL   float64 `json:"hssBcl,omitempty"`
-	HSS_BCU   float64 `json:"hssBcu,omitempty"`
-	ODDS      float64 `json:"odds,omitempty"`
-	ODDS_NCL  float64 `json:"oddsNcl,omitempty"`
-	ODDS_NCU  float64 `json:"oddsNcu,omitempty"`
-	ODDS_BCL  float64 `json:"oddsBcl,omitempty"`
-	ODDS_BCU  float64 `json:"oddsBcu,omitempty"`
-	LODDS     float64 `json:"lodds,omitempty"`
-	LODDS_NCL float64 `json:"loddsNcl,omitempty"`
-	LODDS_NCU float64 `json:"loddsNcu,omitempty"`
-	LODDS_BCL float64 `json:"loddsBcl,omitempty"`
-	LODDS_BCU float64 `json:"loddsBcu,omitempty"`
-	ORSS      float64 `json:"orss,omitempty"`
-	ORSS_NCL  float64 `json:"orssNcl,omitempty"`
-	ORSS_NCU  float64 `json:"orssNcu,omitempty"`
-	ORSS_BCL  float64 `json:"orssBcl,omitempty"`
-	ORSS_BCU  float64 `json:"orssBcu,omitempty"`
-	EDS       float64 `json:"eds,omitempty"`
-	EDS_NCL   float64 `json:"edsNcl,omitempty"`
-	EDS_NCU   float64 `json:"edsNcu,omitempty"`
-	EDS_BCL   float64 `json:"edsBcl,omitempty"`
-	EDS_BCU   float64 `json:"edsBcu,omitempty"`
-	SEDS      float64 `json:"seds,omitempty"`
-	SEDS_NCL  float64 `json:"sedsNcl,omitempty"`
-	SEDS_NCU  float64 `json:"sedsNcu,omitempty"`
-	SEDS_BCL  float64 `json:"sedsBcl,omitempty"`
-	SEDS_BCU  float64 `json:"sedsBcu,omitempty"`
-	EDI       float64 `json:"edi,omitempty"`
-	EDI_NCL   float64 `json:"ediNcl,omitempty"`
-	EDI_NCU   float64 `json:"ediNcu,omitempty"`
-	EDI_BCL   float64 `json:"ediBcl,omitempty"`
-	EDI_BCU   float64 `json:"ediBcu,omitempty"`
-	SEDI      float64 `json:"sedi,omitempty"`
-	SEDI_NCL  float64 `json:"sediNcl,omitempty"`
-	SEDI_NCU  float64 `json:"sediNcu,omitempty"`
-	SEDI_BCL  float64 `json:"sediBcl,omitempty"`
-	SEDI_BCU  float64 `json:"sediBcu,omitempty"`
-	BAGSS     float64 `json:"bagss,omitempty"`
-	BAGSS_BCL float64 `json:"bagssBcl,omitempty"`
-	BAGSS_BCU float64 `json:"bagssBcu,omitempty"`
+	TOTAL      int     `json:"total,omitempty"`
+	BASER      float64 `json:"baser,omitempty"`
+	BASER_NCL  float64 `json:"baserNcl,omitempty"`
+	BASER_NCU  float64 `json:"baserNcu,omitempty"`
+	BASER_BCL  float64 `json:"baserBcl,omitempty"`
+	BASER_BCU  float64 `json:"baserBcu,omitempty"`
+	FMEAN      float64 `json:"fmean,omitempty"`
+	FMEAN_NCL  float64 `json:"fmeanNcl,omitempty"`
+	FMEAN_NCU  float64 `json:"fmeanNcu,omitempty"`
+	FMEAN_BCL  float64 `json:"fmeanBcl,omitempty"`
+	FMEAN_BCU  float64 `json:"fmeanBcu,omitempty"`
+	ACC        float64 `json:"acc,omitempty"`
+	ACC_NCL    float64 `json:"accNcl,omitempty"`
+	ACC_NCU    float64 `json:"accNcu,omitempty"`
+	ACC_BCL    float64 `json:"accBcl,omitempty"`
+	ACC_BCU    float64 `json:"accBcu,omitempty"`
+	FBIAS      float64 `json:"fbias,omitempty"`
+	FBIAS_BCL  float64 `json:"fbiasBcl,omitempty"`
+	FBIAS_BCU  float64 `json:"fbiasBcu,omitempty"`
+	PODY       float64 `json:"pody,omitempty"`
+	PODY_NCL   float64 `json:"podyNcl,omitempty"`
+	PODY_NCU   float64 `json:"podyNcu,omitempty"`
+	PODY_BCL   float64 `json:"podyBcl,omitempty"`
+	PODY_BCU   float64 `json:"podyBcu,omitempty"`
+	PODN       float64 `json:"podn,omitempty"`
+	PODN_NCL   float64 `json:"podnNcl,omitempty"`
+	PODN_NCU   float64 `json:"podnNcu,omitempty"`
+	PODN_BCL   float64 `json:"podnBcl,omitempty"`
+	PODN_BCU   float64 `json:"podnBcu,omitempty"`
+	POFD       float64 `json:"pofd,omitempty"`
+	POFD_NCL   float64 `json:"pofdNcl,omitempty"`
+	POFD_NCU   float64 `json:"pofdNcu,omitempty"`
+	POFD_BCL   float64 `json:"pofdBcl,omitempty"`
+	POFD_BCU   float64 `json:"pofdBcu,omitempty"`
+	FAR        float64 `json:"far,omitempty"`
+	FAR_NCL    float64 `json:"farNcl,omitempty"`
+	FAR_NCU    float64 `json:"farNcu,omitempty"`
+	FAR_BCL    float64 `json:"farBcl,omitempty"`
+	FAR_BCU    float64 `json:"farBcu,omitempty"`
+	CSI        float64 `json:"csi,omitempty"`
+	CSI_NCL    float64 `json:"csiNcl,omitempty"`
+	CSI_NCU    float64 `json:"csiNcu,omitempty"`
+	CSI_BCL    float64 `json:"csiBcl,omitempty"`
+	CSI_BCU    float64 `json:"csiBcu,omitempty"`
+	GSS        float64 `json:"gss,omitempty"`
+	GSS_BCL    float64 `json:"gssBcl,omitempty"`
+	GSS_BCU    float64 `json:"gssBcu,omitempty"`
+	HK         float64 `json:"hk,omitempty"`
+	HK_NCL     float64 `json:"hkNcl,omitempty"`
+	HK_NCU     float64 `json:"hkNcu,omitempty"`
+	HK_BCL     float64 `json:"hkBcl,omitempty"`
+	HK_BCU     float64 `json:"hkBcu,omitempty"`
+	HSS        float64 `json:"hss,omitempty"`
+	HSS_BCL    float64 `json:"hssBcl,omitempty"`
+	HSS_BCU    float64 `json:"hssBcu,omitempty"`
+	ODDS       float64 `json:"odds,omitempty"`
+	ODDS_NCL   float64 `json:"oddsNcl,omitempty"`
+	ODDS_NCU   float64 `json:"oddsNcu,omitempty"`
+	ODDS_BCL   float64 `json:"oddsBcl,omitempty"`
+	ODDS_BCU   float64 `json:"oddsBcu,omitempty"`
+	LODDS      float64 `json:"lodds,omitempty"`
+	LODDS_NCL  float64 `json:"loddsNcl,omitempty"`
+	LODDS_NCU  float64 `json:"loddsNcu,omitempty"`
+	LODDS_BCL  float64 `json:"loddsBcl,omitempty"`
+	LODDS_BCU  float64 `json:"loddsBcu,omitempty"`
+	ORSS       float64 `json:"orss,omitempty"`
+	ORSS_NCL   float64 `json:"orssNcl,omitempty"`
+	ORSS_NCU   float64 `json:"orssNcu,omitempty"`
+	ORSS_BCL   float64 `json:"orssBcl,omitempty"`
+	ORSS_BCU   float64 `json:"orssBcu,omitempty"`
+	EDS        float64 `json:"eds,omitempty"`
+	EDS_NCL    float64 `json:"edsNcl,omitempty"`
+	EDS_NCU    float64 `json:"edsNcu,omitempty"`
+	EDS_BCL    float64 `json:"edsBcl,omitempty"`
+	EDS_BCU    float64 `json:"edsBcu,omitempty"`
+	SEDS       float64 `json:"seds,omitempty"`
+	SEDS_NCL   float64 `json:"sedsNcl,omitempty"`
+	SEDS_NCU   float64 `json:"sedsNcu,omitempty"`
+	SEDS_BCL   float64 `json:"sedsBcl,omitempty"`
+	SEDS_BCU   float64 `json:"sedsBcu,omitempty"`
+	EDI        float64 `json:"edi,omitempty"`
+	EDI_NCL    float64 `json:"ediNcl,omitempty"`
+	EDI_NCU    float64 `json:"ediNcu,omitempty"`
+	EDI_BCL    float64 `json:"ediBcl,omitempty"`
+	EDI_BCU    float64 `json:"ediBcu,omitempty"`
+	SEDI       float64 `json:"sedi,omitempty"`
+	SEDI_NCL   float64 `json:"sediNcl,omitempty"`
+	SEDI_NCU   float64 `json:"sediNcu,omitempty"`
+	SEDI_BCL   float64 `json:"sediBcl,omitempty"`
+	SEDI_BCU   float64 `json:"sediBcu,omitempty"`
+	BAGSS      float64 `json:"bagss,omitempty"`
+	BAGSS_BCL  float64 `json:"bagssBcl,omitempty"`
+	BAGSS_BCU  float64 `json:"bagssBcu,omitempty"`
+	HSS_EC     float64 `json:"hssEc,omitempty"`
+	HSS_EC_BCL float64 `json:"hssEcBcl,omitempty"`
+	HSS_EC_BCU float64 `json:"hssEcBcu,omitempty"`
+	EC_VALUE   float64 `json:"ecValue,omitempty"`
 }
 
 type STAT_DMAP struct {
-	TOTAL     int     `json:"total,omitempty"`
-	FY        int     `json:"fy,omitempty"`
-	OY        int     `json:"oy,omitempty"`
-	FBIAS     float64 `json:"fbias,omitempty"`
-	BADDELEY  float64 `json:"baddeley,omitempty"`
-	HAUSDORFF float64 `json:"hausdorff,omitempty"`
-	MED_FO    float64 `json:"medFo,omitempty"`
-	MED_OF    float64 `json:"medOf,omitempty"`
-	MED_MIN   float64 `json:"medMin,omitempty"`
-	MED_MAX   float64 `json:"medMax,omitempty"`
-	MED_MEAN  float64 `json:"medMean,omitempty"`
-	FOM_FO    float64 `json:"fomFo,omitempty"`
-	FOM_OF    float64 `json:"fomOf,omitempty"`
-	FOM_MIN   float64 `json:"fomMin,omitempty"`
-	FOM_MAX   float64 `json:"fomMax,omitempty"`
-	FOM_MEAN  float64 `json:"fomMean,omitempty"`
-	ZHU_FO    float64 `json:"zhuFo,omitempty"`
-	ZHU_OF    float64 `json:"zhuOf,omitempty"`
-	ZHU_MIN   float64 `json:"zhuMin,omitempty"`
-	ZHU_MAX   float64 `json:"zhuMax,omitempty"`
-	ZHU_MEAN  float64 `json:"zhuMean,omitempty"`
+	TOTAL      int     `json:"total,omitempty"`
+	FY         int     `json:"fy,omitempty"`
+	OY         int     `json:"oy,omitempty"`
+	FBIAS      float64 `json:"fbias,omitempty"`
+	BADDELEY   float64 `json:"baddeley,omitempty"`
+	HAUSDORFF  float64 `json:"hausdorff,omitempty"`
+	MED_FO     float64 `json:"medFo,omitempty"`
+	MED_OF     float64 `json:"medOf,omitempty"`
+	MED_MIN    float64 `json:"medMin,omitempty"`
+	MED_MAX    float64 `json:"medMax,omitempty"`
+	MED_MEAN   float64 `json:"medMean,omitempty"`
+	FOM_FO     float64 `json:"fomFo,omitempty"`
+	FOM_OF     float64 `json:"fomOf,omitempty"`
+	FOM_MIN    float64 `json:"fomMin,omitempty"`
+	FOM_MAX    float64 `json:"fomMax,omitempty"`
+	FOM_MEAN   float64 `json:"fomMean,omitempty"`
+	ZHU_FO     float64 `json:"zhuFo,omitempty"`
+	ZHU_OF     float64 `json:"zhuOf,omitempty"`
+	ZHU_MIN    float64 `json:"zhuMin,omitempty"`
+	ZHU_MAX    float64 `json:"zhuMax,omitempty"`
+	ZHU_MEAN   float64 `json:"zhuMean,omitempty"`
+	G          float64 `json:"g,omitempty"`
+	GBETA      float64 `json:"gbeta,omitempty"`
+	BETA_VALUE float64 `json:"betaValue,omitempty"`
 }
 
 type STAT_ECLV struct {
@@ -3028,6 +3325,15 @@ type STAT_ECNT struct {
 	CRPS_EMP         float64 `json:"crpsEmp,omitempty"`
 	CRPSCL_EMP       float64 `json:"crpsclEmp,omitempty"`
 	CRPSS_EMP        float64 `json:"crpssEmp,omitempty"`
+	CRPS_EMP_FAIR    float64 `json:"crpsEmpFair,omitempty"`
+	SPREAD_MD        float64 `json:"spreadMd,omitempty"`
+	MAE              float64 `json:"mae,omitempty"`
+	MAE_OERR         float64 `json:"maeOerr,omitempty"`
+	BIAS_RATIO       float64 `json:"biasRatio,omitempty"`
+	N_GE_OBS         int     `json:"nGeObs,omitempty"`
+	ME_GE_OBS        float64 `json:"meGeObs,omitempty"`
+	N_LT_OBS         int     `json:"nLtObs,omitempty"`
+	ME_LT_OBS        float64 `json:"meLtObs,omitempty"`
 }
 
 type STAT_FHO struct {
@@ -3041,6 +3347,8 @@ type STAT_GENMPR struct {
 	TOTAL      int     `json:"total,omitempty"`
 	INDEX      int     `json:"index,omitempty"`
 	STORM_ID   string  `json:"stormId,omitempty"`
+	PROB_LEAD  float64 `json:"probLead,omitempty"`
+	PROB_VAL   float64 `json:"probVal,omitempty"`
 	AGEN_INIT  string  `json:"agenInit,omitempty"`
 	AGEN_FHR   string  `json:"agenFhr,omitempty"`
 	AGEN_LAT   float64 `json:"agenLat,omitempty"`
@@ -3085,27 +3393,32 @@ type STAT_ISC struct {
 }
 
 type STAT_MCTC struct {
-	TOTAL int                    `json:"total,omitempty"`
-	CAT   map[string]interface{} `json:"cat,omitempty"`
+	TOTAL    int                    `json:"total,omitempty"`
+	CAT      map[string]interface{} `json:"cat,omitempty"`
+	EC_VALUE float64                `json:"ecValue,omitempty"`
 }
 
 type STAT_MCTS struct {
-	TOTAL   int     `json:"total,omitempty"`
-	N_CAT   int     `json:"nCat,omitempty"`
-	ACC     float64 `json:"acc,omitempty"`
-	ACC_NCL float64 `json:"accNcl,omitempty"`
-	ACC_NCU float64 `json:"accNcu,omitempty"`
-	ACC_BCL float64 `json:"accBcl,omitempty"`
-	ACC_BCU float64 `json:"accBcu,omitempty"`
-	HK      float64 `json:"hk,omitempty"`
-	HK_BCL  float64 `json:"hkBcl,omitempty"`
-	HK_BCU  float64 `json:"hkBcu,omitempty"`
-	HSS     float64 `json:"hss,omitempty"`
-	HSS_BCL float64 `json:"hssBcl,omitempty"`
-	HSS_BCU float64 `json:"hssBcu,omitempty"`
-	GER     float64 `json:"ger,omitempty"`
-	GER_BCL float64 `json:"gerBcl,omitempty"`
-	GER_BCU float64 `json:"gerBcu,omitempty"`
+	TOTAL      int     `json:"total,omitempty"`
+	N_CAT      int     `json:"nCat,omitempty"`
+	ACC        float64 `json:"acc,omitempty"`
+	ACC_NCL    float64 `json:"accNcl,omitempty"`
+	ACC_NCU    float64 `json:"accNcu,omitempty"`
+	ACC_BCL    float64 `json:"accBcl,omitempty"`
+	ACC_BCU    float64 `json:"accBcu,omitempty"`
+	HK         float64 `json:"hk,omitempty"`
+	HK_BCL     float64 `json:"hkBcl,omitempty"`
+	HK_BCU     float64 `json:"hkBcu,omitempty"`
+	HSS        float64 `json:"hss,omitempty"`
+	HSS_BCL    float64 `json:"hssBcl,omitempty"`
+	HSS_BCU    float64 `json:"hssBcu,omitempty"`
+	GER        float64 `json:"ger,omitempty"`
+	GER_BCL    float64 `json:"gerBcl,omitempty"`
+	GER_BCU    float64 `json:"gerBcu,omitempty"`
+	HSS_EC     float64 `json:"hssEc,omitempty"`
+	HSS_EC_BCL float64 `json:"hssEcBcl,omitempty"`
+	HSS_EC_BCU float64 `json:"hssEcBcu,omitempty"`
+	EC_VALUE   float64 `json:"ecValue,omitempty"`
 }
 
 type STAT_MPR struct {
@@ -3346,6 +3659,41 @@ type STAT_SAL1L2 struct {
 	MAE    float64 `json:"mae,omitempty"`
 }
 
+type STAT_SEEPS struct {
+	TOTAL     int     `json:"total,omitempty"`
+	S12       string  `json:"s12,omitempty"`
+	S13       string  `json:"s13,omitempty"`
+	S21       string  `json:"s21,omitempty"`
+	S23       string  `json:"s23,omitempty"`
+	S31       string  `json:"s31,omitempty"`
+	S32       string  `json:"s32,omitempty"`
+	PF1       float64 `json:"pf1,omitempty"`
+	PF2       float64 `json:"pf2,omitempty"`
+	PF3       float64 `json:"pf3,omitempty"`
+	PV1       float64 `json:"pv1,omitempty"`
+	PV2       float64 `json:"pv2,omitempty"`
+	PV3       float64 `json:"pv3,omitempty"`
+	MEAN_FCST float64 `json:"meanFcst,omitempty"`
+	MEAN_OBS  float64 `json:"meanObs,omitempty"`
+	SEEPS     float64 `json:"seeps,omitempty"`
+}
+
+type STAT_SEEPS_MPR struct {
+	OBS_SID  string  `json:"obsSid,omitempty"`
+	OBS_LAT  float64 `json:"obsLat,omitempty"`
+	OBS_LON  float64 `json:"obsLon,omitempty"`
+	FCST     float64 `json:"fcst,omitempty"`
+	OBS      float64 `json:"obs,omitempty"`
+	OBS_QC   string  `json:"obsQc,omitempty"`
+	FCST_CAT int     `json:"fcstCat,omitempty"`
+	OBS_CAT  int     `json:"obsCat,omitempty"`
+	P1       float64 `json:"p1,omitempty"`
+	P2       float64 `json:"p2,omitempty"`
+	T1       float64 `json:"t1,omitempty"`
+	T2       float64 `json:"t2,omitempty"`
+	SEEPS    float64 `json:"seeps,omitempty"`
+}
+
 type STAT_SL1L2 struct {
 	TOTAL int     `json:"total,omitempty"`
 	FBAR  float64 `json:"fbar,omitempty"`
@@ -3354,6 +3702,15 @@ type STAT_SL1L2 struct {
 	FFBAR float64 `json:"ffbar,omitempty"`
 	OOBAR float64 `json:"oobar,omitempty"`
 	MAE   float64 `json:"mae,omitempty"`
+}
+
+type STAT_SSIDX struct {
+	FCST_MODEL string  `json:"fcstModel,omitempty"`
+	REF_MODEL  string  `json:"refModel,omitempty"`
+	N_INIT     int     `json:"nInit,omitempty"`
+	N_TERM     int     `json:"nTerm,omitempty"`
+	N_VLD      int     `json:"nVld,omitempty"`
+	SS_INDEX   float64 `json:"ssIndex,omitempty"`
 }
 
 type STAT_SSVAR struct {
@@ -3395,72 +3752,82 @@ type STAT_SSVAR struct {
 }
 
 type STAT_VAL1L2 struct {
-	TOTAL    int     `json:"total,omitempty"`
-	UFABAR   float64 `json:"ufabar,omitempty"`
-	VFABAR   float64 `json:"vfabar,omitempty"`
-	UOABAR   float64 `json:"uoabar,omitempty"`
-	VOABAR   float64 `json:"voabar,omitempty"`
-	UVFOABAR float64 `json:"uvfoabar,omitempty"`
-	UVFFABAR float64 `json:"uvffabar,omitempty"`
-	UVOOABAR float64 `json:"uvooabar,omitempty"`
+	TOTAL        int     `json:"total,omitempty"`
+	UFABAR       float64 `json:"ufabar,omitempty"`
+	VFABAR       float64 `json:"vfabar,omitempty"`
+	UOABAR       float64 `json:"uoabar,omitempty"`
+	VOABAR       float64 `json:"voabar,omitempty"`
+	UVFOABAR     float64 `json:"uvfoabar,omitempty"`
+	UVFFABAR     float64 `json:"uvffabar,omitempty"`
+	UVOOABAR     float64 `json:"uvooabar,omitempty"`
+	FA_SPEED_BAR float64 `json:"faSpeedBar,omitempty"`
+	OA_SPEED_BAR float64 `json:"oaSpeedBar,omitempty"`
 }
 
 type STAT_VCNT struct {
-	TOTAL            int     `json:"total,omitempty"`
-	FBAR             float64 `json:"fbar,omitempty"`
-	FBAR_BCL         float64 `json:"fbarBcl,omitempty"`
-	FBAR_BCU         float64 `json:"fbarBcu,omitempty"`
-	OBAR             float64 `json:"obar,omitempty"`
-	OBAR_BCL         float64 `json:"obarBcl,omitempty"`
-	OBAR_BCU         float64 `json:"obarBcu,omitempty"`
-	FS_RMS           float64 `json:"fsRms,omitempty"`
-	FS_RMS_BCL       float64 `json:"fsRmsBcl,omitempty"`
-	FS_RMS_BCU       float64 `json:"fsRmsBcu,omitempty"`
-	OS_RMS           float64 `json:"osRms,omitempty"`
-	OS_RMS_BCL       float64 `json:"osRmsBcl,omitempty"`
-	OS_RMS_BCU       float64 `json:"osRmsBcu,omitempty"`
-	MSVE             float64 `json:"msve,omitempty"`
-	MSVE_BCL         float64 `json:"msveBcl,omitempty"`
-	MSVE_BCU         float64 `json:"msveBcu,omitempty"`
-	RMSVE            float64 `json:"rmsve,omitempty"`
-	RMSVE_BCL        float64 `json:"rmsveBcl,omitempty"`
-	RMSVE_BCU        float64 `json:"rmsveBcu,omitempty"`
-	FSTDEV           float64 `json:"fstdev,omitempty"`
-	FSTDEV_BCL       float64 `json:"fstdevBcl,omitempty"`
-	FSTDEV_BCU       float64 `json:"fstdevBcu,omitempty"`
-	OSTDEV           float64 `json:"ostdev,omitempty"`
-	OSTDEV_BCL       float64 `json:"ostdevBcl,omitempty"`
-	OSTDEV_BCU       float64 `json:"ostdevBcu,omitempty"`
-	FDIR             float64 `json:"fdir,omitempty"`
-	FDIR_BCL         float64 `json:"fdirBcl,omitempty"`
-	FDIR_BCU         float64 `json:"fdirBcu,omitempty"`
-	ODIR             float64 `json:"odir,omitempty"`
-	ODIR_BCL         float64 `json:"odirBcl,omitempty"`
-	ODIR_BCU         float64 `json:"odirBcu,omitempty"`
-	FBAR_SPEED       float64 `json:"fbarSpeed,omitempty"`
-	FBAR_SPEED_BCL   float64 `json:"fbarSpeedBcl,omitempty"`
-	FBAR_SPEED_BCU   float64 `json:"fbarSpeedBcu,omitempty"`
-	OBAR_SPEED       float64 `json:"obarSpeed,omitempty"`
-	OBAR_SPEED_BCL   float64 `json:"obarSpeedBcl,omitempty"`
-	OBAR_SPEED_BCU   float64 `json:"obarSpeedBcu,omitempty"`
-	VDIFF_SPEED      float64 `json:"vdiffSpeed,omitempty"`
-	VDIFF_SPEED_BCL  float64 `json:"vdiffSpeedBcl,omitempty"`
-	VDIFF_SPEED_BCU  float64 `json:"vdiffSpeedBcu,omitempty"`
-	VDIFF_DIR        float64 `json:"vdiffDir,omitempty"`
-	VDIFF_DIR_BCL    float64 `json:"vdiffDirBcl,omitempty"`
-	VDIFF_DIR_BCU    float64 `json:"vdiffDirBcu,omitempty"`
-	SPEED_ERR        float64 `json:"speedErr,omitempty"`
-	SPEED_ERR_BCL    float64 `json:"speedErrBcl,omitempty"`
-	SPEED_ERR_BCU    float64 `json:"speedErrBcu,omitempty"`
-	SPEED_ABSERR     float64 `json:"speedAbserr,omitempty"`
-	SPEED_ABSERR_BCL float64 `json:"speedAbserrBcl,omitempty"`
-	SPEED_ABSERR_BCU float64 `json:"speedAbserrBcu,omitempty"`
-	DIR_ERR          float64 `json:"dirErr,omitempty"`
-	DIR_ERR_BCL      float64 `json:"dirErrBcl,omitempty"`
-	DIR_ERR_BCU      float64 `json:"dirErrBcu,omitempty"`
-	DIR_ABSERR       float64 `json:"dirAbserr,omitempty"`
-	DIR_ABSERR_BCL   float64 `json:"dirAbserrBcl,omitempty"`
-	DIR_ABSERR_BCU   float64 `json:"dirAbserrBcu,omitempty"`
+	TOTAL                int     `json:"total,omitempty"`
+	FBAR                 float64 `json:"fbar,omitempty"`
+	FBAR_BCL             float64 `json:"fbarBcl,omitempty"`
+	FBAR_BCU             float64 `json:"fbarBcu,omitempty"`
+	OBAR                 float64 `json:"obar,omitempty"`
+	OBAR_BCL             float64 `json:"obarBcl,omitempty"`
+	OBAR_BCU             float64 `json:"obarBcu,omitempty"`
+	FS_RMS               float64 `json:"fsRms,omitempty"`
+	FS_RMS_BCL           float64 `json:"fsRmsBcl,omitempty"`
+	FS_RMS_BCU           float64 `json:"fsRmsBcu,omitempty"`
+	OS_RMS               float64 `json:"osRms,omitempty"`
+	OS_RMS_BCL           float64 `json:"osRmsBcl,omitempty"`
+	OS_RMS_BCU           float64 `json:"osRmsBcu,omitempty"`
+	MSVE                 float64 `json:"msve,omitempty"`
+	MSVE_BCL             float64 `json:"msveBcl,omitempty"`
+	MSVE_BCU             float64 `json:"msveBcu,omitempty"`
+	RMSVE                float64 `json:"rmsve,omitempty"`
+	RMSVE_BCL            float64 `json:"rmsveBcl,omitempty"`
+	RMSVE_BCU            float64 `json:"rmsveBcu,omitempty"`
+	FSTDEV               float64 `json:"fstdev,omitempty"`
+	FSTDEV_BCL           float64 `json:"fstdevBcl,omitempty"`
+	FSTDEV_BCU           float64 `json:"fstdevBcu,omitempty"`
+	OSTDEV               float64 `json:"ostdev,omitempty"`
+	OSTDEV_BCL           float64 `json:"ostdevBcl,omitempty"`
+	OSTDEV_BCU           float64 `json:"ostdevBcu,omitempty"`
+	FDIR                 float64 `json:"fdir,omitempty"`
+	FDIR_BCL             float64 `json:"fdirBcl,omitempty"`
+	FDIR_BCU             float64 `json:"fdirBcu,omitempty"`
+	ODIR                 float64 `json:"odir,omitempty"`
+	ODIR_BCL             float64 `json:"odirBcl,omitempty"`
+	ODIR_BCU             float64 `json:"odirBcu,omitempty"`
+	FBAR_SPEED           float64 `json:"fbarSpeed,omitempty"`
+	FBAR_SPEED_BCL       float64 `json:"fbarSpeedBcl,omitempty"`
+	FBAR_SPEED_BCU       float64 `json:"fbarSpeedBcu,omitempty"`
+	OBAR_SPEED           float64 `json:"obarSpeed,omitempty"`
+	OBAR_SPEED_BCL       float64 `json:"obarSpeedBcl,omitempty"`
+	OBAR_SPEED_BCU       float64 `json:"obarSpeedBcu,omitempty"`
+	VDIFF_SPEED          float64 `json:"vdiffSpeed,omitempty"`
+	VDIFF_SPEED_BCL      float64 `json:"vdiffSpeedBcl,omitempty"`
+	VDIFF_SPEED_BCU      float64 `json:"vdiffSpeedBcu,omitempty"`
+	VDIFF_DIR            float64 `json:"vdiffDir,omitempty"`
+	VDIFF_DIR_BCL        float64 `json:"vdiffDirBcl,omitempty"`
+	VDIFF_DIR_BCU        float64 `json:"vdiffDirBcu,omitempty"`
+	SPEED_ERR            float64 `json:"speedErr,omitempty"`
+	SPEED_ERR_BCL        float64 `json:"speedErrBcl,omitempty"`
+	SPEED_ERR_BCU        float64 `json:"speedErrBcu,omitempty"`
+	SPEED_ABSERR         float64 `json:"speedAbserr,omitempty"`
+	SPEED_ABSERR_BCL     float64 `json:"speedAbserrBcl,omitempty"`
+	SPEED_ABSERR_BCU     float64 `json:"speedAbserrBcu,omitempty"`
+	DIR_ERR              float64 `json:"dirErr,omitempty"`
+	DIR_ERR_BCL          float64 `json:"dirErrBcl,omitempty"`
+	DIR_ERR_BCU          float64 `json:"dirErrBcu,omitempty"`
+	DIR_ABSERR           float64 `json:"dirAbserr,omitempty"`
+	DIR_ABSERR_BCL       float64 `json:"dirAbserrBcl,omitempty"`
+	DIR_ABSERR_BCU       float64 `json:"dirAbserrBcu,omitempty"`
+	ANOM_CORR            float64 `json:"anomCorr,omitempty"`
+	ANOM_CORR_NCL        float64 `json:"anomCorrNcl,omitempty"`
+	ANOM_CORR_NCU        float64 `json:"anomCorrNcu,omitempty"`
+	ANOM_CORR_BCL        float64 `json:"anomCorrBcl,omitempty"`
+	ANOM_CORR_BCU        float64 `json:"anomCorrBcu,omitempty"`
+	ANOM_CORR_UNCNTR     float64 `json:"anomCorrUncntr,omitempty"`
+	ANOM_CORR_UNCNTR_BCL float64 `json:"anomCorrUncntrBcl,omitempty"`
+	ANOM_CORR_UNCNTR_BCU float64 `json:"anomCorrUncntrBcu,omitempty"`
 }
 
 type STAT_VL1L2 struct {
@@ -3501,74 +3868,89 @@ type TCST_PROBRIRW struct {
 	INIT        int                    `json:"init,omitempty"`
 }
 
+type TCST_TCDIAG struct {
+	TOTAL        int                    `json:"total,omitempty"`
+	INDEX        int                    `json:"index,omitempty"`
+	DIAG_SOURCE  float64                `json:"diagSource,omitempty"`
+	TRACK_SOURCE string                 `json:"trackSource,omitempty"`
+	FIELD_SOURCE string                 `json:"fieldSource,omitempty"`
+	DIAG         map[string]interface{} `json:"diag,omitempty"`
+	INIT         int                    `json:"init,omitempty"`
+}
+
 type TCST_TCMPR struct {
-	TOTAL       int     `json:"total,omitempty"`
-	INDEX       int     `json:"index,omitempty"`
-	LEVEL       string  `json:"level,omitempty"`
-	WATCH_WARN  string  `json:"watchWarn,omitempty"`
-	INITIALS    string  `json:"initials,omitempty"`
-	ALAT        float64 `json:"alat,omitempty"`
-	ALON        float64 `json:"alon,omitempty"`
-	BLAT        float64 `json:"blat,omitempty"`
-	BLON        float64 `json:"blon,omitempty"`
-	TK_ERR      float64 `json:"tkErr,omitempty"`
-	X_ERR       float64 `json:"xErr,omitempty"`
-	Y_ERR       float64 `json:"yErr,omitempty"`
-	ALTK_ERR    float64 `json:"altkErr,omitempty"`
-	CRTK_ERR    float64 `json:"crtkErr,omitempty"`
-	ADLAND      float64 `json:"adland,omitempty"`
-	BDLAND      float64 `json:"bdland,omitempty"`
-	AMSLP       float64 `json:"amslp,omitempty"`
-	BMSLP       float64 `json:"bmslp,omitempty"`
-	AMAX_WIND   float64 `json:"amaxWind,omitempty"`
-	BMAX_WIND   float64 `json:"bmaxWind,omitempty"`
-	AAL_WIND_34 float64 `json:"aalWind34,omitempty"`
-	BAL_WIND_34 float64 `json:"balWind34,omitempty"`
-	ANE_WIND_34 float64 `json:"aneWind34,omitempty"`
-	BNE_WIND_34 float64 `json:"bneWind34,omitempty"`
-	ASE_WIND_34 float64 `json:"aseWind34,omitempty"`
-	BSE_WIND_34 float64 `json:"bseWind34,omitempty"`
-	ASW_WIND_34 float64 `json:"aswWind34,omitempty"`
-	BSW_WIND_34 float64 `json:"bswWind34,omitempty"`
-	ANW_WIND_34 float64 `json:"anwWind34,omitempty"`
-	BNW_WIND_34 float64 `json:"bnwWind34,omitempty"`
-	AAL_WIND_50 float64 `json:"aalWind50,omitempty"`
-	BAL_WIND_50 float64 `json:"balWind50,omitempty"`
-	ANE_WIND_50 float64 `json:"aneWind50,omitempty"`
-	BNE_WIND_50 float64 `json:"bneWind50,omitempty"`
-	ASE_WIND_50 float64 `json:"aseWind50,omitempty"`
-	BSE_WIND_50 float64 `json:"bseWind50,omitempty"`
-	ASW_WIND_50 float64 `json:"aswWind50,omitempty"`
-	BSW_WIND_50 float64 `json:"bswWind50,omitempty"`
-	ANW_WIND_50 float64 `json:"anwWind50,omitempty"`
-	BNW_WIND_50 float64 `json:"bnwWind50,omitempty"`
-	AAL_WIND_64 float64 `json:"aalWind64,omitempty"`
-	BAL_WIND_64 float64 `json:"balWind64,omitempty"`
-	ANE_WIND_64 float64 `json:"aneWind64,omitempty"`
-	BNE_WIND_64 float64 `json:"bneWind64,omitempty"`
-	ASE_WIND_64 float64 `json:"aseWind64,omitempty"`
-	BSE_WIND_64 float64 `json:"bseWind64,omitempty"`
-	ASW_WIND_64 float64 `json:"aswWind64,omitempty"`
-	BSW_WIND_64 float64 `json:"bswWind64,omitempty"`
-	ANW_WIND_64 float64 `json:"anwWind64,omitempty"`
-	BNW_WIND_64 float64 `json:"bnwWind64,omitempty"`
-	ARADP       string  `json:"aradp,omitempty"`
-	BRADP       float64 `json:"bradp,omitempty"`
-	ARRP        int     `json:"arrp,omitempty"`
-	BRRP        float64 `json:"brrp,omitempty"`
-	AMRD        int     `json:"amrd,omitempty"`
-	BMRD        float64 `json:"bmrd,omitempty"`
-	AGUSTS      int     `json:"agusts,omitempty"`
-	BGUSTS      float64 `json:"bgusts,omitempty"`
-	AEYE        int     `json:"aeye,omitempty"`
-	BEYE        float64 `json:"beye,omitempty"`
-	ADIR        int     `json:"adir,omitempty"`
-	BDIR        float64 `json:"bdir,omitempty"`
-	ASPEED      int     `json:"aspeed,omitempty"`
-	BSPEED      float64 `json:"bspeed,omitempty"`
-	ADEPTH      int     `json:"adepth,omitempty"`
-	BDEPTH      float64 `json:"bdepth,omitempty"`
-	INIT        int     `json:"init,omitempty"`
+	TOTAL          int     `json:"total,omitempty"`
+	INDEX          int     `json:"index,omitempty"`
+	LEVEL          string  `json:"level,omitempty"`
+	WATCH_WARN     string  `json:"watchWarn,omitempty"`
+	INITIALS       string  `json:"initials,omitempty"`
+	ALAT           float64 `json:"alat,omitempty"`
+	ALON           float64 `json:"alon,omitempty"`
+	BLAT           float64 `json:"blat,omitempty"`
+	BLON           float64 `json:"blon,omitempty"`
+	TK_ERR         float64 `json:"tkErr,omitempty"`
+	X_ERR          float64 `json:"xErr,omitempty"`
+	Y_ERR          float64 `json:"yErr,omitempty"`
+	ALTK_ERR       float64 `json:"altkErr,omitempty"`
+	CRTK_ERR       float64 `json:"crtkErr,omitempty"`
+	ADLAND         float64 `json:"adland,omitempty"`
+	BDLAND         float64 `json:"bdland,omitempty"`
+	AMSLP          float64 `json:"amslp,omitempty"`
+	BMSLP          float64 `json:"bmslp,omitempty"`
+	AMAX_WIND      float64 `json:"amaxWind,omitempty"`
+	BMAX_WIND      float64 `json:"bmaxWind,omitempty"`
+	AAL_WIND_34    float64 `json:"aalWind34,omitempty"`
+	BAL_WIND_34    float64 `json:"balWind34,omitempty"`
+	ANE_WIND_34    float64 `json:"aneWind34,omitempty"`
+	BNE_WIND_34    float64 `json:"bneWind34,omitempty"`
+	ASE_WIND_34    float64 `json:"aseWind34,omitempty"`
+	BSE_WIND_34    float64 `json:"bseWind34,omitempty"`
+	ASW_WIND_34    float64 `json:"aswWind34,omitempty"`
+	BSW_WIND_34    float64 `json:"bswWind34,omitempty"`
+	ANW_WIND_34    float64 `json:"anwWind34,omitempty"`
+	BNW_WIND_34    float64 `json:"bnwWind34,omitempty"`
+	AAL_WIND_50    float64 `json:"aalWind50,omitempty"`
+	BAL_WIND_50    float64 `json:"balWind50,omitempty"`
+	ANE_WIND_50    float64 `json:"aneWind50,omitempty"`
+	BNE_WIND_50    float64 `json:"bneWind50,omitempty"`
+	ASE_WIND_50    float64 `json:"aseWind50,omitempty"`
+	BSE_WIND_50    float64 `json:"bseWind50,omitempty"`
+	ASW_WIND_50    float64 `json:"aswWind50,omitempty"`
+	BSW_WIND_50    float64 `json:"bswWind50,omitempty"`
+	ANW_WIND_50    float64 `json:"anwWind50,omitempty"`
+	BNW_WIND_50    float64 `json:"bnwWind50,omitempty"`
+	AAL_WIND_64    float64 `json:"aalWind64,omitempty"`
+	BAL_WIND_64    float64 `json:"balWind64,omitempty"`
+	ANE_WIND_64    float64 `json:"aneWind64,omitempty"`
+	BNE_WIND_64    float64 `json:"bneWind64,omitempty"`
+	ASE_WIND_64    float64 `json:"aseWind64,omitempty"`
+	BSE_WIND_64    float64 `json:"bseWind64,omitempty"`
+	ASW_WIND_64    float64 `json:"aswWind64,omitempty"`
+	BSW_WIND_64    float64 `json:"bswWind64,omitempty"`
+	ANW_WIND_64    float64 `json:"anwWind64,omitempty"`
+	BNW_WIND_64    float64 `json:"bnwWind64,omitempty"`
+	ARADP          string  `json:"aradp,omitempty"`
+	BRADP          float64 `json:"bradp,omitempty"`
+	ARRP           int     `json:"arrp,omitempty"`
+	BRRP           float64 `json:"brrp,omitempty"`
+	AMRD           int     `json:"amrd,omitempty"`
+	BMRD           float64 `json:"bmrd,omitempty"`
+	AGUSTS         int     `json:"agusts,omitempty"`
+	BGUSTS         float64 `json:"bgusts,omitempty"`
+	AEYE           int     `json:"aeye,omitempty"`
+	BEYE           float64 `json:"beye,omitempty"`
+	ADIR           int     `json:"adir,omitempty"`
+	BDIR           float64 `json:"bdir,omitempty"`
+	ASPEED         int     `json:"aspeed,omitempty"`
+	BSPEED         float64 `json:"bspeed,omitempty"`
+	ADEPTH         int     `json:"adepth,omitempty"`
+	BDEPTH         float64 `json:"bdepth,omitempty"`
+	NUM_MEMBERS    float64 `json:"numMembers,omitempty"`
+	TRACK_SPREAD   float64 `json:"trackSpread,omitempty"`
+	TRACK_STDEV    float64 `json:"trackStdev,omitempty"`
+	MSLP_STDEV     float64 `json:"mslpStdev,omitempty"`
+	MAX_WIND_STDEV float64 `json:"maxWindStdev,omitempty"`
+	INIT           int     `json:"init,omitempty"`
 }
 
 // fillStructure functions
@@ -4199,6 +4581,18 @@ func (s *STAT_CNT) fill_STAT_CNT(fields []string) {
 	if i <= dataLen {
 		s.ANOM_CORR_UNCNTR_BCU, _ = strconv.ParseFloat(fields[96], 64)
 	}
+	i++
+	if i <= dataLen {
+		s.SI, _ = strconv.ParseFloat(fields[97], 64)
+	}
+	i++
+	if i <= dataLen {
+		s.SI_BCL, _ = strconv.ParseFloat(fields[98], 64)
+	}
+	i++
+	if i <= dataLen {
+		s.SI_BCU, _ = strconv.ParseFloat(fields[99], 64)
+	}
 }
 
 func (s *STAT_CTC) fill_STAT_CTC(fields []string) {
@@ -4223,6 +4617,10 @@ func (s *STAT_CTC) fill_STAT_CTC(fields []string) {
 	i++
 	if i <= dataLen {
 		s.FN_ON, _ = strconv.ParseFloat(fields[4], 64)
+	}
+	i++
+	if i <= dataLen {
+		s.EC_VALUE, _ = strconv.ParseFloat(fields[5], 64)
 	}
 }
 
@@ -4601,6 +4999,22 @@ func (s *STAT_CTS) fill_STAT_CTS(fields []string) {
 	if i <= dataLen {
 		s.BAGSS_BCU, _ = strconv.ParseFloat(fields[92], 64)
 	}
+	i++
+	if i <= dataLen {
+		s.HSS_EC, _ = strconv.ParseFloat(fields[93], 64)
+	}
+	i++
+	if i <= dataLen {
+		s.HSS_EC_BCL, _ = strconv.ParseFloat(fields[94], 64)
+	}
+	i++
+	if i <= dataLen {
+		s.HSS_EC_BCU, _ = strconv.ParseFloat(fields[95], 64)
+	}
+	i++
+	if i <= dataLen {
+		s.EC_VALUE, _ = strconv.ParseFloat(fields[96], 64)
+	}
 }
 
 func (s *STAT_DMAP) fill_STAT_DMAP(fields []string) {
@@ -4689,6 +5103,18 @@ func (s *STAT_DMAP) fill_STAT_DMAP(fields []string) {
 	i++
 	if i <= dataLen {
 		s.ZHU_MEAN, _ = strconv.ParseFloat(fields[20], 64)
+	}
+	i++
+	if i <= dataLen {
+		s.G, _ = strconv.ParseFloat(fields[21], 64)
+	}
+	i++
+	if i <= dataLen {
+		s.GBETA, _ = strconv.ParseFloat(fields[22], 64)
+	}
+	i++
+	if i <= dataLen {
+		s.BETA_VALUE, _ = strconv.ParseFloat(fields[23], 64)
 	}
 }
 
@@ -4800,6 +5226,42 @@ func (s *STAT_ECNT) fill_STAT_ECNT(fields []string) {
 	if i <= dataLen {
 		s.CRPSS_EMP, _ = strconv.ParseFloat(fields[15], 64)
 	}
+	i++
+	if i <= dataLen {
+		s.CRPS_EMP_FAIR, _ = strconv.ParseFloat(fields[16], 64)
+	}
+	i++
+	if i <= dataLen {
+		s.SPREAD_MD, _ = strconv.ParseFloat(fields[17], 64)
+	}
+	i++
+	if i <= dataLen {
+		s.MAE, _ = strconv.ParseFloat(fields[18], 64)
+	}
+	i++
+	if i <= dataLen {
+		s.MAE_OERR, _ = strconv.ParseFloat(fields[19], 64)
+	}
+	i++
+	if i <= dataLen {
+		s.BIAS_RATIO, _ = strconv.ParseFloat(fields[20], 64)
+	}
+	i++
+	if i <= dataLen {
+		s.N_GE_OBS, _ = strconv.Atoi(fields[21])
+	}
+	i++
+	if i <= dataLen {
+		s.ME_GE_OBS, _ = strconv.ParseFloat(fields[22], 64)
+	}
+	i++
+	if i <= dataLen {
+		s.N_LT_OBS, _ = strconv.Atoi(fields[23])
+	}
+	i++
+	if i <= dataLen {
+		s.ME_LT_OBS, _ = strconv.ParseFloat(fields[24], 64)
+	}
 }
 
 func (s *STAT_FHO) fill_STAT_FHO(fields []string) {
@@ -4842,66 +5304,74 @@ func (s *STAT_GENMPR) fill_STAT_GENMPR(fields []string) {
 	}
 	i++
 	if i <= dataLen {
-		if fields[3] != "NA" {
-			s.AGEN_INIT = fields[3]
+		s.PROB_LEAD, _ = strconv.ParseFloat(fields[3], 64)
+	}
+	i++
+	if i <= dataLen {
+		s.PROB_VAL, _ = strconv.ParseFloat(fields[4], 64)
+	}
+	i++
+	if i <= dataLen {
+		if fields[5] != "NA" {
+			s.AGEN_INIT = fields[5]
 		}
 	}
 	i++
 	if i <= dataLen {
-		if fields[4] != "NA" {
-			s.AGEN_FHR = fields[4]
+		if fields[6] != "NA" {
+			s.AGEN_FHR = fields[6]
 		}
 	}
 	i++
 	if i <= dataLen {
-		s.AGEN_LAT, _ = strconv.ParseFloat(fields[5], 64)
+		s.AGEN_LAT, _ = strconv.ParseFloat(fields[7], 64)
 	}
 	i++
 	if i <= dataLen {
-		s.AGEN_LON, _ = strconv.ParseFloat(fields[6], 64)
+		s.AGEN_LON, _ = strconv.ParseFloat(fields[8], 64)
 	}
 	i++
 	if i <= dataLen {
-		s.AGEN_DLAND, _ = strconv.ParseFloat(fields[7], 64)
+		s.AGEN_DLAND, _ = strconv.ParseFloat(fields[9], 64)
 	}
 	i++
 	if i <= dataLen {
-		s.BGEN_LAT, _ = strconv.ParseFloat(fields[8], 64)
+		s.BGEN_LAT, _ = strconv.ParseFloat(fields[10], 64)
 	}
 	i++
 	if i <= dataLen {
-		s.BGEN_LON, _ = strconv.ParseFloat(fields[9], 64)
+		s.BGEN_LON, _ = strconv.ParseFloat(fields[11], 64)
 	}
 	i++
 	if i <= dataLen {
-		s.BGEN_DLAND, _ = strconv.ParseFloat(fields[10], 64)
+		s.BGEN_DLAND, _ = strconv.ParseFloat(fields[12], 64)
 	}
 	i++
 	if i <= dataLen {
-		s.GEN_DIST, _ = strconv.ParseFloat(fields[11], 64)
-	}
-	i++
-	if i <= dataLen {
-		if fields[12] != "NA" {
-			s.GEN_TDIFF = fields[12]
-		}
-	}
-	i++
-	if i <= dataLen {
-		if fields[13] != "NA" {
-			s.INIT_TDIFF = fields[13]
-		}
+		s.GEN_DIST, _ = strconv.ParseFloat(fields[13], 64)
 	}
 	i++
 	if i <= dataLen {
 		if fields[14] != "NA" {
-			s.DEV_CAT = fields[14]
+			s.GEN_TDIFF = fields[14]
 		}
 	}
 	i++
 	if i <= dataLen {
 		if fields[15] != "NA" {
-			s.OPS_CAT = fields[15]
+			s.INIT_TDIFF = fields[15]
+		}
+	}
+	i++
+	if i <= dataLen {
+		if fields[16] != "NA" {
+			s.DEV_CAT = fields[16]
+		}
+	}
+	i++
+	if i <= dataLen {
+		if fields[17] != "NA" {
+			s.OPS_CAT = fields[17]
 		}
 	}
 }
@@ -5036,6 +5506,10 @@ func (s *STAT_MCTC) fill_STAT_MCTC(fields []string) {
 			}
 		}
 	}
+	i++
+	if i <= dataLen {
+		s.EC_VALUE, _ = strconv.ParseFloat(fields[3], 64)
+	}
 }
 
 func (s *STAT_MCTS) fill_STAT_MCTS(fields []string) {
@@ -5104,6 +5578,22 @@ func (s *STAT_MCTS) fill_STAT_MCTS(fields []string) {
 	i++
 	if i <= dataLen {
 		s.GER_BCU, _ = strconv.ParseFloat(fields[15], 64)
+	}
+	i++
+	if i <= dataLen {
+		s.HSS_EC, _ = strconv.ParseFloat(fields[16], 64)
+	}
+	i++
+	if i <= dataLen {
+		s.HSS_EC_BCL, _ = strconv.ParseFloat(fields[17], 64)
+	}
+	i++
+	if i <= dataLen {
+		s.HSS_EC_BCU, _ = strconv.ParseFloat(fields[18], 64)
+	}
+	i++
+	if i <= dataLen {
+		s.EC_VALUE, _ = strconv.ParseFloat(fields[19], 64)
 	}
 }
 
@@ -6129,6 +6619,148 @@ func (s *STAT_SAL1L2) fill_STAT_SAL1L2(fields []string) {
 	}
 }
 
+func (s *STAT_SEEPS) fill_STAT_SEEPS(fields []string) {
+	dataLen := len(fields) - 1
+	i := -1
+	i++
+	if i <= dataLen {
+		s.TOTAL, _ = strconv.Atoi(fields[0])
+	}
+	i++
+	if i <= dataLen {
+		if fields[1] != "NA" {
+			s.S12 = fields[1]
+		}
+	}
+	i++
+	if i <= dataLen {
+		if fields[2] != "NA" {
+			s.S13 = fields[2]
+		}
+	}
+	i++
+	if i <= dataLen {
+		if fields[3] != "NA" {
+			s.S21 = fields[3]
+		}
+	}
+	i++
+	if i <= dataLen {
+		if fields[4] != "NA" {
+			s.S23 = fields[4]
+		}
+	}
+	i++
+	if i <= dataLen {
+		if fields[5] != "NA" {
+			s.S31 = fields[5]
+		}
+	}
+	i++
+	if i <= dataLen {
+		if fields[6] != "NA" {
+			s.S32 = fields[6]
+		}
+	}
+	i++
+	if i <= dataLen {
+		s.PF1, _ = strconv.ParseFloat(fields[7], 64)
+	}
+	i++
+	if i <= dataLen {
+		s.PF2, _ = strconv.ParseFloat(fields[8], 64)
+	}
+	i++
+	if i <= dataLen {
+		s.PF3, _ = strconv.ParseFloat(fields[9], 64)
+	}
+	i++
+	if i <= dataLen {
+		s.PV1, _ = strconv.ParseFloat(fields[10], 64)
+	}
+	i++
+	if i <= dataLen {
+		s.PV2, _ = strconv.ParseFloat(fields[11], 64)
+	}
+	i++
+	if i <= dataLen {
+		s.PV3, _ = strconv.ParseFloat(fields[12], 64)
+	}
+	i++
+	if i <= dataLen {
+		s.MEAN_FCST, _ = strconv.ParseFloat(fields[13], 64)
+	}
+	i++
+	if i <= dataLen {
+		s.MEAN_OBS, _ = strconv.ParseFloat(fields[14], 64)
+	}
+	i++
+	if i <= dataLen {
+		s.SEEPS, _ = strconv.ParseFloat(fields[15], 64)
+	}
+}
+
+func (s *STAT_SEEPS_MPR) fill_STAT_SEEPS_MPR(fields []string) {
+	dataLen := len(fields) - 1
+	i := -1
+	i++
+	if i <= dataLen {
+		if fields[0] != "NA" {
+			s.OBS_SID = fields[0]
+		}
+	}
+	i++
+	if i <= dataLen {
+		s.OBS_LAT, _ = strconv.ParseFloat(fields[1], 64)
+	}
+	i++
+	if i <= dataLen {
+		s.OBS_LON, _ = strconv.ParseFloat(fields[2], 64)
+	}
+	i++
+	if i <= dataLen {
+		s.FCST, _ = strconv.ParseFloat(fields[3], 64)
+	}
+	i++
+	if i <= dataLen {
+		s.OBS, _ = strconv.ParseFloat(fields[4], 64)
+	}
+	i++
+	if i <= dataLen {
+		if fields[5] != "NA" {
+			s.OBS_QC = fields[5]
+		}
+	}
+	i++
+	if i <= dataLen {
+		s.FCST_CAT, _ = strconv.Atoi(fields[6])
+	}
+	i++
+	if i <= dataLen {
+		s.OBS_CAT, _ = strconv.Atoi(fields[7])
+	}
+	i++
+	if i <= dataLen {
+		s.P1, _ = strconv.ParseFloat(fields[8], 64)
+	}
+	i++
+	if i <= dataLen {
+		s.P2, _ = strconv.ParseFloat(fields[9], 64)
+	}
+	i++
+	if i <= dataLen {
+		s.T1, _ = strconv.ParseFloat(fields[10], 64)
+	}
+	i++
+	if i <= dataLen {
+		s.T2, _ = strconv.ParseFloat(fields[11], 64)
+	}
+	i++
+	if i <= dataLen {
+		s.SEEPS, _ = strconv.ParseFloat(fields[12], 64)
+	}
+}
+
 func (s *STAT_SL1L2) fill_STAT_SL1L2(fields []string) {
 	dataLen := len(fields) - 1
 	i := -1
@@ -6159,6 +6791,39 @@ func (s *STAT_SL1L2) fill_STAT_SL1L2(fields []string) {
 	i++
 	if i <= dataLen {
 		s.MAE, _ = strconv.ParseFloat(fields[6], 64)
+	}
+}
+
+func (s *STAT_SSIDX) fill_STAT_SSIDX(fields []string) {
+	dataLen := len(fields) - 1
+	i := -1
+	i++
+	if i <= dataLen {
+		if fields[0] != "NA" {
+			s.FCST_MODEL = fields[0]
+		}
+	}
+	i++
+	if i <= dataLen {
+		if fields[1] != "NA" {
+			s.REF_MODEL = fields[1]
+		}
+	}
+	i++
+	if i <= dataLen {
+		s.N_INIT, _ = strconv.Atoi(fields[2])
+	}
+	i++
+	if i <= dataLen {
+		s.N_TERM, _ = strconv.Atoi(fields[3])
+	}
+	i++
+	if i <= dataLen {
+		s.N_VLD, _ = strconv.Atoi(fields[4])
+	}
+	i++
+	if i <= dataLen {
+		s.SS_INDEX, _ = strconv.ParseFloat(fields[5], 64)
 	}
 }
 
@@ -6341,6 +7006,14 @@ func (s *STAT_VAL1L2) fill_STAT_VAL1L2(fields []string) {
 	i++
 	if i <= dataLen {
 		s.UVOOABAR, _ = strconv.ParseFloat(fields[7], 64)
+	}
+	i++
+	if i <= dataLen {
+		s.FA_SPEED_BAR, _ = strconv.ParseFloat(fields[8], 64)
+	}
+	i++
+	if i <= dataLen {
+		s.OA_SPEED_BAR, _ = strconv.ParseFloat(fields[9], 64)
 	}
 }
 
@@ -6567,6 +7240,38 @@ func (s *STAT_VCNT) fill_STAT_VCNT(fields []string) {
 	if i <= dataLen {
 		s.DIR_ABSERR_BCU, _ = strconv.ParseFloat(fields[54], 64)
 	}
+	i++
+	if i <= dataLen {
+		s.ANOM_CORR, _ = strconv.ParseFloat(fields[55], 64)
+	}
+	i++
+	if i <= dataLen {
+		s.ANOM_CORR_NCL, _ = strconv.ParseFloat(fields[56], 64)
+	}
+	i++
+	if i <= dataLen {
+		s.ANOM_CORR_NCU, _ = strconv.ParseFloat(fields[57], 64)
+	}
+	i++
+	if i <= dataLen {
+		s.ANOM_CORR_BCL, _ = strconv.ParseFloat(fields[58], 64)
+	}
+	i++
+	if i <= dataLen {
+		s.ANOM_CORR_BCU, _ = strconv.ParseFloat(fields[59], 64)
+	}
+	i++
+	if i <= dataLen {
+		s.ANOM_CORR_UNCNTR, _ = strconv.ParseFloat(fields[60], 64)
+	}
+	i++
+	if i <= dataLen {
+		s.ANOM_CORR_UNCNTR_BCL, _ = strconv.ParseFloat(fields[61], 64)
+	}
+	i++
+	if i <= dataLen {
+		s.ANOM_CORR_UNCNTR_BCU, _ = strconv.ParseFloat(fields[62], 64)
+	}
 }
 
 func (s *STAT_VL1L2) fill_STAT_VL1L2(fields []string) {
@@ -6730,6 +7435,60 @@ func (s *TCST_PROBRIRW) fill_TCST_PROBRIRW(fields []string) {
 	i++
 	if i <= dataLen {
 		s.INIT, _ = strconv.Atoi(fields[23])
+	}
+}
+
+func (s *TCST_TCDIAG) fill_TCST_TCDIAG(fields []string) {
+	dataLen := len(fields) - 1
+	i := -1
+	i++
+	if i <= dataLen {
+		s.TOTAL, _ = strconv.Atoi(fields[0])
+	}
+	i++
+	if i <= dataLen {
+		s.INDEX, _ = strconv.Atoi(fields[1])
+	}
+	i++
+	if i <= dataLen {
+		s.DIAG_SOURCE, _ = strconv.ParseFloat(fields[2], 64)
+	}
+	i++
+	if i <= dataLen {
+		if fields[3] != "NA" {
+			s.TRACK_SOURCE = fields[3]
+		}
+	}
+	i++
+	if i <= dataLen {
+		if fields[4] != "NA" {
+			s.FIELD_SOURCE = fields[4]
+		}
+	}
+	i++
+	if i <= dataLen { // the first field of the repeating fields is the TOTAL, the second field is the 1st dimenSion of the 1st sequence (there might be only one sequence)
+		var value interface{}
+		count, err := strconv.Atoi(fields[5])
+		if err != nil {
+			count = 0
+		}
+		keyPrefixes := []string{"DIAG_", "VALUE_"}
+		s.DIAG = make(map[string]interface{})
+		for group := 1; group <= count; group++ {
+			for index := 6; index <= len(keyPrefixes); index++ {
+				key := fmt.Sprintf("%s_%d", keyPrefixes[index-1], index)
+				if index > len(fields) { // sometimes the data line is truncated - we will set expected data to "NA"
+					value = "NA"
+				} else {
+					value = fields[index]
+				}
+				s.DIAG[key] = value
+			}
+		}
+	}
+	i++
+	if i <= dataLen {
+		s.INIT, _ = strconv.Atoi(fields[8])
 	}
 }
 
@@ -7010,7 +7769,27 @@ func (s *TCST_TCMPR) fill_TCST_TCMPR(fields []string) {
 	}
 	i++
 	if i <= dataLen {
-		s.INIT, _ = strconv.Atoi(fields[66])
+		s.NUM_MEMBERS, _ = strconv.ParseFloat(fields[66], 64)
+	}
+	i++
+	if i <= dataLen {
+		s.TRACK_SPREAD, _ = strconv.ParseFloat(fields[67], 64)
+	}
+	i++
+	if i <= dataLen {
+		s.TRACK_STDEV, _ = strconv.ParseFloat(fields[68], 64)
+	}
+	i++
+	if i <= dataLen {
+		s.MSLP_STDEV, _ = strconv.ParseFloat(fields[69], 64)
+	}
+	i++
+	if i <= dataLen {
+		s.MAX_WIND_STDEV, _ = strconv.ParseFloat(fields[70], 64)
+	}
+	i++
+	if i <= dataLen {
+		s.INIT, _ = strconv.Atoi(fields[71])
 	}
 }
 
@@ -7107,6 +7886,28 @@ func GetDocForId(fileLineType string, metaDataMap map[string]interface{}, header
 			(doc)["data"] = make(map[string]STAT_MPR)
 		}
 		if val, ok := (doc)["data"].(map[string]STAT_MPR); ok {
+			val[dataKey] = elem
+			(doc)["data"] = val
+		}
+	case "STAT_SEEPS":
+		elem := STAT_SEEPS{}
+		elem.fill_STAT_SEEPS_Header(headerData, &doc)
+		elem.fill_STAT_SEEPS(dataData)
+		if exists := (doc)["data"]; exists == nil {
+			(doc)["data"] = make(map[string]STAT_SEEPS)
+		}
+		if val, ok := (doc)["data"].(map[string]STAT_SEEPS); ok {
+			val[dataKey] = elem
+			(doc)["data"] = val
+		}
+	case "STAT_SEEPS_MPR":
+		elem := STAT_SEEPS_MPR{}
+		elem.fill_STAT_SEEPS_MPR_Header(headerData, &doc)
+		elem.fill_STAT_SEEPS_MPR(dataData)
+		if exists := (doc)["data"]; exists == nil {
+			(doc)["data"] = make(map[string]STAT_SEEPS_MPR)
+		}
+		if val, ok := (doc)["data"].(map[string]STAT_SEEPS_MPR); ok {
 			val[dataKey] = elem
 			(doc)["data"] = val
 		}
@@ -7363,6 +8164,17 @@ func GetDocForId(fileLineType string, metaDataMap map[string]interface{}, header
 			val[dataKey] = elem
 			(doc)["data"] = val
 		}
+	case "STAT_SSIDX":
+		elem := STAT_SSIDX{}
+		elem.fill_STAT_SSIDX_Header(headerData, &doc)
+		elem.fill_STAT_SSIDX(dataData)
+		if exists := (doc)["data"]; exists == nil {
+			(doc)["data"] = make(map[string]STAT_SSIDX)
+		}
+		if val, ok := (doc)["data"].(map[string]STAT_SSIDX); ok {
+			val[dataKey] = elem
+			(doc)["data"] = val
+		}
 	case "MODE_OBJ":
 		elem := MODE_OBJ{}
 		elem.fill_MODE_OBJ_Header(headerData, &doc)
@@ -7393,6 +8205,17 @@ func GetDocForId(fileLineType string, metaDataMap map[string]interface{}, header
 			(doc)["data"] = make(map[string]TCST_TCMPR)
 		}
 		if val, ok := (doc)["data"].(map[string]TCST_TCMPR); ok {
+			val[dataKey] = elem
+			(doc)["data"] = val
+		}
+	case "TCST_TCDIAG":
+		elem := TCST_TCDIAG{}
+		elem.fill_TCST_TCDIAG_Header(headerData, &doc)
+		elem.fill_TCST_TCDIAG(dataData)
+		if exists := (doc)["data"]; exists == nil {
+			(doc)["data"] = make(map[string]TCST_TCDIAG)
+		}
+		if val, ok := (doc)["data"].(map[string]TCST_TCDIAG); ok {
 			val[dataKey] = elem
 			(doc)["data"] = val
 		}
@@ -7469,6 +8292,20 @@ func AddDataElement(dataKey string, fileLineType string, dataData []string, doc 
 		elem := STAT_MPR{}
 		elem.fill_STAT_MPR(dataData)
 		if val, ok := (*doc)["data"].(map[string]STAT_MPR); ok {
+			val[dataKey] = elem
+			(*doc)["data"] = val
+		}
+	case "STAT_SEEPS":
+		elem := STAT_SEEPS{}
+		elem.fill_STAT_SEEPS(dataData)
+		if val, ok := (*doc)["data"].(map[string]STAT_SEEPS); ok {
+			val[dataKey] = elem
+			(*doc)["data"] = val
+		}
+	case "STAT_SEEPS_MPR":
+		elem := STAT_SEEPS_MPR{}
+		elem.fill_STAT_SEEPS_MPR(dataData)
+		if val, ok := (*doc)["data"].(map[string]STAT_SEEPS_MPR); ok {
 			val[dataKey] = elem
 			(*doc)["data"] = val
 		}
@@ -7633,6 +8470,13 @@ func AddDataElement(dataKey string, fileLineType string, dataData []string, doc 
 			val[dataKey] = elem
 			(*doc)["data"] = val
 		}
+	case "STAT_SSIDX":
+		elem := STAT_SSIDX{}
+		elem.fill_STAT_SSIDX(dataData)
+		if val, ok := (*doc)["data"].(map[string]STAT_SSIDX); ok {
+			val[dataKey] = elem
+			(*doc)["data"] = val
+		}
 	case "MODE_OBJ":
 		elem := MODE_OBJ{}
 		elem.fill_MODE_OBJ(dataData)
@@ -7654,6 +8498,13 @@ func AddDataElement(dataKey string, fileLineType string, dataData []string, doc 
 			val[dataKey] = elem
 			(*doc)["data"] = val
 		}
+	case "TCST_TCDIAG":
+		elem := TCST_TCDIAG{}
+		elem.fill_TCST_TCDIAG(dataData)
+		if val, ok := (*doc)["data"].(map[string]TCST_TCDIAG); ok {
+			val[dataKey] = elem
+			(*doc)["data"] = val
+		}
 	case "TCST_PROBRIRW":
 		elem := TCST_PROBRIRW{}
 		elem.fill_TCST_PROBRIRW(dataData)
@@ -7667,4 +8518,4 @@ func AddDataElement(dataKey string, fileLineType string, dataData []string, doc 
 	return *doc, nil
 }
 
-var MetHeaderColumnsFileUrl = "https://raw.githubusercontent.com/dtcenter/MET/refs/heads/main_v12.0/data/table_files/met_header_columns_V10.0.txt"
+var MetHeaderColumnsFileUrl = "https://raw.githubusercontent.com/dtcenter/MET/refs/heads/main_v12.0/data/table_files/met_header_columns_V11.1.txt"

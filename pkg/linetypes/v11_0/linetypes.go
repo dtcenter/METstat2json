@@ -5,7 +5,7 @@ The following data types were not found in the MET user guide files or the MET s
 
 Undefined data types: [S12 S13 S21 S23 S31 S32]
 */
-package metLineTypeDefinitions_v11_1
+package v11_0
 
 import (
 	"errors"
@@ -18,7 +18,7 @@ import (
 THIS CODE IS AUTOMATICALLY GENERATED - DO NOT EDIT THIS CODE
 To modify this code - modify the generator.go file and run the generator.go program
 cd  <repo_root>
-go run generator -version=v12.0 > metLineTypeDefinitions_v12_0/metLineTypeDefinitions.go
+go run generator -version=v12.0 > pkg/linetypes/v12_0/linetypes.go
 */
 
 func GetLeadFromInitValid(data []string, dataFieldIndex int) string {
@@ -8518,4 +8518,4 @@ func AddDataElement(dataKey string, fileLineType string, dataData []string, doc 
 	return *doc, nil
 }
 
-var MetHeaderColumnsFileUrl = "https://raw.githubusercontent.com/dtcenter/MET/refs/heads/main_v12.0/data/table_files/met_header_columns_V11.1.txt"
+var MetHeaderColumnsFileUrl = "https://raw.githubusercontent.com/dtcenter/MET/refs/heads/main_v12.0/data/table_files/met_header_columns_V11.0.txt"

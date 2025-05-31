@@ -9,11 +9,11 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/NOAA-GSL/METstat2json/pkg/metLineTypeDefinitions_v10_0"
-	"github.com/NOAA-GSL/METstat2json/pkg/metLineTypeDefinitions_v10_1"
-	"github.com/NOAA-GSL/METstat2json/pkg/metLineTypeDefinitions_v11_0"
-	"github.com/NOAA-GSL/METstat2json/pkg/metLineTypeDefinitions_v11_1"
-	"github.com/NOAA-GSL/METstat2json/pkg/metLineTypeDefinitions_v12_0"
+	"github.com/NOAA-GSL/METstat2json/pkg/linetypes/v10_0"
+	"github.com/NOAA-GSL/METstat2json/pkg/linetypes/v10_1"
+	"github.com/NOAA-GSL/METstat2json/pkg/linetypes/v11_0"
+	"github.com/NOAA-GSL/METstat2json/pkg/linetypes/v11_1"
+	"github.com/NOAA-GSL/METstat2json/pkg/linetypes/v12_0"
 	"github.com/NOAA-GSL/METstat2json/pkg/util"
 )
 
@@ -163,15 +163,15 @@ func ParseLine(dataSetName string, headerLine string, dataLine string, docPtr *m
 			// The document needs to be of the correct version.
 			switch parserVersion {
 			case "v10_0":
-				(*docPtr)[metaData.ID], _err = metLineTypeDefinitions_v10_0.GetDocForId(fileLineType, metaDataMap, headerData, dataData, dataKey)
+				(*docPtr)[metaData.ID], _err = v10_0.GetDocForId(fileLineType, metaDataMap, headerData, dataData, dataKey)
 			case "v10_1":
-				(*docPtr)[metaData.ID], _err = metLineTypeDefinitions_v10_1.GetDocForId(fileLineType, metaDataMap, headerData, dataData, dataKey)
+				(*docPtr)[metaData.ID], _err = v10_1.GetDocForId(fileLineType, metaDataMap, headerData, dataData, dataKey)
 			case "v11_0":
-				(*docPtr)[metaData.ID], _err = metLineTypeDefinitions_v11_0.GetDocForId(fileLineType, metaDataMap, headerData, dataData, dataKey)
+				(*docPtr)[metaData.ID], _err = v11_0.GetDocForId(fileLineType, metaDataMap, headerData, dataData, dataKey)
 			case "v11_1":
-				(*docPtr)[metaData.ID], _err = metLineTypeDefinitions_v11_1.GetDocForId(fileLineType, metaDataMap, headerData, dataData, dataKey)
+				(*docPtr)[metaData.ID], _err = v11_1.GetDocForId(fileLineType, metaDataMap, headerData, dataData, dataKey)
 			case "v12_0":
-				(*docPtr)[metaData.ID], _err = metLineTypeDefinitions_v12_0.GetDocForId(fileLineType, metaDataMap, headerData, dataData, dataKey)
+				(*docPtr)[metaData.ID], _err = v12_0.GetDocForId(fileLineType, metaDataMap, headerData, dataData, dataKey)
 			default:
 				return *docPtr, fmt.Errorf("unsupported version %s", parserVersion)
 			}
@@ -190,19 +190,19 @@ func ParseLine(dataSetName string, headerLine string, dataLine string, docPtr *m
 		switch parserVersion {
 		case "v10_0":
 			// add the data to the document
-			(*docPtr)[metaData.ID], _err = metLineTypeDefinitions_v10_0.AddDataElement(dataKey, fileLineType, dataData, &docMap)
+			(*docPtr)[metaData.ID], _err = v10_0.AddDataElement(dataKey, fileLineType, dataData, &docMap)
 		case "v10_1":
 			// add the data to the document
-			(*docPtr)[metaData.ID], _err = metLineTypeDefinitions_v10_1.AddDataElement(dataKey, fileLineType, dataData, &docMap)
+			(*docPtr)[metaData.ID], _err = v10_1.AddDataElement(dataKey, fileLineType, dataData, &docMap)
 		case "v11_0":
 			// add the data to the document
-			(*docPtr)[metaData.ID], _err = metLineTypeDefinitions_v11_0.AddDataElement(dataKey, fileLineType, dataData, &docMap)
+			(*docPtr)[metaData.ID], _err = v11_0.AddDataElement(dataKey, fileLineType, dataData, &docMap)
 		case "v11_1":
 			// add the data to the document
-			(*docPtr)[metaData.ID], _err = metLineTypeDefinitions_v11_1.AddDataElement(dataKey, fileLineType, dataData, &docMap)
+			(*docPtr)[metaData.ID], _err = v11_1.AddDataElement(dataKey, fileLineType, dataData, &docMap)
 		case "v12_0":
 			// add the data to the document
-			(*docPtr)[metaData.ID], _err = metLineTypeDefinitions_v12_0.AddDataElement(dataKey, fileLineType, dataData, &docMap)
+			(*docPtr)[metaData.ID], _err = v12_0.AddDataElement(dataKey, fileLineType, dataData, &docMap)
 		default:
 			return *docPtr, fmt.Errorf("unsupported version %s", parserVersion)
 		}

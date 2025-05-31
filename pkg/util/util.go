@@ -4,7 +4,7 @@ package util
 This package contains the utilities for building the header and line type for the data files. The data files are
 MET output files that contain a header section and a data section. The header section contains the header fields that
 are used to identify the document. The data section contains the data fields that are used to populate the document.
-This package is separate from the metLineTypeDefinitions package because the metLineTypeDefinitions package is automatically
+This package is separate from the linetypes packages because the linetypes package is automatically
 generated from the buildHeaderLineTypes.go program and there is a desire to avoid a circular dependency.
 This package defines a VxMetaData struct that is used to store the metadata for the mapped documents.
 The metadata is used to uniquely identify each document and is used to merge documents with the same metadata.
@@ -463,7 +463,7 @@ func getLineTypeFromColumnDefsFile(headerLine string, version string) (HeaderFie
 	// this function will read the column definitions file and return the line type for the header line
 	// if it is found in the column definitions file
 	// If the columnsDefinition file is not present then the file will be downloaded from the
-	// metLineTypeDefinitions.MetHeaderColumnsFileUrl
+	// linetypes.MetHeaderColumnsFileUrl
 	switch version {
 	case "v12_0":
 		MetHeaderColumnsFileUrl = MetHeaderColumnsFileUrl_v12_0
@@ -535,7 +535,7 @@ func getLineTypeFromColumnDefsFile(headerLine string, version string) (HeaderFie
 	// and find the line type for the header line by looking line by line in the column definitions file.
 	// The column definitions file is a text file that contains the line type for each header line.
 	// If the column definitions file is not present then the file will be downloaded from the
-	// metLineTypeDefinitions.MetHeaderColumnsFileUrl.
+	// linetypes.MetHeaderColumnsFileUrl.
 	columnDefsFilePath := wd + "/" + "./column_defs.txt"
 	_, err := os.Stat(columnDefsFilePath)
 	if os.IsNotExist(err) {

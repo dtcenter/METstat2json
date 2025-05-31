@@ -140,13 +140,13 @@ func main() {
 	addDataElementString += "\tdefault:\n\t\treturn nil, errors.New(\"AddDataElement: Unknown file_line type:\" + fileLineType)\n\t}\n\treturn *doc, nil\n}\n"
 
 	// print the package - header structs, fillHeader functions, data structs, fillStructure functions, getDocForId functions, addDataElement functions
-	fmt.Println("package metLineTypeDefinitions" + "_" + parserVersion)
+	fmt.Println("package " + parserVersion)
 	fmt.Println("")
 	fmt.Println("import (\n\t\"strconv\"\n\t\"errors\"\n\t\"fmt\"\n\t\"time\"\n)")
 	fmt.Println("\n/*\nTHIS CODE IS AUTOMATICALLY GENERATED - DO NOT EDIT THIS CODE")
 	fmt.Println("To modify this code - modify the generator.go file and run the generator.go program")
 	fmt.Println("cd  <repo_root>")
-	fmt.Println("go run generator -version=v12.0 > metLineTypeDefinitions_v12_0/metLineTypeDefinitions.go\n*/")
+	fmt.Println("go run generator -version=v12.0 > pkg/linetypes/v12_0/linetypes.go\n*/")
 	fmt.Println("")
 
 	// print some utility funcs

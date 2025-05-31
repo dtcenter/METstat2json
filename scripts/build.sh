@@ -24,17 +24,17 @@ for arch in arm64 amd64; do
 	done
 done
 
-echo "building new metLineTypeDefinitions.go"
-go run ./generator -version=v12.0 > pkg/metLineTypeDefinitions_v12_0/metLineTypeDefinitions.go \
-  && go run ./generator -version=v11.1 > pkg/metLineTypeDefinitions_v11_1/metLineTypeDefinitions.go \
-  && go run ./generator -version=v11.0 > pkg/metLineTypeDefinitions_v11_0/metLineTypeDefinitions.go \
-  && go run ./generator -version=v10.1 > pkg/metLineTypeDefinitions_v10_1/metLineTypeDefinitions.go \
-  && go run ./generator -version=v10.0 > pkg/metLineTypeDefinitions_v10_0/metLineTypeDefinitions.go \
+echo "building new linetypes"
+go run ./generator -version=v12.0 > pkg/linetypes/v12_0/linetypes.go \
+  && go run ./generator -version=v11.1 > pkg/linetypes/v11_1/linetypes.go \
+  && go run ./generator -version=v11.0 > pkg/linetypes/v11_0/linetypes.go \
+  && go run ./generator -version=v10.1 > pkg/linetypes/v10_1/linetypes.go \
+  && go run ./generator -version=v10.0 > pkg/linetypes/v10_0/linetypes.go \
   && golangci-lint fmt ./...
 
-echo "format and lint metLinetypeDefinitions"
-echo "formatting ./pkg/metLineTypeDefinitions"
-for f in $(find ./pkg -name metLineTypeDefinitions.go)
+echo "format and lint linetypes"
+echo "formatting ./pkg/linetypes"
+for f in $(find ./pkg -name linetypes.go)
 do
 	echo "golangci-lint fmt $f"
 	golangci-lint fmt $f
