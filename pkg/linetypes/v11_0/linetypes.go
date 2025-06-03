@@ -1,9 +1,11 @@
 /*
 The following data types were not found in the MET user guide files or the MET source code files.
+For simplicity, the values of these data types will be treated as strings in the generated code.
 
-	TODO - add an actionable message.
+	Undefined data types: [S12 S13 S21 S23 S31 S32]
 
-Undefined data types: [S12 S13 S21 S23 S31 S32]
+To resolve this, consult the github.com/dtcenter/MET repo to determine if there is a more appropriate type,
+and, if there is, add an override to the overRideDefinedMetDataTypes function in generator/generator.go.
 */
 package v11_0
 
