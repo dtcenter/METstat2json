@@ -793,6 +793,8 @@ func fillMetDataMapFromUserGuide(metDataTypesForLines, fieldNameMap map[string]s
 	return metDataTypesForLines
 }
 
+// overRideDefinedMetDataTypes is used to manually override the data types for specific fields that are defined in, or missing from the MET source
+// code & documentation that we reference.
 func overRideDefinedMetDataTypes(metDataTypesForLines map[string]string, fieldNameMap map[string]string) (map[string]string, map[string]string) {
 	metDataTypesForLines["RIRW_WINDOW"] = "int"
 	metDataTypesForLines["F[0-9]*_O[0-9]*"] = "string"
@@ -847,9 +849,17 @@ func overRideDefinedMetDataTypes(metDataTypesForLines map[string]string, fieldNa
 	}
 	if len(undefineds) > 0 {
 		slices.Sort(undefineds)
-		fmt.Printf("\n/*\nThe following data types were not found in the MET user guide files or the MET source code files.\n")
-		fmt.Printf("\n TODO - add an actionable message.\n")
-		fmt.Printf("\nUndefined data types: %v*/\n", undefineds)
+		fmt.Printf(`
+/*
+The following data types were not found in the MET user guide files or the MET source code files.
+For simplicity, the values of these data types will be treated as strings in the generated code.
+
+    Undefined data types: %v
+
+To resolve this, consult the github.com/dtcenter/MET repo to determine if there is a more appropriate type, 
+and, if there is, add an override to the overRideDefinedMetDataTypes function in generator/generator.go.
+*/
+`, undefineds)
 	}
 	return metDataTypesForLines, fieldNameMap
 }
