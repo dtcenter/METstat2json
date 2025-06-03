@@ -11,6 +11,8 @@ import (
 	"strings"
 
 	buildHeaderLineTypeUtilities "github.com/NOAA-GSL/METstat2json/pkg/buildHeaderLineTypeUtilities"
+	"golang.org/x/text/cases"
+	"golang.org/x/text/language"
 )
 
 /*
@@ -239,8 +241,10 @@ func main() {
 	fmt.Println("")
 }
 
+// private functions
+
+// returns the keys of the map, sorted alphabetically
 func getSortedKeys(m map[string]string) []string {
-	// returns the keys of the map, sorted alphabetically
 	keys := make([]string, 0, len(m))
 	for k := range m {
 		keys = append(keys, k)
@@ -249,7 +253,29 @@ func getSortedKeys(m map[string]string) []string {
 	return keys
 }
 
-// private functions
+// rewrites strings to camelCase format.
+func toCamelCase(s string) string {
+	// Remove all characters that are not alphanumeric, spaces, hyphens or underscores
+	s = regexp.MustCompile("[^a-zA-Z0-9-_ ]+").ReplaceAllString(s, "")
+
+	// Replace all underscores & hyphens with spaces
+	s = strings.ReplaceAll(s, "_", " ")
+	s = strings.ReplaceAll(s, "-", " ")
+
+	// Title case s. As part of that, switch from UPPER to lower case
+	s = cases.Title(language.AmericanEnglish).String(s)
+
+	// Remove all spaces
+	s = strings.ReplaceAll(s, " ", "")
+
+	// Lowercase the first letter
+	if len(s) > 0 {
+		s = strings.ToLower(s[:1]) + s[1:]
+	}
+
+	return s
+}
+
 func getFileLineType(line string) (string, string, string, error) {
 	parts := strings.Split(line, ": VERSION")
 	if len(parts) < 2 {
@@ -333,7 +359,7 @@ func getHeaderStructureString(fileType string, lineType string, getDocIDString s
 		term = strings.ReplaceAll(term, "[0-9]*", "i")
 		name := strings.ToUpper(term)
 		_, dataType := getDataType(term, &metDataTypesForLines)
-		jsonName := strings.ToLower(name)
+		jsonName := toCamelCase(name)
 		headerStructString += fmt.Sprintf("    %-*s %s `json:\"%s\"`\n", padding, name, dataType, jsonName)
 		if term == "LINE_TYPE" && (fileType == "MODE" || fileType == "MTD") {
 			// these file types do not have a LINE_TYPE field in the header definition
@@ -381,7 +407,7 @@ func getFillStructureTerm(term string, metDataTypesForLines map[string]string, d
 	_filledStructureString := fillStructureString
 	_dataStruct := dataStruct
 	cleanTerm, dataType := getDataType(term, &metDataTypesForLines)
-	jsonTerm := strings.ToLower(cleanTerm)
+	jsonTerm := toCamelCase(cleanTerm)
 
 	_dataStruct += fmt.Sprintf("    %-*s %-*s `json:\"%s,omitempty\"`\n", padding, cleanTerm, padding2, dataType, jsonTerm)
 	var numFields int
@@ -854,40 +880,40 @@ func getPatterns() *map[string]Pattern {
 		// The structure generator needs to know what it is that is repeating. Most likely a map of some sort.
 
 		// repeating patterns
-		patterns["(n_cat)"] = Pattern{match: regexp.MustCompile(`(N_CAT)`), dType: "int", structField: "CAT", structType: "map[string]interface{}"}
-		patterns["(n_thresh)"] = Pattern{match: regexp.MustCompile(`(N_THRESH)`), dType: "int", structField: "THRESH", structType: "map[string]interface{}"}
-		patterns["(n_pts)"] = Pattern{match: regexp.MustCompile(`(N_PTS)`), dType: "int", structField: "PTS", structType: "map[string]interface{}"}
-		patterns["(n_ens)"] = Pattern{match: regexp.MustCompile(`(N_ENS)`), dType: "int", structField: "ENS", structType: "map[string]interface{}"}
-		patterns["(n_rank)"] = Pattern{match: regexp.MustCompile(`(N_RANK)`), dType: "int", structField: "RANK", structType: "map[string]interface{}"}
-		patterns["(n_bin)"] = Pattern{match: regexp.MustCompile(`(N_BIN)`), dType: "int", structField: "BIN", structType: "map[string]interface{}"}
-		patterns["(n_diag)"] = Pattern{match: regexp.MustCompile(`(N_DIAG)`), dType: "int", structField: "DIAG", structType: "map[string]interface{}"}
+		patterns["(nCat)"] = Pattern{match: regexp.MustCompile(`(N_CAT)`), dType: "int", structField: "CAT", structType: "map[string]interface{}"}
+		patterns["(nThresh)"] = Pattern{match: regexp.MustCompile(`(N_THRESH)`), dType: "int", structField: "THRESH", structType: "map[string]interface{}"}
+		patterns["(nPts)"] = Pattern{match: regexp.MustCompile(`(N_PTS)`), dType: "int", structField: "PTS", structType: "map[string]interface{}"}
+		patterns["(nEns)"] = Pattern{match: regexp.MustCompile(`(N_ENS)`), dType: "int", structField: "ENS", structType: "map[string]interface{}"}
+		patterns["(nRank)"] = Pattern{match: regexp.MustCompile(`(N_RANK)`), dType: "int", structField: "RANK", structType: "map[string]interface{}"}
+		patterns["(nBin)"] = Pattern{match: regexp.MustCompile(`(N_BIN)`), dType: "int", structField: "BIN", structType: "map[string]interface{}"}
+		patterns["(nDiag)"] = Pattern{match: regexp.MustCompile(`(N_DIAG)`), dType: "int", structField: "DIAG", structType: "map[string]interface{}"}
 		// single patterns
-		patterns["baser_n"] = Pattern{match: regexp.MustCompile("BASER_[0-9]*"), dType: "float64", structField: "BASER_I", structType: "map[string]interface{}"}
-		patterns["bin_n"] = Pattern{match: regexp.MustCompile("BIN_[0-9]*"), dType: "int", structField: "BIN_I", structType: "int"}
-		patterns["calibration_n"] = Pattern{match: regexp.MustCompile("CALIBRATION_[0-9]*"), dType: "float64", structField: "CALIBRATION_I", structType: "float64"}
-		patterns["cl_n"] = Pattern{match: regexp.MustCompile("CL_[0-9]*"), dType: "float64", structField: "CL_I", structType: "float64"}
-		patterns["diag_n"] = Pattern{match: regexp.MustCompile("DIAG_[0-9]*"), dType: "float64", structField: "DIAG_I", structType: "float64"}
-		patterns["ens_n"] = Pattern{match: regexp.MustCompile("ENS_[0-9]*"), dType: "int", structField: "ENS_I", structType: "int"}
-		patterns["fi_oi"] = Pattern{match: regexp.MustCompile("F[0-9]*_O[0-9]*"), dType: "string", structField: "FI_OI", structType: "string"}
-		patterns["azfi_azoi"] = Pattern{match: regexp.MustCompile("[A-Z]F[0-9]*_[A-Z]O[0-9]*"), dType: "string", structField: "AZFI_AZOI", structType: "string"}
-		patterns["likelihood_n"] = Pattern{match: regexp.MustCompile("LIKELIHOOD_[0-9]*"), dType: "float64", structField: "LIKELIHOOD_I", structType: "float64"}
-		patterns["aal_wind_n"] = Pattern{match: regexp.MustCompile("AAL_WIND_[0-9]*"), dType: "float64", structField: "AAL_WIND_I", structType: "float64"}
-		patterns["ase_wind_n"] = Pattern{match: regexp.MustCompile("ASE_WIND_[0-9]*"), dType: "float64", structField: "ASE_WIND_I", structType: "float64"}
-		patterns["asw_wind_n"] = Pattern{match: regexp.MustCompile("ASW_WIND_[0-9]*"), dType: "float64", structField: "ASW_WIND_I", structType: "float64"}
-		patterns["ane_wind_n"] = Pattern{match: regexp.MustCompile("ANE_WIND_[0-9]*"), dType: "float64", structField: "ANE_WIND_I", structType: "float64"}
-		patterns["anw_wind_n"] = Pattern{match: regexp.MustCompile("ANW_WIND_[0-9]*"), dType: "float64", structField: "ANW_WIND_I", structType: "float64"}
-		patterns["on_tp_n"] = Pattern{match: regexp.MustCompile("ON_TP_[0-9]*"), dType: "float64", structField: "ON_TP_I", structType: "float64"}
-		patterns["on_n"] = Pattern{match: regexp.MustCompile("ON_[0-9]*"), dType: "float64", structField: "ON_I", structType: "float64"}
-		patterns["oy_tp_n"] = Pattern{match: regexp.MustCompile("OY_TP_[0-9]*"), dType: "float64", structField: "OY_TP_I", structType: "float64"}
-		patterns["oy_n"] = Pattern{match: regexp.MustCompile("OY_[0-9]*"), dType: "float64", structField: "OY_I", structType: "float64"}
-		patterns["pody_n"] = Pattern{match: regexp.MustCompile("PODY_[0-9]*"), dType: "float64", structField: "PODY_I", structType: "float64"}
-		patterns["pofd_n"] = Pattern{match: regexp.MustCompile("POFD_[0-9]*"), dType: "float64", structField: "POFD_I", structType: "float64"}
-		patterns["prob_n"] = Pattern{match: regexp.MustCompile("PROB_[0-9]*"), dType: "float64", structField: "PROB_I", structType: "float64"}
-		patterns["rank_n"] = Pattern{match: regexp.MustCompile("RANK_[0-9]*"), dType: "int", structField: "RANK_I", structType: "int"}
-		patterns["refinement_n"] = Pattern{match: regexp.MustCompile("REFINEMENT_[0-9]*"), dType: "float64", structField: "REFINEMENT_I", structType: "float64"}
-		patterns["relp_n"] = Pattern{match: regexp.MustCompile("RELP_[0-9]*"), dType: "float64", structField: "RELP_I", structType: "float64"}
-		patterns["thresh_n"] = Pattern{match: regexp.MustCompile("THRESH_[0-9]*"), dType: "int", structField: "THRESH_I", structType: "int"}
-		patterns["value_n"] = Pattern{match: regexp.MustCompile("VALUE_[0-9]*"), dType: "int", structField: "VALUE_I", structType: "int"}
+		patterns["baserN"] = Pattern{match: regexp.MustCompile("BASER_[0-9]*"), dType: "float64", structField: "BASER_I", structType: "map[string]interface{}"}
+		patterns["binN"] = Pattern{match: regexp.MustCompile("BIN_[0-9]*"), dType: "int", structField: "BIN_I", structType: "int"}
+		patterns["calibrationN"] = Pattern{match: regexp.MustCompile("CALIBRATION_[0-9]*"), dType: "float64", structField: "CALIBRATION_I", structType: "float64"}
+		patterns["clN"] = Pattern{match: regexp.MustCompile("CL_[0-9]*"), dType: "float64", structField: "CL_I", structType: "float64"}
+		patterns["diagN"] = Pattern{match: regexp.MustCompile("DIAG_[0-9]*"), dType: "float64", structField: "DIAG_I", structType: "float64"}
+		patterns["ensN"] = Pattern{match: regexp.MustCompile("ENS_[0-9]*"), dType: "int", structField: "ENS_I", structType: "int"}
+		patterns["fiOi"] = Pattern{match: regexp.MustCompile("F[0-9]*_O[0-9]*"), dType: "string", structField: "FI_OI", structType: "string"}
+		patterns["azfiAzoi"] = Pattern{match: regexp.MustCompile("[A-Z]F[0-9]*_[A-Z]O[0-9]*"), dType: "string", structField: "AZFI_AZOI", structType: "string"}
+		patterns["likelihoodN"] = Pattern{match: regexp.MustCompile("LIKELIHOOD_[0-9]*"), dType: "float64", structField: "LIKELIHOOD_I", structType: "float64"}
+		patterns["aalWindN"] = Pattern{match: regexp.MustCompile("AAL_WIND_[0-9]*"), dType: "float64", structField: "AAL_WIND_I", structType: "float64"}
+		patterns["aseWindN"] = Pattern{match: regexp.MustCompile("ASE_WIND_[0-9]*"), dType: "float64", structField: "ASE_WIND_I", structType: "float64"}
+		patterns["aswWindN"] = Pattern{match: regexp.MustCompile("ASW_WIND_[0-9]*"), dType: "float64", structField: "ASW_WIND_I", structType: "float64"}
+		patterns["aneWindN"] = Pattern{match: regexp.MustCompile("ANE_WIND_[0-9]*"), dType: "float64", structField: "ANE_WIND_I", structType: "float64"}
+		patterns["anwWindN"] = Pattern{match: regexp.MustCompile("ANW_WIND_[0-9]*"), dType: "float64", structField: "ANW_WIND_I", structType: "float64"}
+		patterns["onTpN"] = Pattern{match: regexp.MustCompile("ON_TP_[0-9]*"), dType: "float64", structField: "ON_TP_I", structType: "float64"}
+		patterns["onN"] = Pattern{match: regexp.MustCompile("ON_[0-9]*"), dType: "float64", structField: "ON_I", structType: "float64"}
+		patterns["oyTpN"] = Pattern{match: regexp.MustCompile("OY_TP_[0-9]*"), dType: "float64", structField: "OY_TP_I", structType: "float64"}
+		patterns["oyN"] = Pattern{match: regexp.MustCompile("OY_[0-9]*"), dType: "float64", structField: "OY_I", structType: "float64"}
+		patterns["podyN"] = Pattern{match: regexp.MustCompile("PODY_[0-9]*"), dType: "float64", structField: "PODY_I", structType: "float64"}
+		patterns["pofdN"] = Pattern{match: regexp.MustCompile("POFD_[0-9]*"), dType: "float64", structField: "POFD_I", structType: "float64"}
+		patterns["probN"] = Pattern{match: regexp.MustCompile("PROB_[0-9]*"), dType: "float64", structField: "PROB_I", structType: "float64"}
+		patterns["rankN"] = Pattern{match: regexp.MustCompile("RANK_[0-9]*"), dType: "int", structField: "RANK_I", structType: "int"}
+		patterns["refinementN"] = Pattern{match: regexp.MustCompile("REFINEMENT_[0-9]*"), dType: "float64", structField: "REFINEMENT_I", structType: "float64"}
+		patterns["relpN"] = Pattern{match: regexp.MustCompile("RELP_[0-9]*"), dType: "float64", structField: "RELP_I", structType: "float64"}
+		patterns["threshN"] = Pattern{match: regexp.MustCompile("THRESH_[0-9]*"), dType: "int", structField: "THRESH_I", structType: "int"}
+		patterns["valueN"] = Pattern{match: regexp.MustCompile("VALUE_[0-9]*"), dType: "int", structField: "VALUE_I", structType: "int"}
 	}
 	return &patterns
 }
