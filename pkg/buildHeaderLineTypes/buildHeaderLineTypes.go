@@ -91,7 +91,7 @@ func main() {
 	var version string
 	flag.StringVar(&version, "version", "", "Specify the parser version (e.g., -version=v12.0|v11.1|v11.0|v10.1|v10.0)")
 	flag.Parse()
-	parserVersion := strings.Replace(version, ".", "_", -1)
+	parserVersion := strings.ReplaceAll(version, ".", "_")
 	err := setMetVersion(parserVersion)
 	if err != nil {
 		fmt.Println("error setting MET version: ", err)
@@ -191,34 +191,36 @@ func main() {
 			}
 		}
 	}`)
-	// print the header structs
+	// print the header structs in order
 	fmt.Println("")
 	fmt.Println("//Header struct definitions")
-	for _, headerStruct := range headerStructs {
-		// print the struct
-		fmt.Println(headerStruct)
+	hsKeys := getSortedKeys(headerStructs)
+	for _, key := range hsKeys {
+		fmt.Println(headerStructs[key])
 	}
-	// print the fillHeader functions
+	// print the fillHeader functions in order
 	fmt.Println("")
 	fmt.Println("//fillHeader functions")
-	for _, fillHeaderFunc := range fillHeaderFuncs {
-		// print the function
-		fmt.Println(fillHeaderFunc)
+	fhKeys := getSortedKeys(fillHeaderFuncs)
+	for _, key := range fhKeys {
+		fmt.Println(fillHeaderFuncs[key])
 	}
 
-	// print the data structs
+	// print the data structs in order
 	fmt.Println("")
 	fmt.Println("//line data struct definitions")
-	for _, dataStruct := range dataStructs {
-		fmt.Println(dataStruct)
+	dsKeys := getSortedKeys(dataStructs)
+	for _, key := range dsKeys {
+		fmt.Println(dataStructs[key])
 	}
 
-	// print the fillStructure functions
+	// print the fillStructure functions in order
 	fmt.Println("")
 	fmt.Println("//fillStructure functions")
-	for _, fillStructureFunc := range fillDataFuncs {
+	fdfKeys := getSortedKeys(fillDataFuncs)
+	for _, key := range fdfKeys {
 		// print the function
-		fmt.Println(fillStructureFunc)
+		fmt.Println(fillDataFuncs[key])
 	}
 
 	// print the getDocForId functions
@@ -235,6 +237,16 @@ func main() {
 	fmt.Println("")
 	fmt.Println("var MetHeaderColumnsFileUrl = \"" + metHeaderColumnsFileUrl + "\"")
 	fmt.Println("")
+}
+
+func getSortedKeys(m map[string]string) []string {
+	// returns the keys of the map, sorted alphabetically
+	keys := make([]string, 0, len(m))
+	for k := range m {
+		keys = append(keys, k)
+	}
+	slices.Sort(keys)
+	return keys
 }
 
 // private functions
@@ -316,9 +328,9 @@ func getHeaderStructureString(fileType string, lineType string, getDocIDString s
 			continue
 		}
 		// change regex type terms
-		term = strings.Replace(term, "(", "", -1)
-		term = strings.Replace(term, ")", "", -1)
-		term = strings.Replace(term, "[0-9]*", "i", -1)
+		term = strings.ReplaceAll(term, "(", "")
+		term = strings.ReplaceAll(term, ")", "")
+		term = strings.ReplaceAll(term, "[0-9]*", "i")
 		name := strings.ToUpper(term)
 		_, dataType := getDataType(term, &metDataTypesForLines)
 		jsonName := strings.ToLower(name)
@@ -506,17 +518,18 @@ func getFillStructureSequenceString(keyPrefixes []string, cleanTerm string, elem
 	var convStr string
 	// sometimes we need to do a nilCheck (if it is a conversion to an int) - otherwise we will get a panic
 	keyPrefixesStr := `"` + strings.Join(keyPrefixes, `","`) + `"`
-	if elemType == "float64" {
+	switch elemType {
+	case "float64":
 		convStr = `value, err = strconv.ParseFloat(fields[index],64)
 					if err != nil { // sometimes there can be these NA values in the data, which will be left out of json
 						value = "NA"
 					}`
-	} else if elemType == "int" {
+	case "int":
 		convStr = `value, err = strconv.Atoi(fields[index])
 					if err != nil { // sometimes there can be these NA values in the data, which will be left out of json
 						value = "NA"
 					}`
-	} else {
+	default:
 		convStr = "value = fields[index]"
 	}
 	str := `    // the first field of the repeating fields is the TOTAL, the second field is the 1st dimenSion of the 1st sequence (there might be only one sequence)
@@ -664,19 +677,19 @@ func fillMetDataMapFromUserGuide(metDataTypesForLines, fieldNameMap map[string]s
 					i++
 					line = docFileLines[i]
 					// remove possible embedded html - ugh!
-					line = strings.Replace(line, ":raw-html:`<br />`", "", -1)
-					line = strings.Replace(line, `\`, "", -1)
+					line = strings.ReplaceAll(line, ":raw-html:`<br />`", "")
+					line = strings.ReplaceAll(line, `\`, "")
 					if line == "    -" {
 						break // this table is formatted poorly (empty fieldName), go to the next one.
 					}
 					parts = linePrefix.Split(line, -1)
-					fieldName := strings.Replace(parts[1], " ", "", -1) // remove extra spaces
-					parts := strings.Split(fieldName, "/")              // remove any front slashes
+					fieldName := strings.ReplaceAll(parts[1], " ", "") // remove extra spaces
+					parts := strings.Split(fieldName, "/")             // remove any front slashes
 					if len(parts) > 1 {
 						fieldName = parts[1]
 					}
 					// It seems that the actual fieldNames that are specified in the doc as abc_i are labeled as abc_[0-9]* in the code
-					fieldName = strings.Replace(fieldName, `_i`, `_[0-9]*`, -1) // replace _i with _[0-9]
+					fieldName = strings.ReplaceAll(fieldName, `_i`, `_[0-9]*`) // replace _i with _[0-9]
 					// skip the description line
 					i = i + 2
 					line = docFileLines[i]
@@ -722,7 +735,7 @@ func fillMetDataMapFromUserGuide(metDataTypesForLines, fieldNameMap map[string]s
 						if len(majorFields) > 1 {
 							for _, majorField := range majorFields {
 								// remove any  remaining spaces - some fields have nonsense spaces in them
-								subfield := strings.Replace(majorField, " ", "", -1)
+								subfield := strings.ReplaceAll(majorField, " ", "")
 								fields = append(fields, subfield)
 							}
 						} else {
@@ -792,7 +805,7 @@ func overRideDefinedMetDataTypes(metDataTypesForLines map[string]string, fieldNa
 
 	// Uncomment the following to look for missing data types in the MET user guide files.
 	var found bool
-	var undefineds []string = []string{}
+	undefineds := []string{}
 	for k, v := range fieldNameMap {
 		if v == "UNDEFINED" {
 			found = false
@@ -808,7 +821,10 @@ func overRideDefinedMetDataTypes(metDataTypesForLines map[string]string, fieldNa
 		}
 	}
 	if len(undefineds) > 0 {
-		fmt.Printf("\n/*undefined: %v*/\n", undefineds)
+		slices.Sort(undefineds)
+		fmt.Printf("\n/*\nThe following data types were not found in the MET user guide files or the MET source code files.\n")
+		fmt.Printf("\n TODO - add an actionable message.\n")
+		fmt.Printf("\nUndefined data types: %v*/\n", undefineds)
 	}
 	return metDataTypesForLines, fieldNameMap
 }
