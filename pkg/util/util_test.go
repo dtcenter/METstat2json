@@ -1,4 +1,4 @@
-package buildHeaderLineTypeUtilities
+package util
 
 import (
 	"testing"

@@ -1,4 +1,11 @@
-package metLineTypeDefinitions_v12_0
+/*
+The following data types were not found in the MET user guide files or the MET source code files.
+
+	TODO - add an actionable message.
+
+Undefined data types: [S12 S13 S21 S23 S31 S32]
+*/
+package v11_1
 
 import (
 	"errors"
@@ -9,10 +16,9 @@ import (
 
 /*
 THIS CODE IS AUTOMATICALLY GENERATED - DO NOT EDIT THIS CODE
-To modify this code - modify the buildHeaderLineTypes.go file and run the buildHeaderLineTypes.go program
-cd  <repo path>/metlinetypes/pkg/buildHeaderLineTypes
-go run . > /tmp/types.go
-cp /tmp/types.go ../metLineTypeDefinitions/metLineTypeDefinitions.go
+To modify this code - modify the generator.go file and run the generator.go program
+cd  <repo_root>
+go run generator -version=v12.0 > pkg/linetypes/v12_0/linetypes.go
 */
 
 func GetLeadFromInitValid(data []string, dataFieldIndex int) string {
@@ -106,84 +112,6 @@ type MODE_OBJ_header struct {
 	OBS_LEV    string  `json:"obsLev"`
 	OBTYPE     string  `json:"obtype"`
 	LINE_TYPE  string  `json:"lineType"`
-}
-
-type MTD_2DSINGLE_header struct {
-	VERSION    string `json:"version"`
-	MODEL      string `json:"model"`
-	DESC       string `json:"desc"`
-	FCST_LEAD  int    `json:"fcstLead"`
-	FCST_VALID string `json:"fcstValid"`
-	OBS_LEAD   int    `json:"obsLead"`
-	OBS_VALID  string `json:"obsValid"`
-	T_DELTA    string `json:"tDelta"`
-	FCST_T_BEG int    `json:"fcstTBeg"`
-	FCST_T_END int    `json:"fcstTEnd"`
-	FCST_RAD   int    `json:"fcstRad"`
-	FCST_THR   string `json:"fcstThr"`
-	OBS_T_BEG  int    `json:"obsTBeg"`
-	OBS_T_END  int    `json:"obsTEnd"`
-	OBS_RAD    int    `json:"obsRad"`
-	OBS_THR    string `json:"obsThr"`
-	FCST_VAR   string `json:"fcstVar"`
-	FCST_UNITS string `json:"fcstUnits"`
-	FCST_LEV   string `json:"fcstLev"`
-	OBS_VAR    string `json:"obsVar"`
-	OBS_UNITS  string `json:"obsUnits"`
-	OBS_LEV    string `json:"obsLev"`
-	LINE_TYPE  string `json:"lineType"`
-}
-
-type MTD_3DPAIR_header struct {
-	VERSION    string `json:"version"`
-	MODEL      string `json:"model"`
-	DESC       string `json:"desc"`
-	FCST_LEAD  int    `json:"fcstLead"`
-	FCST_VALID string `json:"fcstValid"`
-	OBS_LEAD   int    `json:"obsLead"`
-	OBS_VALID  string `json:"obsValid"`
-	T_DELTA    string `json:"tDelta"`
-	FCST_T_BEG int    `json:"fcstTBeg"`
-	FCST_T_END int    `json:"fcstTEnd"`
-	FCST_RAD   int    `json:"fcstRad"`
-	FCST_THR   string `json:"fcstThr"`
-	OBS_T_BEG  int    `json:"obsTBeg"`
-	OBS_T_END  int    `json:"obsTEnd"`
-	OBS_RAD    int    `json:"obsRad"`
-	OBS_THR    string `json:"obsThr"`
-	FCST_VAR   string `json:"fcstVar"`
-	FCST_UNITS string `json:"fcstUnits"`
-	FCST_LEV   string `json:"fcstLev"`
-	OBS_VAR    string `json:"obsVar"`
-	OBS_UNITS  string `json:"obsUnits"`
-	OBS_LEV    string `json:"obsLev"`
-	LINE_TYPE  string `json:"lineType"`
-}
-
-type MTD_3DSINGLE_header struct {
-	VERSION    string `json:"version"`
-	MODEL      string `json:"model"`
-	DESC       string `json:"desc"`
-	FCST_LEAD  int    `json:"fcstLead"`
-	FCST_VALID string `json:"fcstValid"`
-	OBS_LEAD   int    `json:"obsLead"`
-	OBS_VALID  string `json:"obsValid"`
-	T_DELTA    string `json:"tDelta"`
-	FCST_T_BEG int    `json:"fcstTBeg"`
-	FCST_T_END int    `json:"fcstTEnd"`
-	FCST_RAD   int    `json:"fcstRad"`
-	FCST_THR   string `json:"fcstThr"`
-	OBS_T_BEG  int    `json:"obsTBeg"`
-	OBS_T_END  int    `json:"obsTEnd"`
-	OBS_RAD    int    `json:"obsRad"`
-	OBS_THR    string `json:"obsThr"`
-	FCST_VAR   string `json:"fcstVar"`
-	FCST_UNITS string `json:"fcstUnits"`
-	FCST_LEV   string `json:"fcstLev"`
-	OBS_VAR    string `json:"obsVar"`
-	OBS_UNITS  string `json:"obsUnits"`
-	OBS_LEV    string `json:"obsLev"`
-	LINE_TYPE  string `json:"lineType"`
 }
 
 type STAT_CNT_header struct {
@@ -1212,159 +1140,6 @@ func (s *MODE_OBJ) fill_MODE_OBJ_Header(fields []string, doc *map[string]interfa
 	i++
 	SetValueForField(doc, "MODE", "OBTYPE", i, dataLen, fields, 21, "string")
 	(*doc)["LINE_TYPE"] = "MODE_OBJ"
-}
-
-func (s *MTD_2DSINGLE) fill_MTD_2DSINGLE_Header(fields []string, doc *map[string]interface{}) {
-	dataLen := len(fields)
-	i := -1
-	// fill the met fields leaving out "" and NA values
-	i++
-	SetValueForField(doc, "MTD", "VERSION", i, dataLen, fields, 0, "string")
-	i++
-	SetValueForField(doc, "MTD", "MODEL", i, dataLen, fields, 1, "string")
-	i++
-	SetValueForField(doc, "MTD", "DESC", i, dataLen, fields, 2, "string")
-	i++
-	SetValueForField(doc, "MTD", "FCST_LEAD", i, dataLen, fields, 3, "int")
-	i++
-	SetValueForField(doc, "MTD", "FCST_VALID", i, dataLen, fields, 4, "string")
-	i++
-	SetValueForField(doc, "MTD", "OBS_LEAD", i, dataLen, fields, 5, "int")
-	i++
-	SetValueForField(doc, "MTD", "OBS_VALID", i, dataLen, fields, 6, "string")
-	i++
-	SetValueForField(doc, "MTD", "T_DELTA", i, dataLen, fields, 7, "string")
-	i++
-	SetValueForField(doc, "MTD", "FCST_T_BEG", i, dataLen, fields, 8, "int")
-	i++
-	SetValueForField(doc, "MTD", "FCST_T_END", i, dataLen, fields, 9, "int")
-	i++
-	SetValueForField(doc, "MTD", "FCST_RAD", i, dataLen, fields, 10, "int")
-	i++
-	SetValueForField(doc, "MTD", "FCST_THR", i, dataLen, fields, 11, "string")
-	i++
-	SetValueForField(doc, "MTD", "OBS_T_BEG", i, dataLen, fields, 12, "int")
-	i++
-	SetValueForField(doc, "MTD", "OBS_T_END", i, dataLen, fields, 13, "int")
-	i++
-	SetValueForField(doc, "MTD", "OBS_RAD", i, dataLen, fields, 14, "int")
-	i++
-	SetValueForField(doc, "MTD", "OBS_THR", i, dataLen, fields, 15, "string")
-	i++
-	SetValueForField(doc, "MTD", "FCST_VAR", i, dataLen, fields, 16, "string")
-	i++
-	SetValueForField(doc, "MTD", "FCST_UNITS", i, dataLen, fields, 17, "string")
-	i++
-	SetValueForField(doc, "MTD", "FCST_LEV", i, dataLen, fields, 18, "string")
-	i++
-	SetValueForField(doc, "MTD", "OBS_VAR", i, dataLen, fields, 19, "string")
-	i++
-	SetValueForField(doc, "MTD", "OBS_UNITS", i, dataLen, fields, 20, "string")
-	i++
-	SetValueForField(doc, "MTD", "OBS_LEV", i, dataLen, fields, 21, "string")
-	(*doc)["LINE_TYPE"] = "MTD_2DSINGLE"
-}
-
-func (s *MTD_3DPAIR) fill_MTD_3DPAIR_Header(fields []string, doc *map[string]interface{}) {
-	dataLen := len(fields)
-	i := -1
-	// fill the met fields leaving out "" and NA values
-	i++
-	SetValueForField(doc, "MTD", "VERSION", i, dataLen, fields, 0, "string")
-	i++
-	SetValueForField(doc, "MTD", "MODEL", i, dataLen, fields, 1, "string")
-	i++
-	SetValueForField(doc, "MTD", "DESC", i, dataLen, fields, 2, "string")
-	i++
-	SetValueForField(doc, "MTD", "FCST_LEAD", i, dataLen, fields, 3, "int")
-	i++
-	SetValueForField(doc, "MTD", "FCST_VALID", i, dataLen, fields, 4, "string")
-	i++
-	SetValueForField(doc, "MTD", "OBS_LEAD", i, dataLen, fields, 5, "int")
-	i++
-	SetValueForField(doc, "MTD", "OBS_VALID", i, dataLen, fields, 6, "string")
-	i++
-	SetValueForField(doc, "MTD", "T_DELTA", i, dataLen, fields, 7, "string")
-	i++
-	SetValueForField(doc, "MTD", "FCST_T_BEG", i, dataLen, fields, 8, "int")
-	i++
-	SetValueForField(doc, "MTD", "FCST_T_END", i, dataLen, fields, 9, "int")
-	i++
-	SetValueForField(doc, "MTD", "FCST_RAD", i, dataLen, fields, 10, "int")
-	i++
-	SetValueForField(doc, "MTD", "FCST_THR", i, dataLen, fields, 11, "string")
-	i++
-	SetValueForField(doc, "MTD", "OBS_T_BEG", i, dataLen, fields, 12, "int")
-	i++
-	SetValueForField(doc, "MTD", "OBS_T_END", i, dataLen, fields, 13, "int")
-	i++
-	SetValueForField(doc, "MTD", "OBS_RAD", i, dataLen, fields, 14, "int")
-	i++
-	SetValueForField(doc, "MTD", "OBS_THR", i, dataLen, fields, 15, "string")
-	i++
-	SetValueForField(doc, "MTD", "FCST_VAR", i, dataLen, fields, 16, "string")
-	i++
-	SetValueForField(doc, "MTD", "FCST_UNITS", i, dataLen, fields, 17, "string")
-	i++
-	SetValueForField(doc, "MTD", "FCST_LEV", i, dataLen, fields, 18, "string")
-	i++
-	SetValueForField(doc, "MTD", "OBS_VAR", i, dataLen, fields, 19, "string")
-	i++
-	SetValueForField(doc, "MTD", "OBS_UNITS", i, dataLen, fields, 20, "string")
-	i++
-	SetValueForField(doc, "MTD", "OBS_LEV", i, dataLen, fields, 21, "string")
-	(*doc)["LINE_TYPE"] = "MTD_3DPAIR"
-}
-
-func (s *MTD_3DSINGLE) fill_MTD_3DSINGLE_Header(fields []string, doc *map[string]interface{}) {
-	dataLen := len(fields)
-	i := -1
-	// fill the met fields leaving out "" and NA values
-	i++
-	SetValueForField(doc, "MTD", "VERSION", i, dataLen, fields, 0, "string")
-	i++
-	SetValueForField(doc, "MTD", "MODEL", i, dataLen, fields, 1, "string")
-	i++
-	SetValueForField(doc, "MTD", "DESC", i, dataLen, fields, 2, "string")
-	i++
-	SetValueForField(doc, "MTD", "FCST_LEAD", i, dataLen, fields, 3, "int")
-	i++
-	SetValueForField(doc, "MTD", "FCST_VALID", i, dataLen, fields, 4, "string")
-	i++
-	SetValueForField(doc, "MTD", "OBS_LEAD", i, dataLen, fields, 5, "int")
-	i++
-	SetValueForField(doc, "MTD", "OBS_VALID", i, dataLen, fields, 6, "string")
-	i++
-	SetValueForField(doc, "MTD", "T_DELTA", i, dataLen, fields, 7, "string")
-	i++
-	SetValueForField(doc, "MTD", "FCST_T_BEG", i, dataLen, fields, 8, "int")
-	i++
-	SetValueForField(doc, "MTD", "FCST_T_END", i, dataLen, fields, 9, "int")
-	i++
-	SetValueForField(doc, "MTD", "FCST_RAD", i, dataLen, fields, 10, "int")
-	i++
-	SetValueForField(doc, "MTD", "FCST_THR", i, dataLen, fields, 11, "string")
-	i++
-	SetValueForField(doc, "MTD", "OBS_T_BEG", i, dataLen, fields, 12, "int")
-	i++
-	SetValueForField(doc, "MTD", "OBS_T_END", i, dataLen, fields, 13, "int")
-	i++
-	SetValueForField(doc, "MTD", "OBS_RAD", i, dataLen, fields, 14, "int")
-	i++
-	SetValueForField(doc, "MTD", "OBS_THR", i, dataLen, fields, 15, "string")
-	i++
-	SetValueForField(doc, "MTD", "FCST_VAR", i, dataLen, fields, 16, "string")
-	i++
-	SetValueForField(doc, "MTD", "FCST_UNITS", i, dataLen, fields, 17, "string")
-	i++
-	SetValueForField(doc, "MTD", "FCST_LEV", i, dataLen, fields, 18, "string")
-	i++
-	SetValueForField(doc, "MTD", "OBS_VAR", i, dataLen, fields, 19, "string")
-	i++
-	SetValueForField(doc, "MTD", "OBS_UNITS", i, dataLen, fields, 20, "string")
-	i++
-	SetValueForField(doc, "MTD", "OBS_LEV", i, dataLen, fields, 21, "string")
-	(*doc)["LINE_TYPE"] = "MTD_3DSINGLE"
 }
 
 func (s *STAT_CNT) fill_STAT_CNT_Header(fields []string, doc *map[string]interface{}) {
@@ -3246,13 +3021,6 @@ type MODE_CTS struct {
 	HK    float64 `json:"hk,omitempty"`
 	HSS   float64 `json:"hss,omitempty"`
 	ODDS  float64 `json:"odds,omitempty"`
-	LODDS float64 `json:"lodds,omitempty"`
-	ORSS  float64 `json:"orss,omitempty"`
-	EDS   float64 `json:"eds,omitempty"`
-	SEDS  float64 `json:"seds,omitempty"`
-	EDI   float64 `json:"edi,omitempty"`
-	SEDI  float64 `json:"sedi,omitempty"`
-	BAGSS float64 `json:"bagss,omitempty"`
 }
 
 type MODE_OBJ struct {
@@ -3292,63 +3060,6 @@ type MODE_OBJ struct {
 	COMPLEXITY_RATIO           float64 `json:"complexityRatio,omitempty"`
 	PERCENTILE_INTENSITY_RATIO float64 `json:"percentileIntensityRatio,omitempty"`
 	INTEREST                   float64 `json:"interest,omitempty"`
-}
-
-type MTD_2DSINGLE struct {
-	OBJECT_ID      string  `json:"objectId,omitempty"`
-	OBJECT_CAT     string  `json:"objectCat,omitempty"`
-	TIME_INDEX     int     `json:"timeIndex,omitempty"`
-	AREA           int     `json:"area,omitempty"`
-	CENTROID_X     float64 `json:"centroidX,omitempty"`
-	CENTROID_Y     float64 `json:"centroidY,omitempty"`
-	CENTROID_LAT   float64 `json:"centroidLat,omitempty"`
-	CENTROID_LON   float64 `json:"centroidLon,omitempty"`
-	AXIS_ANG       float64 `json:"axisAng,omitempty"`
-	INTENSITY_10   float64 `json:"intensity10,omitempty"`
-	INTENSITY_25   float64 `json:"intensity25,omitempty"`
-	INTENSITY_50   float64 `json:"intensity50,omitempty"`
-	INTENSITY_75   float64 `json:"intensity75,omitempty"`
-	INTENSITY_90   float64 `json:"intensity90,omitempty"`
-	INTENSITY_USER float64 `json:"intensityUser,omitempty"`
-}
-
-type MTD_3DPAIR struct {
-	OBJECT_ID           string  `json:"objectId,omitempty"`
-	OBJECT_CAT          string  `json:"objectCat,omitempty"`
-	SPACE_CENTROID_DIST float64 `json:"spaceCentroidDist,omitempty"`
-	TIME_CENTROID_DELTA float64 `json:"timeCentroidDelta,omitempty"`
-	AXIS_DIFF           float64 `json:"axisDiff,omitempty"`
-	SPEED_DELTA         float64 `json:"speedDelta,omitempty"`
-	DIRECTION_DIFF      float64 `json:"directionDiff,omitempty"`
-	VOLUME_RATIO        float64 `json:"volumeRatio,omitempty"`
-	START_TIME_DELTA    int     `json:"startTimeDelta,omitempty"`
-	END_TIME_DELTA      int     `json:"endTimeDelta,omitempty"`
-	INTERSECTION_VOLUME float64 `json:"intersectionVolume,omitempty"`
-	DURATION_DIFF       float64 `json:"durationDiff,omitempty"`
-	INTEREST            float64 `json:"interest,omitempty"`
-}
-
-type MTD_3DSINGLE struct {
-	OBJECT_ID       string  `json:"objectId,omitempty"`
-	OBJECT_CAT      string  `json:"objectCat,omitempty"`
-	CENTROID_X      float64 `json:"centroidX,omitempty"`
-	CENTROID_Y      float64 `json:"centroidY,omitempty"`
-	CENTROID_T      float64 `json:"centroidT,omitempty"`
-	CENTROID_LAT    float64 `json:"centroidLat,omitempty"`
-	CENTROID_LON    float64 `json:"centroidLon,omitempty"`
-	X_DOT           float64 `json:"xDot,omitempty"`
-	Y_DOT           float64 `json:"yDot,omitempty"`
-	AXIS_ANG        float64 `json:"axisAng,omitempty"`
-	VOLUME          int     `json:"volume,omitempty"`
-	START_TIME      int     `json:"startTime,omitempty"`
-	END_TIME        int     `json:"endTime,omitempty"`
-	CDIST_TRAVELLED float64 `json:"cdistTravelled,omitempty"`
-	INTENSITY_10    float64 `json:"intensity10,omitempty"`
-	INTENSITY_25    float64 `json:"intensity25,omitempty"`
-	INTENSITY_50    float64 `json:"intensity50,omitempty"`
-	INTENSITY_75    float64 `json:"intensity75,omitempty"`
-	INTENSITY_90    float64 `json:"intensity90,omitempty"`
-	INTENSITY_USER  float64 `json:"intensityUser,omitempty"`
 }
 
 type STAT_CNT struct {
@@ -3623,8 +3334,6 @@ type STAT_ECNT struct {
 	ME_GE_OBS        float64 `json:"meGeObs,omitempty"`
 	N_LT_OBS         int     `json:"nLtObs,omitempty"`
 	ME_LT_OBS        float64 `json:"meLtObs,omitempty"`
-	IGN_CONV_OERR    float64 `json:"ignConvOerr,omitempty"`
-	IGN_CORR_OERR    float64 `json:"ignCorrOerr,omitempty"`
 }
 
 type STAT_FHO struct {
@@ -3713,21 +3422,19 @@ type STAT_MCTS struct {
 }
 
 type STAT_MPR struct {
-	TOTAL            int     `json:"total,omitempty"`
-	INDEX            int     `json:"index,omitempty"`
-	OBS_SID          string  `json:"obsSid,omitempty"`
-	OBS_LAT          float64 `json:"obsLat,omitempty"`
-	OBS_LON          float64 `json:"obsLon,omitempty"`
-	OBS_LVL          float64 `json:"obsLvl,omitempty"`
-	OBS_ELV          float64 `json:"obsElv,omitempty"`
-	FCST             float64 `json:"fcst,omitempty"`
-	OBS              float64 `json:"obs,omitempty"`
-	OBS_QC           string  `json:"obsQc,omitempty"`
-	OBS_CLIMO_MEAN   float64 `json:"obsClimoMean,omitempty"`
-	OBS_CLIMO_STDEV  float64 `json:"obsClimoStdev,omitempty"`
-	OBS_CLIMO_CDF    float64 `json:"obsClimoCdf,omitempty"`
-	FCST_CLIMO_MEAN  float64 `json:"fcstClimoMean,omitempty"`
-	FCST_CLIMO_STDEV float64 `json:"fcstClimoStdev,omitempty"`
+	TOTAL       int     `json:"total,omitempty"`
+	INDEX       int     `json:"index,omitempty"`
+	OBS_SID     string  `json:"obsSid,omitempty"`
+	OBS_LAT     float64 `json:"obsLat,omitempty"`
+	OBS_LON     float64 `json:"obsLon,omitempty"`
+	OBS_LVL     float64 `json:"obsLvl,omitempty"`
+	OBS_ELV     float64 `json:"obsElv,omitempty"`
+	FCST        float64 `json:"fcst,omitempty"`
+	OBS         float64 `json:"obs,omitempty"`
+	OBS_QC      string  `json:"obsQc,omitempty"`
+	CLIMO_MEAN  float64 `json:"climoMean,omitempty"`
+	CLIMO_STDEV float64 `json:"climoStdev,omitempty"`
+	CLIMO_CDF   float64 `json:"climoCdf,omitempty"`
 }
 
 type STAT_NBRCNT struct {
@@ -3871,14 +3578,12 @@ type STAT_ORANK struct {
 	ENS              map[string]interface{} `json:"ens,omitempty"`
 	OBS_QC           string                 `json:"obsQc,omitempty"`
 	ENS_MEAN         int                    `json:"ensMean,omitempty"`
-	OBS_CLIMO_MEAN   float64                `json:"obsClimoMean,omitempty"`
+	CLIMO_MEAN       float64                `json:"climoMean,omitempty"`
 	SPREAD           float64                `json:"spread,omitempty"`
 	ENS_MEAN_OERR    int                    `json:"ensMeanOerr,omitempty"`
 	SPREAD_OERR      float64                `json:"spreadOerr,omitempty"`
 	SPREAD_PLUS_OERR float64                `json:"spreadPlusOerr,omitempty"`
-	OBS_CLIMO_STDEV  float64                `json:"obsClimoStdev,omitempty"`
-	FCST_CLIMO_MEAN  float64                `json:"fcstClimoMean,omitempty"`
-	FCST_CLIMO_STDEV float64                `json:"fcstClimoStdev,omitempty"`
+	CLIMO_STDEV      float64                `json:"climoStdev,omitempty"`
 }
 
 type STAT_PCT struct {
@@ -3956,12 +3661,12 @@ type STAT_SAL1L2 struct {
 
 type STAT_SEEPS struct {
 	TOTAL     int     `json:"total,omitempty"`
-	ODFL      float64 `json:"odfl,omitempty"`
-	ODFH      float64 `json:"odfh,omitempty"`
-	OLFD      float64 `json:"olfd,omitempty"`
-	OLFH      float64 `json:"olfh,omitempty"`
-	OHFD      float64 `json:"ohfd,omitempty"`
-	OHFL      float64 `json:"ohfl,omitempty"`
+	S12       string  `json:"s12,omitempty"`
+	S13       string  `json:"s13,omitempty"`
+	S21       string  `json:"s21,omitempty"`
+	S23       string  `json:"s23,omitempty"`
+	S31       string  `json:"s31,omitempty"`
+	S32       string  `json:"s32,omitempty"`
 	PF1       float64 `json:"pf1,omitempty"`
 	PF2       float64 `json:"pf2,omitempty"`
 	PF3       float64 `json:"pf3,omitempty"`
@@ -4057,10 +3762,6 @@ type STAT_VAL1L2 struct {
 	UVOOABAR     float64 `json:"uvooabar,omitempty"`
 	FA_SPEED_BAR float64 `json:"faSpeedBar,omitempty"`
 	OA_SPEED_BAR float64 `json:"oaSpeedBar,omitempty"`
-	TOTAL_DIR    float64 `json:"totalDir,omitempty"`
-	DIRA_ME      float64 `json:"diraMe,omitempty"`
-	DIRA_MAE     float64 `json:"diraMae,omitempty"`
-	DIRA_MSE     float64 `json:"diraMse,omitempty"`
 }
 
 type STAT_VCNT struct {
@@ -4127,19 +3828,6 @@ type STAT_VCNT struct {
 	ANOM_CORR_UNCNTR     float64 `json:"anomCorrUncntr,omitempty"`
 	ANOM_CORR_UNCNTR_BCL float64 `json:"anomCorrUncntrBcl,omitempty"`
 	ANOM_CORR_UNCNTR_BCU float64 `json:"anomCorrUncntrBcu,omitempty"`
-	TOTAL_DIR            float64 `json:"totalDir,omitempty"`
-	DIR_ME               float64 `json:"dirMe,omitempty"`
-	DIR_ME_BCL           float64 `json:"dirMeBcl,omitempty"`
-	DIR_ME_BCU           float64 `json:"dirMeBcu,omitempty"`
-	DIR_MAE              float64 `json:"dirMae,omitempty"`
-	DIR_MAE_BCL          float64 `json:"dirMaeBcl,omitempty"`
-	DIR_MAE_BCU          float64 `json:"dirMaeBcu,omitempty"`
-	DIR_MSE              float64 `json:"dirMse,omitempty"`
-	DIR_MSE_BCL          float64 `json:"dirMseBcl,omitempty"`
-	DIR_MSE_BCU          float64 `json:"dirMseBcu,omitempty"`
-	DIR_RMSE             float64 `json:"dirRmse,omitempty"`
-	DIR_RMSE_BCL         float64 `json:"dirRmseBcl,omitempty"`
-	DIR_RMSE_BCU         float64 `json:"dirRmseBcu,omitempty"`
 }
 
 type STAT_VL1L2 struct {
@@ -4153,10 +3841,6 @@ type STAT_VL1L2 struct {
 	UVOOBAR     float64 `json:"uvoobar,omitempty"`
 	F_SPEED_BAR float64 `json:"fSpeedBar,omitempty"`
 	O_SPEED_BAR float64 `json:"oSpeedBar,omitempty"`
-	TOTAL_DIR   float64 `json:"totalDir,omitempty"`
-	DIR_ME      float64 `json:"dirMe,omitempty"`
-	DIR_MAE     float64 `json:"dirMae,omitempty"`
-	DIR_MSE     float64 `json:"dirMse,omitempty"`
 }
 
 type TCST_PROBRIRW struct {
@@ -4351,34 +4035,6 @@ func (s *MODE_CTS) fill_MODE_CTS(fields []string) {
 	if i <= dataLen {
 		s.ODDS, _ = strconv.ParseFloat(fields[18], 64)
 	}
-	i++
-	if i <= dataLen {
-		s.LODDS, _ = strconv.ParseFloat(fields[19], 64)
-	}
-	i++
-	if i <= dataLen {
-		s.ORSS, _ = strconv.ParseFloat(fields[20], 64)
-	}
-	i++
-	if i <= dataLen {
-		s.EDS, _ = strconv.ParseFloat(fields[21], 64)
-	}
-	i++
-	if i <= dataLen {
-		s.SEDS, _ = strconv.ParseFloat(fields[22], 64)
-	}
-	i++
-	if i <= dataLen {
-		s.EDI, _ = strconv.ParseFloat(fields[23], 64)
-	}
-	i++
-	if i <= dataLen {
-		s.SEDI, _ = strconv.ParseFloat(fields[24], 64)
-	}
-	i++
-	if i <= dataLen {
-		s.BAGSS, _ = strconv.ParseFloat(fields[25], 64)
-	}
 }
 
 func (s *MODE_OBJ) fill_MODE_OBJ(fields []string) {
@@ -4531,225 +4187,6 @@ func (s *MODE_OBJ) fill_MODE_OBJ(fields []string) {
 	i++
 	if i <= dataLen {
 		s.INTEREST, _ = strconv.ParseFloat(fields[35], 64)
-	}
-}
-
-func (s *MTD_2DSINGLE) fill_MTD_2DSINGLE(fields []string) {
-	dataLen := len(fields) - 1
-	i := -1
-	i++
-	if i <= dataLen {
-		if fields[0] != "NA" {
-			s.OBJECT_ID = fields[0]
-		}
-	}
-	i++
-	if i <= dataLen {
-		if fields[1] != "NA" {
-			s.OBJECT_CAT = fields[1]
-		}
-	}
-	i++
-	if i <= dataLen {
-		s.TIME_INDEX, _ = strconv.Atoi(fields[2])
-	}
-	i++
-	if i <= dataLen {
-		s.AREA, _ = strconv.Atoi(fields[3])
-	}
-	i++
-	if i <= dataLen {
-		s.CENTROID_X, _ = strconv.ParseFloat(fields[4], 64)
-	}
-	i++
-	if i <= dataLen {
-		s.CENTROID_Y, _ = strconv.ParseFloat(fields[5], 64)
-	}
-	i++
-	if i <= dataLen {
-		s.CENTROID_LAT, _ = strconv.ParseFloat(fields[6], 64)
-	}
-	i++
-	if i <= dataLen {
-		s.CENTROID_LON, _ = strconv.ParseFloat(fields[7], 64)
-	}
-	i++
-	if i <= dataLen {
-		s.AXIS_ANG, _ = strconv.ParseFloat(fields[8], 64)
-	}
-	i++
-	if i <= dataLen {
-		s.INTENSITY_10, _ = strconv.ParseFloat(fields[9], 64)
-	}
-	i++
-	if i <= dataLen {
-		s.INTENSITY_25, _ = strconv.ParseFloat(fields[10], 64)
-	}
-	i++
-	if i <= dataLen {
-		s.INTENSITY_50, _ = strconv.ParseFloat(fields[11], 64)
-	}
-	i++
-	if i <= dataLen {
-		s.INTENSITY_75, _ = strconv.ParseFloat(fields[12], 64)
-	}
-	i++
-	if i <= dataLen {
-		s.INTENSITY_90, _ = strconv.ParseFloat(fields[13], 64)
-	}
-	i++
-	if i <= dataLen {
-		s.INTENSITY_USER, _ = strconv.ParseFloat(fields[14], 64)
-	}
-}
-
-func (s *MTD_3DPAIR) fill_MTD_3DPAIR(fields []string) {
-	dataLen := len(fields) - 1
-	i := -1
-	i++
-	if i <= dataLen {
-		if fields[0] != "NA" {
-			s.OBJECT_ID = fields[0]
-		}
-	}
-	i++
-	if i <= dataLen {
-		if fields[1] != "NA" {
-			s.OBJECT_CAT = fields[1]
-		}
-	}
-	i++
-	if i <= dataLen {
-		s.SPACE_CENTROID_DIST, _ = strconv.ParseFloat(fields[2], 64)
-	}
-	i++
-	if i <= dataLen {
-		s.TIME_CENTROID_DELTA, _ = strconv.ParseFloat(fields[3], 64)
-	}
-	i++
-	if i <= dataLen {
-		s.AXIS_DIFF, _ = strconv.ParseFloat(fields[4], 64)
-	}
-	i++
-	if i <= dataLen {
-		s.SPEED_DELTA, _ = strconv.ParseFloat(fields[5], 64)
-	}
-	i++
-	if i <= dataLen {
-		s.DIRECTION_DIFF, _ = strconv.ParseFloat(fields[6], 64)
-	}
-	i++
-	if i <= dataLen {
-		s.VOLUME_RATIO, _ = strconv.ParseFloat(fields[7], 64)
-	}
-	i++
-	if i <= dataLen {
-		s.START_TIME_DELTA, _ = strconv.Atoi(fields[8])
-	}
-	i++
-	if i <= dataLen {
-		s.END_TIME_DELTA, _ = strconv.Atoi(fields[9])
-	}
-	i++
-	if i <= dataLen {
-		s.INTERSECTION_VOLUME, _ = strconv.ParseFloat(fields[10], 64)
-	}
-	i++
-	if i <= dataLen {
-		s.DURATION_DIFF, _ = strconv.ParseFloat(fields[11], 64)
-	}
-	i++
-	if i <= dataLen {
-		s.INTEREST, _ = strconv.ParseFloat(fields[12], 64)
-	}
-}
-
-func (s *MTD_3DSINGLE) fill_MTD_3DSINGLE(fields []string) {
-	dataLen := len(fields) - 1
-	i := -1
-	i++
-	if i <= dataLen {
-		if fields[0] != "NA" {
-			s.OBJECT_ID = fields[0]
-		}
-	}
-	i++
-	if i <= dataLen {
-		if fields[1] != "NA" {
-			s.OBJECT_CAT = fields[1]
-		}
-	}
-	i++
-	if i <= dataLen {
-		s.CENTROID_X, _ = strconv.ParseFloat(fields[2], 64)
-	}
-	i++
-	if i <= dataLen {
-		s.CENTROID_Y, _ = strconv.ParseFloat(fields[3], 64)
-	}
-	i++
-	if i <= dataLen {
-		s.CENTROID_T, _ = strconv.ParseFloat(fields[4], 64)
-	}
-	i++
-	if i <= dataLen {
-		s.CENTROID_LAT, _ = strconv.ParseFloat(fields[5], 64)
-	}
-	i++
-	if i <= dataLen {
-		s.CENTROID_LON, _ = strconv.ParseFloat(fields[6], 64)
-	}
-	i++
-	if i <= dataLen {
-		s.X_DOT, _ = strconv.ParseFloat(fields[7], 64)
-	}
-	i++
-	if i <= dataLen {
-		s.Y_DOT, _ = strconv.ParseFloat(fields[8], 64)
-	}
-	i++
-	if i <= dataLen {
-		s.AXIS_ANG, _ = strconv.ParseFloat(fields[9], 64)
-	}
-	i++
-	if i <= dataLen {
-		s.VOLUME, _ = strconv.Atoi(fields[10])
-	}
-	i++
-	if i <= dataLen {
-		s.START_TIME, _ = strconv.Atoi(fields[11])
-	}
-	i++
-	if i <= dataLen {
-		s.END_TIME, _ = strconv.Atoi(fields[12])
-	}
-	i++
-	if i <= dataLen {
-		s.CDIST_TRAVELLED, _ = strconv.ParseFloat(fields[13], 64)
-	}
-	i++
-	if i <= dataLen {
-		s.INTENSITY_10, _ = strconv.ParseFloat(fields[14], 64)
-	}
-	i++
-	if i <= dataLen {
-		s.INTENSITY_25, _ = strconv.ParseFloat(fields[15], 64)
-	}
-	i++
-	if i <= dataLen {
-		s.INTENSITY_50, _ = strconv.ParseFloat(fields[16], 64)
-	}
-	i++
-	if i <= dataLen {
-		s.INTENSITY_75, _ = strconv.ParseFloat(fields[17], 64)
-	}
-	i++
-	if i <= dataLen {
-		s.INTENSITY_90, _ = strconv.ParseFloat(fields[18], 64)
-	}
-	i++
-	if i <= dataLen {
-		s.INTENSITY_USER, _ = strconv.ParseFloat(fields[19], 64)
 	}
 }
 
@@ -5825,14 +5262,6 @@ func (s *STAT_ECNT) fill_STAT_ECNT(fields []string) {
 	if i <= dataLen {
 		s.ME_LT_OBS, _ = strconv.ParseFloat(fields[24], 64)
 	}
-	i++
-	if i <= dataLen {
-		s.IGN_CONV_OERR, _ = strconv.ParseFloat(fields[25], 64)
-	}
-	i++
-	if i <= dataLen {
-		s.IGN_CORR_OERR, _ = strconv.ParseFloat(fields[26], 64)
-	}
 }
 
 func (s *STAT_FHO) fill_STAT_FHO(fields []string) {
@@ -6217,23 +5646,15 @@ func (s *STAT_MPR) fill_STAT_MPR(fields []string) {
 	}
 	i++
 	if i <= dataLen {
-		s.OBS_CLIMO_MEAN, _ = strconv.ParseFloat(fields[10], 64)
+		s.CLIMO_MEAN, _ = strconv.ParseFloat(fields[10], 64)
 	}
 	i++
 	if i <= dataLen {
-		s.OBS_CLIMO_STDEV, _ = strconv.ParseFloat(fields[11], 64)
+		s.CLIMO_STDEV, _ = strconv.ParseFloat(fields[11], 64)
 	}
 	i++
 	if i <= dataLen {
-		s.OBS_CLIMO_CDF, _ = strconv.ParseFloat(fields[12], 64)
-	}
-	i++
-	if i <= dataLen {
-		s.FCST_CLIMO_MEAN, _ = strconv.ParseFloat(fields[13], 64)
-	}
-	i++
-	if i <= dataLen {
-		s.FCST_CLIMO_STDEV, _ = strconv.ParseFloat(fields[14], 64)
+		s.CLIMO_CDF, _ = strconv.ParseFloat(fields[12], 64)
 	}
 }
 
@@ -6805,7 +6226,7 @@ func (s *STAT_ORANK) fill_STAT_ORANK(fields []string) {
 	}
 	i++
 	if i <= dataLen {
-		s.OBS_CLIMO_MEAN, _ = strconv.ParseFloat(fields[15], 64)
+		s.CLIMO_MEAN, _ = strconv.ParseFloat(fields[15], 64)
 	}
 	i++
 	if i <= dataLen {
@@ -6825,15 +6246,7 @@ func (s *STAT_ORANK) fill_STAT_ORANK(fields []string) {
 	}
 	i++
 	if i <= dataLen {
-		s.OBS_CLIMO_STDEV, _ = strconv.ParseFloat(fields[20], 64)
-	}
-	i++
-	if i <= dataLen {
-		s.FCST_CLIMO_MEAN, _ = strconv.ParseFloat(fields[21], 64)
-	}
-	i++
-	if i <= dataLen {
-		s.FCST_CLIMO_STDEV, _ = strconv.ParseFloat(fields[22], 64)
+		s.CLIMO_STDEV, _ = strconv.ParseFloat(fields[20], 64)
 	}
 }
 
@@ -7215,27 +6628,39 @@ func (s *STAT_SEEPS) fill_STAT_SEEPS(fields []string) {
 	}
 	i++
 	if i <= dataLen {
-		s.ODFL, _ = strconv.ParseFloat(fields[1], 64)
+		if fields[1] != "NA" {
+			s.S12 = fields[1]
+		}
 	}
 	i++
 	if i <= dataLen {
-		s.ODFH, _ = strconv.ParseFloat(fields[2], 64)
+		if fields[2] != "NA" {
+			s.S13 = fields[2]
+		}
 	}
 	i++
 	if i <= dataLen {
-		s.OLFD, _ = strconv.ParseFloat(fields[3], 64)
+		if fields[3] != "NA" {
+			s.S21 = fields[3]
+		}
 	}
 	i++
 	if i <= dataLen {
-		s.OLFH, _ = strconv.ParseFloat(fields[4], 64)
+		if fields[4] != "NA" {
+			s.S23 = fields[4]
+		}
 	}
 	i++
 	if i <= dataLen {
-		s.OHFD, _ = strconv.ParseFloat(fields[5], 64)
+		if fields[5] != "NA" {
+			s.S31 = fields[5]
+		}
 	}
 	i++
 	if i <= dataLen {
-		s.OHFL, _ = strconv.ParseFloat(fields[6], 64)
+		if fields[6] != "NA" {
+			s.S32 = fields[6]
+		}
 	}
 	i++
 	if i <= dataLen {
@@ -7590,22 +7015,6 @@ func (s *STAT_VAL1L2) fill_STAT_VAL1L2(fields []string) {
 	if i <= dataLen {
 		s.OA_SPEED_BAR, _ = strconv.ParseFloat(fields[9], 64)
 	}
-	i++
-	if i <= dataLen {
-		s.TOTAL_DIR, _ = strconv.ParseFloat(fields[10], 64)
-	}
-	i++
-	if i <= dataLen {
-		s.DIRA_ME, _ = strconv.ParseFloat(fields[11], 64)
-	}
-	i++
-	if i <= dataLen {
-		s.DIRA_MAE, _ = strconv.ParseFloat(fields[12], 64)
-	}
-	i++
-	if i <= dataLen {
-		s.DIRA_MSE, _ = strconv.ParseFloat(fields[13], 64)
-	}
 }
 
 func (s *STAT_VCNT) fill_STAT_VCNT(fields []string) {
@@ -7863,58 +7272,6 @@ func (s *STAT_VCNT) fill_STAT_VCNT(fields []string) {
 	if i <= dataLen {
 		s.ANOM_CORR_UNCNTR_BCU, _ = strconv.ParseFloat(fields[62], 64)
 	}
-	i++
-	if i <= dataLen {
-		s.TOTAL_DIR, _ = strconv.ParseFloat(fields[63], 64)
-	}
-	i++
-	if i <= dataLen {
-		s.DIR_ME, _ = strconv.ParseFloat(fields[64], 64)
-	}
-	i++
-	if i <= dataLen {
-		s.DIR_ME_BCL, _ = strconv.ParseFloat(fields[65], 64)
-	}
-	i++
-	if i <= dataLen {
-		s.DIR_ME_BCU, _ = strconv.ParseFloat(fields[66], 64)
-	}
-	i++
-	if i <= dataLen {
-		s.DIR_MAE, _ = strconv.ParseFloat(fields[67], 64)
-	}
-	i++
-	if i <= dataLen {
-		s.DIR_MAE_BCL, _ = strconv.ParseFloat(fields[68], 64)
-	}
-	i++
-	if i <= dataLen {
-		s.DIR_MAE_BCU, _ = strconv.ParseFloat(fields[69], 64)
-	}
-	i++
-	if i <= dataLen {
-		s.DIR_MSE, _ = strconv.ParseFloat(fields[70], 64)
-	}
-	i++
-	if i <= dataLen {
-		s.DIR_MSE_BCL, _ = strconv.ParseFloat(fields[71], 64)
-	}
-	i++
-	if i <= dataLen {
-		s.DIR_MSE_BCU, _ = strconv.ParseFloat(fields[72], 64)
-	}
-	i++
-	if i <= dataLen {
-		s.DIR_RMSE, _ = strconv.ParseFloat(fields[73], 64)
-	}
-	i++
-	if i <= dataLen {
-		s.DIR_RMSE_BCL, _ = strconv.ParseFloat(fields[74], 64)
-	}
-	i++
-	if i <= dataLen {
-		s.DIR_RMSE_BCU, _ = strconv.ParseFloat(fields[75], 64)
-	}
 }
 
 func (s *STAT_VL1L2) fill_STAT_VL1L2(fields []string) {
@@ -7959,22 +7316,6 @@ func (s *STAT_VL1L2) fill_STAT_VL1L2(fields []string) {
 	i++
 	if i <= dataLen {
 		s.O_SPEED_BAR, _ = strconv.ParseFloat(fields[9], 64)
-	}
-	i++
-	if i <= dataLen {
-		s.TOTAL_DIR, _ = strconv.ParseFloat(fields[10], 64)
-	}
-	i++
-	if i <= dataLen {
-		s.DIR_ME, _ = strconv.ParseFloat(fields[11], 64)
-	}
-	i++
-	if i <= dataLen {
-		s.DIR_MAE, _ = strconv.ParseFloat(fields[12], 64)
-	}
-	i++
-	if i <= dataLen {
-		s.DIR_MSE, _ = strconv.ParseFloat(fields[13], 64)
 	}
 }
 
@@ -8856,39 +8197,6 @@ func GetDocForId(fileLineType string, metaDataMap map[string]interface{}, header
 			val[dataKey] = elem
 			(doc)["data"] = val
 		}
-	case "MTD_2DSINGLE":
-		elem := MTD_2DSINGLE{}
-		elem.fill_MTD_2DSINGLE_Header(headerData, &doc)
-		elem.fill_MTD_2DSINGLE(dataData)
-		if exists := (doc)["data"]; exists == nil {
-			(doc)["data"] = make(map[string]MTD_2DSINGLE)
-		}
-		if val, ok := (doc)["data"].(map[string]MTD_2DSINGLE); ok {
-			val[dataKey] = elem
-			(doc)["data"] = val
-		}
-	case "MTD_3DSINGLE":
-		elem := MTD_3DSINGLE{}
-		elem.fill_MTD_3DSINGLE_Header(headerData, &doc)
-		elem.fill_MTD_3DSINGLE(dataData)
-		if exists := (doc)["data"]; exists == nil {
-			(doc)["data"] = make(map[string]MTD_3DSINGLE)
-		}
-		if val, ok := (doc)["data"].(map[string]MTD_3DSINGLE); ok {
-			val[dataKey] = elem
-			(doc)["data"] = val
-		}
-	case "MTD_3DPAIR":
-		elem := MTD_3DPAIR{}
-		elem.fill_MTD_3DPAIR_Header(headerData, &doc)
-		elem.fill_MTD_3DPAIR(dataData)
-		if exists := (doc)["data"]; exists == nil {
-			(doc)["data"] = make(map[string]MTD_3DPAIR)
-		}
-		if val, ok := (doc)["data"].(map[string]MTD_3DPAIR); ok {
-			val[dataKey] = elem
-			(doc)["data"] = val
-		}
 	case "TCST_TCMPR":
 		elem := TCST_TCMPR{}
 		elem.fill_TCST_TCMPR_Header(headerData, &doc)
@@ -9183,27 +8491,6 @@ func AddDataElement(dataKey string, fileLineType string, dataData []string, doc 
 			val[dataKey] = elem
 			(*doc)["data"] = val
 		}
-	case "MTD_2DSINGLE":
-		elem := MTD_2DSINGLE{}
-		elem.fill_MTD_2DSINGLE(dataData)
-		if val, ok := (*doc)["data"].(map[string]MTD_2DSINGLE); ok {
-			val[dataKey] = elem
-			(*doc)["data"] = val
-		}
-	case "MTD_3DSINGLE":
-		elem := MTD_3DSINGLE{}
-		elem.fill_MTD_3DSINGLE(dataData)
-		if val, ok := (*doc)["data"].(map[string]MTD_3DSINGLE); ok {
-			val[dataKey] = elem
-			(*doc)["data"] = val
-		}
-	case "MTD_3DPAIR":
-		elem := MTD_3DPAIR{}
-		elem.fill_MTD_3DPAIR(dataData)
-		if val, ok := (*doc)["data"].(map[string]MTD_3DPAIR); ok {
-			val[dataKey] = elem
-			(*doc)["data"] = val
-		}
 	case "TCST_TCMPR":
 		elem := TCST_TCMPR{}
 		elem.fill_TCST_TCMPR(dataData)
@@ -9231,4 +8518,4 @@ func AddDataElement(dataKey string, fileLineType string, dataData []string, doc 
 	return *doc, nil
 }
 
-var MetHeaderColumnsFileUrl = "https://raw.githubusercontent.com/dtcenter/MET/refs/heads/main_v12.0/data/table_files/met_header_columns_V12.0.txt"
+var MetHeaderColumnsFileUrl = "https://raw.githubusercontent.com/dtcenter/MET/refs/heads/main_v12.0/data/table_files/met_header_columns_V11.1.txt"

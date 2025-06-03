@@ -1,4 +1,4 @@
-package metLineTypeParser
+package parser
 
 /*
 For profiling -
@@ -20,11 +20,11 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	metLineTypeDefinitions_v10_0 "github.com/NOAA-GSL/METstat2json/pkg/metLineTypeDefinitions_v10_0"
-	metLineTypeDefinitions_v10_1 "github.com/NOAA-GSL/METstat2json/pkg/metLineTypeDefinitions_v10_1"
-	metLineTypeDefinitions_v11_0 "github.com/NOAA-GSL/METstat2json/pkg/metLineTypeDefinitions_v11_0"
-	metLineTypeDefinitions_v11_1 "github.com/NOAA-GSL/METstat2json/pkg/metLineTypeDefinitions_v11_1"
-	metLineTypeDefinitions_v12_0 "github.com/NOAA-GSL/METstat2json/pkg/metLineTypeDefinitions_v12_0"
+	"github.com/NOAA-GSL/METstat2json/pkg/linetypes/v10_0"
+	"github.com/NOAA-GSL/METstat2json/pkg/linetypes/v10_1"
+	"github.com/NOAA-GSL/METstat2json/pkg/linetypes/v11_0"
+	"github.com/NOAA-GSL/METstat2json/pkg/linetypes/v11_1"
+	"github.com/NOAA-GSL/METstat2json/pkg/linetypes/v12_0"
 )
 
 var testdataDir = ""
@@ -85,15 +85,15 @@ func getExistingExternalDocForId(id string) (map[string]interface{}, error) {
 	var doc map[string]interface{}
 	switch parserVersion {
 	case "v12_0":
-		doc, _err = metLineTypeDefinitions_v12_0.GetDocForId(fileLineType, metaDataMap, headerData, dataData, dataKey)
+		doc, _err = v12_0.GetDocForId(fileLineType, metaDataMap, headerData, dataData, dataKey)
 	case "v11_1":
-		doc, _err = metLineTypeDefinitions_v11_1.GetDocForId(fileLineType, metaDataMap, headerData, dataData, dataKey)
+		doc, _err = v11_1.GetDocForId(fileLineType, metaDataMap, headerData, dataData, dataKey)
 	case "v11_0":
-		doc, _err = metLineTypeDefinitions_v11_0.GetDocForId(fileLineType, metaDataMap, headerData, dataData, dataKey)
+		doc, _err = v11_0.GetDocForId(fileLineType, metaDataMap, headerData, dataData, dataKey)
 	case "v10_1":
-		doc, _err = metLineTypeDefinitions_v10_1.GetDocForId(fileLineType, metaDataMap, headerData, dataData, dataKey)
+		doc, _err = v10_1.GetDocForId(fileLineType, metaDataMap, headerData, dataData, dataKey)
 	case "v10_0":
-		doc, _err = metLineTypeDefinitions_v10_0.GetDocForId(fileLineType, metaDataMap, headerData, dataData, dataKey)
+		doc, _err = v10_0.GetDocForId(fileLineType, metaDataMap, headerData, dataData, dataKey)
 	default:
 		return nil, fmt.Errorf("unsupported parser version: %s", parserVersion)
 	}
@@ -209,8 +209,8 @@ func TestParseVAL1L2(t *testing.T) {
 	assert.Equal(t, 3, len(parsedDoc), "expected 3 but got %d", len(parsedDoc)) // two top level elements
 	doc0 := doc["MET:DD:MET:test:V12.0.0:FCST:1333972800:1333972800:000000:1333971000:1333974600:UGRD_VGRD:m/s:Z10:UGRD_VGRD:Z10:ADPSFC:LAND_L0:NEAREST:1:VAL1L2"].(map[string]interface{})
 	doc2 := doc["MET:DD:MET:test:V12.0.0:FCST:this_is_a_:1333972800:1333972800:000000:1333971000:1333974600:UGRD_VGRD:m/s:Z10:UGRD_VGRD:Z10:ADPSFC:LMV:NEAREST:1:VAL1L2"].(map[string]interface{})
-	doc0Data := doc0["data"].(map[string]metLineTypeDefinitions_v12_0.STAT_VAL1L2)
-	doc2Data := doc2["data"].(map[string]metLineTypeDefinitions_v12_0.STAT_VAL1L2)
+	doc0Data := doc0["data"].(map[string]v12_0.STAT_VAL1L2)
+	doc2Data := doc2["data"].(map[string]v12_0.STAT_VAL1L2)
 	doc0Data120000 := doc0Data["120000"]
 	doc2Data180000 := doc2Data["180000"]
 	doc0DataMap := doc0Data120000
@@ -267,8 +267,8 @@ func TestParseMODE_OBJ(t *testing.T) {
 	assert.Equal(t, 2, len(parsedDoc), "expected 3 but got %d", len(parsedDoc)) // two top level elements
 	doc0 := doc["MET:DD:MET:test:V12.0.0:FCST:26026:9:20120410_180000:060000:120000:20050807_120000:120000:2:>=5.0:2:>=5.0:APCP_06:kg/m^2:A6:OBS:None:Surface:STAGE4"].(map[string]interface{})
 	doc2 := doc["MET:DD:MET:test:V12.0.0:FCST:26026:9:this_is_a_:20120410_180000:060000:120000:20050807_120000:120000:2:>=5.0:2:>=5.0:APCP_06:kg/m^2:A6:OBS:None:Surface:STAGE4"].(map[string]interface{})
-	doc0Data := doc0["data"].(map[string]metLineTypeDefinitions_v12_0.MODE_CTS)
-	doc2Data := doc2["data"].(map[string]metLineTypeDefinitions_v12_0.MODE_CTS)
+	doc0Data := doc0["data"].(map[string]v12_0.MODE_CTS)
+	doc2Data := doc2["data"].(map[string]v12_0.MODE_CTS)
 	doc0Data120000 := doc0Data["300000"]
 	doc2Data180000 := doc2Data["300000"]
 	doc0DataTotal := doc0Data120000.TOTAL
@@ -320,7 +320,7 @@ func TestParseMODE_OBJ_V11_1_0(t *testing.T) {
 	assert.NotNil(t, parsedDoc)
 	assert.Equal(t, 1, len(parsedDoc), "expected 1 but got %d", len(parsedDoc)) // two top level elements
 	tmpDoc := doc["MET:DD:MET:test:V11.1.0:HRRR_OPS:656523:3:E_CONUS:20241201_130000:000000:000000:20241201_125839:000000:1:>=30:1:>=30:REFC:dB:L0:REFC:dB:R1:MRMS"].(map[string]interface{})
-	data := tmpDoc["data"].(map[string]metLineTypeDefinitions_v11_1.MODE_OBJ)
+	data := tmpDoc["data"].(map[string]v11_1.MODE_OBJ)
 	elem1Data := data["010000_F001"]
 	elem2Data := data["010000_F002"]
 	assert.Equal(t, elem1Data.CENTROID_X, 1191.36111, "expected data[\"010000_F001\"].CENTROID_X to be 1191.36111")

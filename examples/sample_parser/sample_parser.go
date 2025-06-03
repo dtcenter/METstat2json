@@ -12,14 +12,14 @@ import (
 	"runtime"
 	"strings"
 
-	metLineTypeParser "github.com/NOAA-GSL/METstat2json/pkg/metLineTypeParser"
+	"github.com/NOAA-GSL/METstat2json/pkg/parser"
 )
 
 // dummy function to satisfy the function signature of getExternalDocForId
 func getExternalDocForId(id string) (map[string]interface{}, error) {
 	// fmt.Println("getExternalDocForId called with id:", id)
 	// Put your own code here in this method but always return this exact error if the document is not found
-	return nil, fmt.Errorf("%s: %s", metLineTypeParser.DOC_NOT_FOUND, id)
+	return nil, fmt.Errorf("%s: %s", parser.DOC_NOT_FOUND, id)
 }
 
 func ReadJsonFromGzipFile(filename string) (map[string]interface{}, error) {
@@ -94,7 +94,7 @@ func ParseRegressionSuite() error {
 		return err
 	}
 	// write output to json	gzipped file
-	err = metLineTypeParser.WriteJsonToCompressedFile(doc, output_directory+dataSetName+".json.gz")
+	err = parser.WriteJsonToCompressedFile(doc, output_directory+dataSetName+".json.gz")
 	if err != nil {
 		log.Printf("%v", err)
 		return err
@@ -133,7 +133,7 @@ func parseFile(dataSetName string, fPath string, fileInfos os.FileInfo, doc map[
 			continue
 		}
 		dataLine := lines[line]
-		doc, err = metLineTypeParser.ParseLine(dataSetName, headerLine, dataLine, &doc, fName, getExternalDocForId)
+		doc, err = parser.ParseLine(dataSetName, headerLine, dataLine, &doc, fName, getExternalDocForId)
 		if err != nil {
 			log.Printf("Error parsing line: %s for file %s\n", err, fName)
 		}

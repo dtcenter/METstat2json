@@ -1,4 +1,4 @@
-package metLineTypeDefinitions_v10_1
+package v10_0
 
 import (
 	"errors"
@@ -9,10 +9,9 @@ import (
 
 /*
 THIS CODE IS AUTOMATICALLY GENERATED - DO NOT EDIT THIS CODE
-To modify this code - modify the buildHeaderLineTypes.go file and run the buildHeaderLineTypes.go program
-cd  <repo path>/metlinetypes/pkg/buildHeaderLineTypes
-go run . > /tmp/types.go
-cp /tmp/types.go ../metLineTypeDefinitions/metLineTypeDefinitions.go
+To modify this code - modify the generator.go file and run the generator.go program
+cd  <repo_root>
+go run generator -version=v12.0 > pkg/linetypes/v12_0/linetypes.go
 */
 
 func GetLeadFromInitValid(data []string, dataFieldIndex int) string {
@@ -785,32 +784,6 @@ type STAT_SAL1L2_header struct {
 }
 
 type STAT_SL1L2_header struct {
-	VERSION        string  `json:"version"`
-	MODEL          string  `json:"model"`
-	DESC           string  `json:"desc"`
-	FCST_VALID_BEG int     `json:"fcstValidBeg"`
-	FCST_VALID_END int     `json:"fcstValidEnd"`
-	OBS_LEAD       int     `json:"obsLead"`
-	OBS_VALID_BEG  int     `json:"obsValidBeg"`
-	OBS_VALID_END  int     `json:"obsValidEnd"`
-	FCST_VAR       string  `json:"fcstVar"`
-	FCST_UNITS     string  `json:"fcstUnits"`
-	FCST_LEV       string  `json:"fcstLev"`
-	OBS_VAR        string  `json:"obsVar"`
-	OBS_UNITS      string  `json:"obsUnits"`
-	OBS_LEV        string  `json:"obsLev"`
-	OBTYPE         string  `json:"obtype"`
-	VX_MASK        string  `json:"vxMask"`
-	INTERP_MTHD    string  `json:"interpMthd"`
-	INTERP_PNTS    int     `json:"interpPnts"`
-	FCST_THRESH    string  `json:"fcstThresh"`
-	OBS_THRESH     string  `json:"obsThresh"`
-	COV_THRESH     string  `json:"covThresh"`
-	ALPHA          float64 `json:"alpha"`
-	LINE_TYPE      string  `json:"lineType"`
-}
-
-type STAT_SSIDX_header struct {
 	VERSION        string  `json:"version"`
 	MODEL          string  `json:"model"`
 	DESC           string  `json:"desc"`
@@ -2473,58 +2446,6 @@ func (s *STAT_SL1L2) fill_STAT_SL1L2_Header(fields []string, doc *map[string]int
 	SetValueForField(doc, "STAT", "LINE_TYPE", i, dataLen, fields, 23, "string")
 }
 
-func (s *STAT_SSIDX) fill_STAT_SSIDX_Header(fields []string, doc *map[string]interface{}) {
-	dataLen := len(fields)
-	i := -1
-	// fill the met fields leaving out "" and NA values
-	i++
-	SetValueForField(doc, "STAT", "VERSION", i, dataLen, fields, 0, "string")
-	i++
-	SetValueForField(doc, "STAT", "MODEL", i, dataLen, fields, 1, "string")
-	i++
-	SetValueForField(doc, "STAT", "DESC", i, dataLen, fields, 2, "string")
-	i++
-	SetValueForField(doc, "STAT", "FCST_VALID_BEG", i, dataLen, fields, 4, "int")
-	i++
-	SetValueForField(doc, "STAT", "FCST_VALID_END", i, dataLen, fields, 5, "int")
-	i++
-	SetValueForField(doc, "STAT", "OBS_LEAD", i, dataLen, fields, 6, "int")
-	i++
-	SetValueForField(doc, "STAT", "OBS_VALID_BEG", i, dataLen, fields, 7, "int")
-	i++
-	SetValueForField(doc, "STAT", "OBS_VALID_END", i, dataLen, fields, 8, "int")
-	i++
-	SetValueForField(doc, "STAT", "FCST_VAR", i, dataLen, fields, 9, "string")
-	i++
-	SetValueForField(doc, "STAT", "FCST_UNITS", i, dataLen, fields, 10, "string")
-	i++
-	SetValueForField(doc, "STAT", "FCST_LEV", i, dataLen, fields, 11, "string")
-	i++
-	SetValueForField(doc, "STAT", "OBS_VAR", i, dataLen, fields, 12, "string")
-	i++
-	SetValueForField(doc, "STAT", "OBS_UNITS", i, dataLen, fields, 13, "string")
-	i++
-	SetValueForField(doc, "STAT", "OBS_LEV", i, dataLen, fields, 14, "string")
-	i++
-	SetValueForField(doc, "STAT", "OBTYPE", i, dataLen, fields, 15, "string")
-	i++
-	SetValueForField(doc, "STAT", "VX_MASK", i, dataLen, fields, 16, "string")
-	i++
-	SetValueForField(doc, "STAT", "INTERP_MTHD", i, dataLen, fields, 17, "string")
-	i++
-	SetValueForField(doc, "STAT", "INTERP_PNTS", i, dataLen, fields, 18, "int")
-	i++
-	SetValueForField(doc, "STAT", "FCST_THRESH", i, dataLen, fields, 19, "string")
-	i++
-	SetValueForField(doc, "STAT", "OBS_THRESH", i, dataLen, fields, 20, "string")
-	i++
-	SetValueForField(doc, "STAT", "COV_THRESH", i, dataLen, fields, 21, "string")
-	i++
-	SetValueForField(doc, "STAT", "ALPHA", i, dataLen, fields, 22, "float64")
-	i++
-	SetValueForField(doc, "STAT", "LINE_TYPE", i, dataLen, fields, 23, "string")
-}
-
 func (s *STAT_SSVAR) fill_STAT_SSVAR_Header(fields []string, doc *map[string]interface{}) {
 	dataLen := len(fields)
 	i := -1
@@ -2953,9 +2874,6 @@ type STAT_CNT struct {
 	ANOM_CORR_UNCNTR     float64 `json:"anomCorrUncntr,omitempty"`
 	ANOM_CORR_UNCNTR_BCL float64 `json:"anomCorrUncntrBcl,omitempty"`
 	ANOM_CORR_UNCNTR_BCU float64 `json:"anomCorrUncntrBcu,omitempty"`
-	SI                   float64 `json:"si,omitempty"`
-	SI_BCL               float64 `json:"siBcl,omitempty"`
-	SI_BCU               float64 `json:"siBcu,omitempty"`
 }
 
 type STAT_CTC struct {
@@ -3063,30 +2981,27 @@ type STAT_CTS struct {
 }
 
 type STAT_DMAP struct {
-	TOTAL      int     `json:"total,omitempty"`
-	FY         int     `json:"fy,omitempty"`
-	OY         int     `json:"oy,omitempty"`
-	FBIAS      float64 `json:"fbias,omitempty"`
-	BADDELEY   float64 `json:"baddeley,omitempty"`
-	HAUSDORFF  float64 `json:"hausdorff,omitempty"`
-	MED_FO     float64 `json:"medFo,omitempty"`
-	MED_OF     float64 `json:"medOf,omitempty"`
-	MED_MIN    float64 `json:"medMin,omitempty"`
-	MED_MAX    float64 `json:"medMax,omitempty"`
-	MED_MEAN   float64 `json:"medMean,omitempty"`
-	FOM_FO     float64 `json:"fomFo,omitempty"`
-	FOM_OF     float64 `json:"fomOf,omitempty"`
-	FOM_MIN    float64 `json:"fomMin,omitempty"`
-	FOM_MAX    float64 `json:"fomMax,omitempty"`
-	FOM_MEAN   float64 `json:"fomMean,omitempty"`
-	ZHU_FO     float64 `json:"zhuFo,omitempty"`
-	ZHU_OF     float64 `json:"zhuOf,omitempty"`
-	ZHU_MIN    float64 `json:"zhuMin,omitempty"`
-	ZHU_MAX    float64 `json:"zhuMax,omitempty"`
-	ZHU_MEAN   float64 `json:"zhuMean,omitempty"`
-	G          float64 `json:"g,omitempty"`
-	GBETA      float64 `json:"gbeta,omitempty"`
-	BETA_VALUE float64 `json:"betaValue,omitempty"`
+	TOTAL     int     `json:"total,omitempty"`
+	FY        int     `json:"fy,omitempty"`
+	OY        int     `json:"oy,omitempty"`
+	FBIAS     float64 `json:"fbias,omitempty"`
+	BADDELEY  float64 `json:"baddeley,omitempty"`
+	HAUSDORFF float64 `json:"hausdorff,omitempty"`
+	MED_FO    float64 `json:"medFo,omitempty"`
+	MED_OF    float64 `json:"medOf,omitempty"`
+	MED_MIN   float64 `json:"medMin,omitempty"`
+	MED_MAX   float64 `json:"medMax,omitempty"`
+	MED_MEAN  float64 `json:"medMean,omitempty"`
+	FOM_FO    float64 `json:"fomFo,omitempty"`
+	FOM_OF    float64 `json:"fomOf,omitempty"`
+	FOM_MIN   float64 `json:"fomMin,omitempty"`
+	FOM_MAX   float64 `json:"fomMax,omitempty"`
+	FOM_MEAN  float64 `json:"fomMean,omitempty"`
+	ZHU_FO    float64 `json:"zhuFo,omitempty"`
+	ZHU_OF    float64 `json:"zhuOf,omitempty"`
+	ZHU_MIN   float64 `json:"zhuMin,omitempty"`
+	ZHU_MAX   float64 `json:"zhuMax,omitempty"`
+	ZHU_MEAN  float64 `json:"zhuMean,omitempty"`
 }
 
 type STAT_ECLV struct {
@@ -3126,8 +3041,6 @@ type STAT_GENMPR struct {
 	TOTAL      int     `json:"total,omitempty"`
 	INDEX      int     `json:"index,omitempty"`
 	STORM_ID   string  `json:"stormId,omitempty"`
-	PROB_LEAD  float64 `json:"probLead,omitempty"`
-	PROB_VAL   float64 `json:"probVal,omitempty"`
 	AGEN_INIT  string  `json:"agenInit,omitempty"`
 	AGEN_FHR   string  `json:"agenFhr,omitempty"`
 	AGEN_LAT   float64 `json:"agenLat,omitempty"`
@@ -3172,32 +3085,27 @@ type STAT_ISC struct {
 }
 
 type STAT_MCTC struct {
-	TOTAL    int                    `json:"total,omitempty"`
-	CAT      map[string]interface{} `json:"cat,omitempty"`
-	EC_VALUE float64                `json:"ecValue,omitempty"`
+	TOTAL int                    `json:"total,omitempty"`
+	CAT   map[string]interface{} `json:"cat,omitempty"`
 }
 
 type STAT_MCTS struct {
-	TOTAL      int     `json:"total,omitempty"`
-	N_CAT      int     `json:"nCat,omitempty"`
-	ACC        float64 `json:"acc,omitempty"`
-	ACC_NCL    float64 `json:"accNcl,omitempty"`
-	ACC_NCU    float64 `json:"accNcu,omitempty"`
-	ACC_BCL    float64 `json:"accBcl,omitempty"`
-	ACC_BCU    float64 `json:"accBcu,omitempty"`
-	HK         float64 `json:"hk,omitempty"`
-	HK_BCL     float64 `json:"hkBcl,omitempty"`
-	HK_BCU     float64 `json:"hkBcu,omitempty"`
-	HSS        float64 `json:"hss,omitempty"`
-	HSS_BCL    float64 `json:"hssBcl,omitempty"`
-	HSS_BCU    float64 `json:"hssBcu,omitempty"`
-	GER        float64 `json:"ger,omitempty"`
-	GER_BCL    float64 `json:"gerBcl,omitempty"`
-	GER_BCU    float64 `json:"gerBcu,omitempty"`
-	HSS_EC     float64 `json:"hssEc,omitempty"`
-	HSS_EC_BCL float64 `json:"hssEcBcl,omitempty"`
-	HSS_EC_BCU float64 `json:"hssEcBcu,omitempty"`
-	EC_VALUE   float64 `json:"ecValue,omitempty"`
+	TOTAL   int     `json:"total,omitempty"`
+	N_CAT   int     `json:"nCat,omitempty"`
+	ACC     float64 `json:"acc,omitempty"`
+	ACC_NCL float64 `json:"accNcl,omitempty"`
+	ACC_NCU float64 `json:"accNcu,omitempty"`
+	ACC_BCL float64 `json:"accBcl,omitempty"`
+	ACC_BCU float64 `json:"accBcu,omitempty"`
+	HK      float64 `json:"hk,omitempty"`
+	HK_BCL  float64 `json:"hkBcl,omitempty"`
+	HK_BCU  float64 `json:"hkBcu,omitempty"`
+	HSS     float64 `json:"hss,omitempty"`
+	HSS_BCL float64 `json:"hssBcl,omitempty"`
+	HSS_BCU float64 `json:"hssBcu,omitempty"`
+	GER     float64 `json:"ger,omitempty"`
+	GER_BCL float64 `json:"gerBcl,omitempty"`
+	GER_BCU float64 `json:"gerBcu,omitempty"`
 }
 
 type STAT_MPR struct {
@@ -3446,15 +3354,6 @@ type STAT_SL1L2 struct {
 	FFBAR float64 `json:"ffbar,omitempty"`
 	OOBAR float64 `json:"oobar,omitempty"`
 	MAE   float64 `json:"mae,omitempty"`
-}
-
-type STAT_SSIDX struct {
-	FCST_MODEL string  `json:"fcstModel,omitempty"`
-	REF_MODEL  string  `json:"refModel,omitempty"`
-	N_INIT     int     `json:"nInit,omitempty"`
-	N_TERM     int     `json:"nTerm,omitempty"`
-	N_VLD      int     `json:"nVld,omitempty"`
-	SS_INDEX   float64 `json:"ssIndex,omitempty"`
 }
 
 type STAT_SSVAR struct {
@@ -4300,18 +4199,6 @@ func (s *STAT_CNT) fill_STAT_CNT(fields []string) {
 	if i <= dataLen {
 		s.ANOM_CORR_UNCNTR_BCU, _ = strconv.ParseFloat(fields[96], 64)
 	}
-	i++
-	if i <= dataLen {
-		s.SI, _ = strconv.ParseFloat(fields[97], 64)
-	}
-	i++
-	if i <= dataLen {
-		s.SI_BCL, _ = strconv.ParseFloat(fields[98], 64)
-	}
-	i++
-	if i <= dataLen {
-		s.SI_BCU, _ = strconv.ParseFloat(fields[99], 64)
-	}
 }
 
 func (s *STAT_CTC) fill_STAT_CTC(fields []string) {
@@ -4803,18 +4690,6 @@ func (s *STAT_DMAP) fill_STAT_DMAP(fields []string) {
 	if i <= dataLen {
 		s.ZHU_MEAN, _ = strconv.ParseFloat(fields[20], 64)
 	}
-	i++
-	if i <= dataLen {
-		s.G, _ = strconv.ParseFloat(fields[21], 64)
-	}
-	i++
-	if i <= dataLen {
-		s.GBETA, _ = strconv.ParseFloat(fields[22], 64)
-	}
-	i++
-	if i <= dataLen {
-		s.BETA_VALUE, _ = strconv.ParseFloat(fields[23], 64)
-	}
 }
 
 func (s *STAT_ECLV) fill_STAT_ECLV(fields []string) {
@@ -4967,74 +4842,66 @@ func (s *STAT_GENMPR) fill_STAT_GENMPR(fields []string) {
 	}
 	i++
 	if i <= dataLen {
-		s.PROB_LEAD, _ = strconv.ParseFloat(fields[3], 64)
-	}
-	i++
-	if i <= dataLen {
-		s.PROB_VAL, _ = strconv.ParseFloat(fields[4], 64)
-	}
-	i++
-	if i <= dataLen {
-		if fields[5] != "NA" {
-			s.AGEN_INIT = fields[5]
+		if fields[3] != "NA" {
+			s.AGEN_INIT = fields[3]
 		}
 	}
 	i++
 	if i <= dataLen {
-		if fields[6] != "NA" {
-			s.AGEN_FHR = fields[6]
+		if fields[4] != "NA" {
+			s.AGEN_FHR = fields[4]
 		}
 	}
 	i++
 	if i <= dataLen {
-		s.AGEN_LAT, _ = strconv.ParseFloat(fields[7], 64)
+		s.AGEN_LAT, _ = strconv.ParseFloat(fields[5], 64)
 	}
 	i++
 	if i <= dataLen {
-		s.AGEN_LON, _ = strconv.ParseFloat(fields[8], 64)
+		s.AGEN_LON, _ = strconv.ParseFloat(fields[6], 64)
 	}
 	i++
 	if i <= dataLen {
-		s.AGEN_DLAND, _ = strconv.ParseFloat(fields[9], 64)
+		s.AGEN_DLAND, _ = strconv.ParseFloat(fields[7], 64)
 	}
 	i++
 	if i <= dataLen {
-		s.BGEN_LAT, _ = strconv.ParseFloat(fields[10], 64)
+		s.BGEN_LAT, _ = strconv.ParseFloat(fields[8], 64)
 	}
 	i++
 	if i <= dataLen {
-		s.BGEN_LON, _ = strconv.ParseFloat(fields[11], 64)
+		s.BGEN_LON, _ = strconv.ParseFloat(fields[9], 64)
 	}
 	i++
 	if i <= dataLen {
-		s.BGEN_DLAND, _ = strconv.ParseFloat(fields[12], 64)
+		s.BGEN_DLAND, _ = strconv.ParseFloat(fields[10], 64)
 	}
 	i++
 	if i <= dataLen {
-		s.GEN_DIST, _ = strconv.ParseFloat(fields[13], 64)
+		s.GEN_DIST, _ = strconv.ParseFloat(fields[11], 64)
+	}
+	i++
+	if i <= dataLen {
+		if fields[12] != "NA" {
+			s.GEN_TDIFF = fields[12]
+		}
+	}
+	i++
+	if i <= dataLen {
+		if fields[13] != "NA" {
+			s.INIT_TDIFF = fields[13]
+		}
 	}
 	i++
 	if i <= dataLen {
 		if fields[14] != "NA" {
-			s.GEN_TDIFF = fields[14]
+			s.DEV_CAT = fields[14]
 		}
 	}
 	i++
 	if i <= dataLen {
 		if fields[15] != "NA" {
-			s.INIT_TDIFF = fields[15]
-		}
-	}
-	i++
-	if i <= dataLen {
-		if fields[16] != "NA" {
-			s.DEV_CAT = fields[16]
-		}
-	}
-	i++
-	if i <= dataLen {
-		if fields[17] != "NA" {
-			s.OPS_CAT = fields[17]
+			s.OPS_CAT = fields[15]
 		}
 	}
 }
@@ -5169,10 +5036,6 @@ func (s *STAT_MCTC) fill_STAT_MCTC(fields []string) {
 			}
 		}
 	}
-	i++
-	if i <= dataLen {
-		s.EC_VALUE, _ = strconv.ParseFloat(fields[3], 64)
-	}
 }
 
 func (s *STAT_MCTS) fill_STAT_MCTS(fields []string) {
@@ -5241,22 +5104,6 @@ func (s *STAT_MCTS) fill_STAT_MCTS(fields []string) {
 	i++
 	if i <= dataLen {
 		s.GER_BCU, _ = strconv.ParseFloat(fields[15], 64)
-	}
-	i++
-	if i <= dataLen {
-		s.HSS_EC, _ = strconv.ParseFloat(fields[16], 64)
-	}
-	i++
-	if i <= dataLen {
-		s.HSS_EC_BCL, _ = strconv.ParseFloat(fields[17], 64)
-	}
-	i++
-	if i <= dataLen {
-		s.HSS_EC_BCU, _ = strconv.ParseFloat(fields[18], 64)
-	}
-	i++
-	if i <= dataLen {
-		s.EC_VALUE, _ = strconv.ParseFloat(fields[19], 64)
 	}
 }
 
@@ -6312,39 +6159,6 @@ func (s *STAT_SL1L2) fill_STAT_SL1L2(fields []string) {
 	i++
 	if i <= dataLen {
 		s.MAE, _ = strconv.ParseFloat(fields[6], 64)
-	}
-}
-
-func (s *STAT_SSIDX) fill_STAT_SSIDX(fields []string) {
-	dataLen := len(fields) - 1
-	i := -1
-	i++
-	if i <= dataLen {
-		if fields[0] != "NA" {
-			s.FCST_MODEL = fields[0]
-		}
-	}
-	i++
-	if i <= dataLen {
-		if fields[1] != "NA" {
-			s.REF_MODEL = fields[1]
-		}
-	}
-	i++
-	if i <= dataLen {
-		s.N_INIT, _ = strconv.Atoi(fields[2])
-	}
-	i++
-	if i <= dataLen {
-		s.N_TERM, _ = strconv.Atoi(fields[3])
-	}
-	i++
-	if i <= dataLen {
-		s.N_VLD, _ = strconv.Atoi(fields[4])
-	}
-	i++
-	if i <= dataLen {
-		s.SS_INDEX, _ = strconv.ParseFloat(fields[5], 64)
 	}
 }
 
@@ -7549,17 +7363,6 @@ func GetDocForId(fileLineType string, metaDataMap map[string]interface{}, header
 			val[dataKey] = elem
 			(doc)["data"] = val
 		}
-	case "STAT_SSIDX":
-		elem := STAT_SSIDX{}
-		elem.fill_STAT_SSIDX_Header(headerData, &doc)
-		elem.fill_STAT_SSIDX(dataData)
-		if exists := (doc)["data"]; exists == nil {
-			(doc)["data"] = make(map[string]STAT_SSIDX)
-		}
-		if val, ok := (doc)["data"].(map[string]STAT_SSIDX); ok {
-			val[dataKey] = elem
-			(doc)["data"] = val
-		}
 	case "MODE_OBJ":
 		elem := MODE_OBJ{}
 		elem.fill_MODE_OBJ_Header(headerData, &doc)
@@ -7830,13 +7633,6 @@ func AddDataElement(dataKey string, fileLineType string, dataData []string, doc 
 			val[dataKey] = elem
 			(*doc)["data"] = val
 		}
-	case "STAT_SSIDX":
-		elem := STAT_SSIDX{}
-		elem.fill_STAT_SSIDX(dataData)
-		if val, ok := (*doc)["data"].(map[string]STAT_SSIDX); ok {
-			val[dataKey] = elem
-			(*doc)["data"] = val
-		}
 	case "MODE_OBJ":
 		elem := MODE_OBJ{}
 		elem.fill_MODE_OBJ(dataData)
@@ -7871,4 +7667,4 @@ func AddDataElement(dataKey string, fileLineType string, dataData []string, doc 
 	return *doc, nil
 }
 
-var MetHeaderColumnsFileUrl = "https://raw.githubusercontent.com/dtcenter/MET/refs/heads/main_v12.0/data/table_files/met_header_columns_V10.1.txt"
+var MetHeaderColumnsFileUrl = "https://raw.githubusercontent.com/dtcenter/MET/refs/heads/main_v12.0/data/table_files/met_header_columns_V10.0.txt"

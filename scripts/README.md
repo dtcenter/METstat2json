@@ -7,16 +7,16 @@
 >./scripts/build.sh
 formatting primary packages
 linting primary packages
-building package buildHeaderLineTypes
+building package generator
 building for linux/arm64
 building for darwin/arm64
 building for linux/amd64
 building for darwin/amd64
-saving current metLineTypeDefinitions.go to /tmp/metLineTypeDefinitions.go.bak
-building new metLineTypeDefinitions.go
-format and lint metLineTypeDefinitions
-formatting ./pkg/metLineTypeDefinitions
-linting ./pkg/metLineTypeDefinitions
+saving current linetypes.go to /tmp/linetypes.go.bak
+building new linetypes.go
+format and lint linetypes
+formatting ./pkg/linetypes
+linting ./pkg/linetypes
 building sample program
 building for linux/arm64
 building for darwin/arm64
@@ -26,8 +26,8 @@ finished
 >
 ```
 
-After the above step you should have a complete, generated, formatted, and linted GO package in pkg/metLineTypeDefinitions and supporting
-pks pkg/buildHeaderLineTypeUtilities, pkg/structColumnDefs and pkg/ample_parser.
+After the above step you should have a complete, generated, formatted, and linted GO package in pkg/linetypes and supporting
+pks pkg/util, pkg/structColumnDefs and pkg/ample_parser.
 
 ## running the parser
 
