@@ -12,7 +12,7 @@ import (
 	"runtime"
 	"strings"
 
-	"github.com/NOAA-GSL/METstat2json/pkg/parser"
+	"github.com/dtcenter/METstat2json/pkg/parser"
 )
 
 // dummy function to satisfy the function signature of getExternalDocForId
