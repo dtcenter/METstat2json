@@ -9,12 +9,12 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/NOAA-GSL/METstat2json/pkg/linetypes/v10_0"
-	"github.com/NOAA-GSL/METstat2json/pkg/linetypes/v10_1"
-	"github.com/NOAA-GSL/METstat2json/pkg/linetypes/v11_0"
-	"github.com/NOAA-GSL/METstat2json/pkg/linetypes/v11_1"
-	"github.com/NOAA-GSL/METstat2json/pkg/linetypes/v12_0"
-	"github.com/NOAA-GSL/METstat2json/pkg/util"
+	"github.com/dtcenter/METstat2json/pkg/linetypes/v10_0"
+	"github.com/dtcenter/METstat2json/pkg/linetypes/v10_1"
+	"github.com/dtcenter/METstat2json/pkg/linetypes/v11_0"
+	"github.com/dtcenter/METstat2json/pkg/linetypes/v11_1"
+	"github.com/dtcenter/METstat2json/pkg/linetypes/v12_0"
+	"github.com/dtcenter/METstat2json/pkg/util"
 )
 
 /*

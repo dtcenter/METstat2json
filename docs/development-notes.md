@@ -4,7 +4,7 @@ This is a parser for MET output files.
 
 ## Approach
 
-The approach is to use a [Go program](https://github.com/NOAA-GSL/METstat2json/blob/main/generator/generator.go) that uses several files from the MET repo (which is versioned by METplus) to generate another GO package that can then be imported to a GO program that can be used for parsing MET output files. The MET output file versions that are supported are v10.0.0 and later.
+The approach is to use a [Go program](https://github.com/dtcenter/METstat2json/blob/main/generator/generator.go) that uses several files from the MET repo (which is versioned by METplus) to generate another GO package that can then be imported to a GO program that can be used for parsing MET output files. The MET output file versions that are supported are v10.0.0 and later.
 
 The file [column defs](https://raw.githubusercontent.com/dtcenter/MET/refs/heads/main_v12.0/data/table_files/met_header_columns_V12.0.txt) as well as met_header_columns_v11.1.0, ...\_v11.0.0, ...\_v10.1.0, and ...\_v10.0.0 are used to get a list of required terms that need to be type defined for eacg respective version. Then several source code files are searched for type conversion statements for those terms. If the type of a term cannot be determined from source code an attempt is made to look up the term in the MET user guide.
 
@@ -35,17 +35,17 @@ These are the src files that are searched...
 
 ... in order to derive column definitions and type information that is used to create the GO packages ...
 
-- [linetypes/v10_0](https://github.com/NOAA-GSL/METstat2json/tree/main/pkg/linetypes/v10_0)
-- [linetypes/v10_1](https://github.com/NOAA-GSL/METstat2json/tree/main/pkg/linetypes/v10_1)
-- [linetypes/v11_0](https://github.com/NOAA-GSL/METstat2json/tree/main/pkg/linetypes/v11_0)
-- [linetypes/v11_0](https://github.com/NOAA-GSL/METstat2json/tree/main/pkg/linetypes/v11_0)
-- [linetypes/v11_1](https://github.com/NOAA-GSL/METstat2json/tree/main/pkg/linetypes/v11_1)
-- [linetypes/v12_0](https://github.com/NOAA-GSL/METstat2json/tree/main/pkg/linetypes/v12_0)
+- [linetypes/v10_0](https://github.com/dtcenter/METstat2json/tree/main/pkg/linetypes/v10_0)
+- [linetypes/v10_1](https://github.com/dtcenter/METstat2json/tree/main/pkg/linetypes/v10_1)
+- [linetypes/v11_0](https://github.com/dtcenter/METstat2json/tree/main/pkg/linetypes/v11_0)
+- [linetypes/v11_0](https://github.com/dtcenter/METstat2json/tree/main/pkg/linetypes/v11_0)
+- [linetypes/v11_1](https://github.com/dtcenter/METstat2json/tree/main/pkg/linetypes/v11_1)
+- [linetypes/v12_0](https://github.com/dtcenter/METstat2json/tree/main/pkg/linetypes/v12_0)
 
 These packages contain the struct definitions, fill functions for each MET line type, and parse routines necessary to convert MET output files into json documents for use in a GSL AVID Couchbase database, according to the AVID Couchbase data schema.
 
 In addition to the "pkg/linetypes/*" packages there are several other local packages, "pkg/parser", "examples/sample_parser", "generator", and "pkg/util".
-The "sample_parser" package demonstrates how to use the [parser](https://github.com/NOAA-GSL/METstat2json/tree/main/pkg/parser) package. The parser is the only package that is required to parse MET output files.
+The "sample_parser" package demonstrates how to use the [parser](https://github.com/dtcenter/METstat2json/tree/main/pkg/parser) package. The parser is the only package that is required to parse MET output files.
 
 ### parser
 

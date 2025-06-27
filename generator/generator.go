@@ -10,7 +10,7 @@ import (
 	"slices"
 	"strings"
 
-	"github.com/NOAA-GSL/METstat2json/pkg/util"
+	"github.com/dtcenter/METstat2json/pkg/util"
 	"golang.org/x/text/cases"
 	"golang.org/x/text/language"
 )

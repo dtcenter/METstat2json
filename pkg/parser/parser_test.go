@@ -20,11 +20,11 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/NOAA-GSL/METstat2json/pkg/linetypes/v10_0"
-	"github.com/NOAA-GSL/METstat2json/pkg/linetypes/v10_1"
-	"github.com/NOAA-GSL/METstat2json/pkg/linetypes/v11_0"
-	"github.com/NOAA-GSL/METstat2json/pkg/linetypes/v11_1"
-	"github.com/NOAA-GSL/METstat2json/pkg/linetypes/v12_0"
+	"github.com/dtcenter/METstat2json/pkg/linetypes/v10_0"
+	"github.com/dtcenter/METstat2json/pkg/linetypes/v10_1"
+	"github.com/dtcenter/METstat2json/pkg/linetypes/v11_0"
+	"github.com/dtcenter/METstat2json/pkg/linetypes/v11_1"
+	"github.com/dtcenter/METstat2json/pkg/linetypes/v12_0"
 )
 
 var testdataDir = ""
