@@ -28,7 +28,7 @@ The entrypoint for the library is intended to be `parser` and should be the only
 
 ```go
 import (
-    "github.com/NOAA-GSL/METstat2json/pkg/parser"
+    "github.com/dtcenter/METstat2json/pkg/parser"
 )
 
 func main() {
