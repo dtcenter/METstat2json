@@ -72,6 +72,8 @@ var MetSrcFiles = []string{
 }
 
 // vxMetadata struct definition
+//
+//nolint:tagliatelle // We need these fields to match other metadata fields in our documents.
 type VxMetadata struct {
 	ID      string `json:"id"`
 	Subset  string `json:"subset"`

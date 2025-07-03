@@ -358,7 +358,7 @@ func getHeaderStructureString(fileType string, lineType string, getDocIDString s
 		term = strings.ReplaceAll(term, "[0-9]*", "i")
 		name := strings.ToUpper(term)
 		_, dataType := getDataType(term, &metDataTypesForLines)
-		jsonName := toCamelCase(name)
+		jsonName := strings.ToUpper(name)
 		headerStructString += fmt.Sprintf("    %-*s %s `json:\"%s\"`\n", padding, name, dataType, jsonName)
 		if term == "LINE_TYPE" && (fileType == "MODE" || fileType == "MTD") {
 			// these file types do not have a LINE_TYPE field in the header definition
@@ -406,7 +406,7 @@ func getFillStructureTerm(term string, metDataTypesForLines map[string]string, d
 	_filledStructureString := fillStructureString
 	_dataStruct := dataStruct
 	cleanTerm, dataType := getDataType(term, &metDataTypesForLines)
-	jsonTerm := toCamelCase(cleanTerm)
+	jsonTerm := strings.ToUpper(cleanTerm)
 
 	_dataStruct += fmt.Sprintf("    %-*s %-*s `json:\"%s,omitempty\"`\n", padding, cleanTerm, padding2, dataType, jsonTerm)
 	var numFields int
