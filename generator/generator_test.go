@@ -6,37 +6,6 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestToCamelCase(t *testing.T) {
-	tests := []struct {
-		input    string
-		expected string
-	}{
-		{"FCST_VALID", "fcstValid"},
-		{"VERSION", "version"},
-		{"N_VALID", "nValid"},
-		{"STORM_ID", "stormId"},
-		{"LINE_TYPE", "lineType"},
-		{"INIT_MASK", "initMask"},
-		{"N_CAT", "nCat"},
-		{"DIAG_N", "diagN"},
-		{"", ""},
-		{"A", "a"},
-		{"FOO_BAR_BAZ", "fooBarBaz"},
-		{"FOO__BAR", "fooBar"},
-		{"FOO BAR", "fooBar"},
-		{"FOO-BAR", "fooBar"},
-		{"INIT_12345", "init12345"},
-		{"F1_O2", "f1O2"},
-	}
-
-	for _, test := range tests {
-		t.Run(test.input, func(t *testing.T) {
-			result := toCamelCase(test.input)
-			assert.Equal(t, test.expected, result, "toCamelCase(%q) should return %q", test.input, test.expected)
-		})
-	}
-}
-
 func TestGetSortedKeys(t *testing.T) {
 	tests := []struct {
 		name     string
