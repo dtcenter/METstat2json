@@ -11,8 +11,6 @@ import (
 	"strings"
 
 	"github.com/dtcenter/METstat2json/pkg/util"
-	"golang.org/x/text/cases"
-	"golang.org/x/text/language"
 )
 
 /*
@@ -248,29 +246,6 @@ func getSortedKeys(m map[string]string) []string {
 	}
 	slices.Sort(keys)
 	return keys
-}
-
-// rewrites strings to camelCase format.
-func toCamelCase(s string) string {
-	// Remove all characters that are not alphanumeric, spaces, hyphens or underscores
-	s = regexp.MustCompile("[^a-zA-Z0-9-_ ]+").ReplaceAllString(s, "")
-
-	// Replace all underscores & hyphens with spaces
-	s = strings.ReplaceAll(s, "_", " ")
-	s = strings.ReplaceAll(s, "-", " ")
-
-	// Title case s. As part of that, switch from UPPER to lower case
-	s = cases.Title(language.AmericanEnglish).String(s)
-
-	// Remove all spaces
-	s = strings.ReplaceAll(s, " ", "")
-
-	// Lowercase the first letter
-	if len(s) > 0 {
-		s = strings.ToLower(s[:1]) + s[1:]
-	}
-
-	return s
 }
 
 func getFileLineType(line string) (string, string, string, error) {
