@@ -11,8 +11,6 @@ import (
 	"strings"
 
 	"github.com/dtcenter/METstat2json/pkg/util"
-	"golang.org/x/text/cases"
-	"golang.org/x/text/language"
 )
 
 /*
@@ -69,8 +67,6 @@ func setMetVersion(parserVersion string) error {
 	}
 	return nil
 }
-
-var patterns = make(map[string]Pattern)
 
 /*
 The output of this program is a series of structs that can be used to define the header
@@ -252,29 +248,6 @@ func getSortedKeys(m map[string]string) []string {
 	return keys
 }
 
-// rewrites strings to camelCase format.
-func toCamelCase(s string) string {
-	// Remove all characters that are not alphanumeric, spaces, hyphens or underscores
-	s = regexp.MustCompile("[^a-zA-Z0-9-_ ]+").ReplaceAllString(s, "")
-
-	// Replace all underscores & hyphens with spaces
-	s = strings.ReplaceAll(s, "_", " ")
-	s = strings.ReplaceAll(s, "-", " ")
-
-	// Title case s. As part of that, switch from UPPER to lower case
-	s = cases.Title(language.AmericanEnglish).String(s)
-
-	// Remove all spaces
-	s = strings.ReplaceAll(s, " ", "")
-
-	// Lowercase the first letter
-	if len(s) > 0 {
-		s = strings.ToLower(s[:1]) + s[1:]
-	}
-
-	return s
-}
-
 func getFileLineType(line string) (string, string, string, error) {
 	parts := strings.Split(line, ": VERSION")
 	if len(parts) < 2 {
@@ -358,7 +331,7 @@ func getHeaderStructureString(fileType string, lineType string, getDocIDString s
 		term = strings.ReplaceAll(term, "[0-9]*", "i")
 		name := strings.ToUpper(term)
 		_, dataType := getDataType(term, &metDataTypesForLines)
-		jsonName := toCamelCase(name)
+		jsonName := strings.ToUpper(name)
 		headerStructString += fmt.Sprintf("    %-*s %s `json:\"%s\"`\n", padding, name, dataType, jsonName)
 		if term == "LINE_TYPE" && (fileType == "MODE" || fileType == "MTD") {
 			// these file types do not have a LINE_TYPE field in the header definition
@@ -406,7 +379,7 @@ func getFillStructureTerm(term string, metDataTypesForLines map[string]string, d
 	_filledStructureString := fillStructureString
 	_dataStruct := dataStruct
 	cleanTerm, dataType := getDataType(term, &metDataTypesForLines)
-	jsonTerm := toCamelCase(cleanTerm)
+	jsonTerm := strings.ToUpper(cleanTerm)
 
 	_dataStruct += fmt.Sprintf("    %-*s %-*s `json:\"%s,omitempty\"`\n", padding, cleanTerm, padding2, dataType, jsonTerm)
 	var numFields int
@@ -836,7 +809,7 @@ func overRideDefinedMetDataTypes(metDataTypesForLines map[string]string, fieldNa
 	for k, v := range fieldNameMap {
 		if v == "UNDEFINED" {
 			found = false
-			for _, v1 := range *getPatterns() {
+			for _, v1 := range getPatterns() {
 				if v1.match.MatchString(strings.ToUpper(k)) {
 					found = true
 					break
@@ -864,67 +837,68 @@ and, if there is, add an override to the overRideDefinedMetDataTypes function in
 	return metDataTypesForLines, fieldNameMap
 }
 
-func getPatterns() *map[string]Pattern {
-	// These are Regular expression patterns that are used to find the data types for the fields that are not simple,
-	// linear or not found in the user guide files.
+// Returns a slice of regex patterns that identify dynamic field sequences in MET data
+// files, distinguishing between count fields (like N_THRESH) and their corresponding
+// numbered data fields (like THRESH_1, PROB_1), along with their Go data types for
+// code generation.
+func getPatterns() []Pattern {
 	// PROBRIRW example
 	// VERSION AMODEL BMODEL DESC STORM_ID BASIN CYCLONE STORM_NAME INIT            LEAD   VALID           INIT_MASK VALID_MASK LINE_TYPE ALAT ALON  BLAT BLON  INITIALS TK_ERR    X_ERR      Y_ERR ADLAND     BDLAND     RIRW_BEG RIRW_END RIRW_WINDOW AWIND_END BWIND_BEG BWIND_END BDELTA BDELTA_MAX BLEVEL_BEG BLEVEL_END N_THRESH THRESH_1 PROB_1 THRESH_2 PROB_2 THRESH_3 PROB_3 THRESH_4 PROB_4 THRESH_5 PROB_5
 	// V12.0.0 GPMI   BEST   NA   AL012015 AL    01      ANA        20150508_120000 240000 20150509_120000 NA        NA         PROBRIRW  31.6 -77.7 32.5 -77.8       NA  54.23894    5.08551   -54  135.63956   80.31028        0       24          24        44        40        50     10         10         TS         TS        5      -30      0      -10      0        0    100       10      0       30      0
-	// Only define and Compile these things once
-	if len(patterns) == 0 {
-		// these `\(N_[A-Z]+\)` are repeated sequences of data fields - a map of data fields
-		// that indicate repeated sequences of data fields in the data sections.
-		// These do not have direct corresponding data elements, but they have
-		// corresponding sequences of data elements in the data sections.
-		// Those elements are identified in the actual data section headers by
-		// things like THRESH_[0-9]* PROB_[0-9]* for PROBRIRW. There are associated data
-		// elements in the data sections that are of different types and they are
-		// defined by tokens like THRESH_1 PROB_1 THRESH_2 PROB_2 THRESH_3 PROB_3
-		// Since these are essentially key value pairs of varying length (per individual data file)
-		// they are not directly represented in the data structures as a map.
-		// The data structures are created dynamically based on the data files and the types
-		// of the values in the map are specific to each pattern e.g. bin_n values are ints
-		// but cl_n values are float64s.
-		// structField is for repeating fields only. These patterns are surrounded by "()" i.e. (N_CAT).
-		// The structure generator needs to know what it is that is repeating. Most likely a map of some sort.
 
+	// these `\(N_[A-Z]+\)` are repeated sequences of data fields - a map of data fields
+	// that indicate repeated sequences of data fields in the data sections.
+	// These do not have direct corresponding data elements, but they have
+	// corresponding sequences of data elements in the data sections.
+	// Those elements are identified in the actual data section headers by
+	// things like THRESH_[0-9]* PROB_[0-9]* for PROBRIRW. There are associated data
+	// elements in the data sections that are of different types and they are
+	// defined by tokens like THRESH_1 PROB_1 THRESH_2 PROB_2 THRESH_3 PROB_3
+	// Since these are essentially key value pairs of varying length (per individual data file)
+	// they are not directly represented in the data structures as a map.
+	// The data structures are created dynamically based on the data files and the types
+	// of the values in the map are specific to each pattern e.g. bin_n values are ints
+	// but cl_n values are float64s.
+	// structField is for repeating fields only. These patterns are surrounded by "()" i.e. (N_CAT).
+	// The structure generator needs to know what it is that is repeating. Most likely a map of some sort.
+
+	return []Pattern{
 		// repeating patterns
-		patterns["(nCat)"] = Pattern{match: regexp.MustCompile(`(N_CAT)`), dType: "int", structField: "CAT", structType: "map[string]interface{}"}
-		patterns["(nThresh)"] = Pattern{match: regexp.MustCompile(`(N_THRESH)`), dType: "int", structField: "THRESH", structType: "map[string]interface{}"}
-		patterns["(nPts)"] = Pattern{match: regexp.MustCompile(`(N_PTS)`), dType: "int", structField: "PTS", structType: "map[string]interface{}"}
-		patterns["(nEns)"] = Pattern{match: regexp.MustCompile(`(N_ENS)`), dType: "int", structField: "ENS", structType: "map[string]interface{}"}
-		patterns["(nRank)"] = Pattern{match: regexp.MustCompile(`(N_RANK)`), dType: "int", structField: "RANK", structType: "map[string]interface{}"}
-		patterns["(nBin)"] = Pattern{match: regexp.MustCompile(`(N_BIN)`), dType: "int", structField: "BIN", structType: "map[string]interface{}"}
-		patterns["(nDiag)"] = Pattern{match: regexp.MustCompile(`(N_DIAG)`), dType: "int", structField: "DIAG", structType: "map[string]interface{}"}
+		{match: regexp.MustCompile(`(N_CAT)`), dType: "int", structField: "CAT", structType: "map[string]interface{}"},
+		{match: regexp.MustCompile(`(N_THRESH)`), dType: "int", structField: "THRESH", structType: "map[string]interface{}"},
+		{match: regexp.MustCompile(`(N_PTS)`), dType: "int", structField: "PTS", structType: "map[string]interface{}"},
+		{match: regexp.MustCompile(`(N_ENS)`), dType: "int", structField: "ENS", structType: "map[string]interface{}"},
+		{match: regexp.MustCompile(`(N_RANK)`), dType: "int", structField: "RANK", structType: "map[string]interface{}"},
+		{match: regexp.MustCompile(`(N_BIN)`), dType: "int", structField: "BIN", structType: "map[string]interface{}"},
+		{match: regexp.MustCompile(`(N_DIAG)`), dType: "int", structField: "DIAG", structType: "map[string]interface{}"},
 		// single patterns
-		patterns["baserN"] = Pattern{match: regexp.MustCompile("BASER_[0-9]*"), dType: "float64", structField: "BASER_I", structType: "map[string]interface{}"}
-		patterns["binN"] = Pattern{match: regexp.MustCompile("BIN_[0-9]*"), dType: "int", structField: "BIN_I", structType: "int"}
-		patterns["calibrationN"] = Pattern{match: regexp.MustCompile("CALIBRATION_[0-9]*"), dType: "float64", structField: "CALIBRATION_I", structType: "float64"}
-		patterns["clN"] = Pattern{match: regexp.MustCompile("CL_[0-9]*"), dType: "float64", structField: "CL_I", structType: "float64"}
-		patterns["diagN"] = Pattern{match: regexp.MustCompile("DIAG_[0-9]*"), dType: "float64", structField: "DIAG_I", structType: "float64"}
-		patterns["ensN"] = Pattern{match: regexp.MustCompile("ENS_[0-9]*"), dType: "int", structField: "ENS_I", structType: "int"}
-		patterns["fiOi"] = Pattern{match: regexp.MustCompile("F[0-9]*_O[0-9]*"), dType: "string", structField: "FI_OI", structType: "string"}
-		patterns["azfiAzoi"] = Pattern{match: regexp.MustCompile("[A-Z]F[0-9]*_[A-Z]O[0-9]*"), dType: "string", structField: "AZFI_AZOI", structType: "string"}
-		patterns["likelihoodN"] = Pattern{match: regexp.MustCompile("LIKELIHOOD_[0-9]*"), dType: "float64", structField: "LIKELIHOOD_I", structType: "float64"}
-		patterns["aalWindN"] = Pattern{match: regexp.MustCompile("AAL_WIND_[0-9]*"), dType: "float64", structField: "AAL_WIND_I", structType: "float64"}
-		patterns["aseWindN"] = Pattern{match: regexp.MustCompile("ASE_WIND_[0-9]*"), dType: "float64", structField: "ASE_WIND_I", structType: "float64"}
-		patterns["aswWindN"] = Pattern{match: regexp.MustCompile("ASW_WIND_[0-9]*"), dType: "float64", structField: "ASW_WIND_I", structType: "float64"}
-		patterns["aneWindN"] = Pattern{match: regexp.MustCompile("ANE_WIND_[0-9]*"), dType: "float64", structField: "ANE_WIND_I", structType: "float64"}
-		patterns["anwWindN"] = Pattern{match: regexp.MustCompile("ANW_WIND_[0-9]*"), dType: "float64", structField: "ANW_WIND_I", structType: "float64"}
-		patterns["onTpN"] = Pattern{match: regexp.MustCompile("ON_TP_[0-9]*"), dType: "float64", structField: "ON_TP_I", structType: "float64"}
-		patterns["onN"] = Pattern{match: regexp.MustCompile("ON_[0-9]*"), dType: "float64", structField: "ON_I", structType: "float64"}
-		patterns["oyTpN"] = Pattern{match: regexp.MustCompile("OY_TP_[0-9]*"), dType: "float64", structField: "OY_TP_I", structType: "float64"}
-		patterns["oyN"] = Pattern{match: regexp.MustCompile("OY_[0-9]*"), dType: "float64", structField: "OY_I", structType: "float64"}
-		patterns["podyN"] = Pattern{match: regexp.MustCompile("PODY_[0-9]*"), dType: "float64", structField: "PODY_I", structType: "float64"}
-		patterns["pofdN"] = Pattern{match: regexp.MustCompile("POFD_[0-9]*"), dType: "float64", structField: "POFD_I", structType: "float64"}
-		patterns["probN"] = Pattern{match: regexp.MustCompile("PROB_[0-9]*"), dType: "float64", structField: "PROB_I", structType: "float64"}
-		patterns["rankN"] = Pattern{match: regexp.MustCompile("RANK_[0-9]*"), dType: "int", structField: "RANK_I", structType: "int"}
-		patterns["refinementN"] = Pattern{match: regexp.MustCompile("REFINEMENT_[0-9]*"), dType: "float64", structField: "REFINEMENT_I", structType: "float64"}
-		patterns["relpN"] = Pattern{match: regexp.MustCompile("RELP_[0-9]*"), dType: "float64", structField: "RELP_I", structType: "float64"}
-		patterns["threshN"] = Pattern{match: regexp.MustCompile("THRESH_[0-9]*"), dType: "int", structField: "THRESH_I", structType: "int"}
-		patterns["valueN"] = Pattern{match: regexp.MustCompile("VALUE_[0-9]*"), dType: "int", structField: "VALUE_I", structType: "int"}
+		{match: regexp.MustCompile("BASER_[0-9]*"), dType: "float64", structField: "BASER_I", structType: "map[string]interface{}"},
+		{match: regexp.MustCompile("BIN_[0-9]*"), dType: "int", structField: "BIN_I", structType: "int"},
+		{match: regexp.MustCompile("CALIBRATION_[0-9]*"), dType: "float64", structField: "CALIBRATION_I", structType: "float64"},
+		{match: regexp.MustCompile("CL_[0-9]*"), dType: "float64", structField: "CL_I", structType: "float64"},
+		{match: regexp.MustCompile("DIAG_[0-9]*"), dType: "float64", structField: "DIAG_I", structType: "float64"},
+		{match: regexp.MustCompile("ENS_[0-9]*"), dType: "int", structField: "ENS_I", structType: "int"},
+		{match: regexp.MustCompile("F[0-9]*_O[0-9]*"), dType: "string", structField: "FI_OI", structType: "string"},
+		{match: regexp.MustCompile("[A-Z]F[0-9]*_[A-Z]O[0-9]*"), dType: "string", structField: "AZFI_AZOI", structType: "string"},
+		{match: regexp.MustCompile("LIKELIHOOD_[0-9]*"), dType: "float64", structField: "LIKELIHOOD_I", structType: "float64"},
+		{match: regexp.MustCompile("AAL_WIND_[0-9]*"), dType: "float64", structField: "AAL_WIND_I", structType: "float64"},
+		{match: regexp.MustCompile("ASE_WIND_[0-9]*"), dType: "float64", structField: "ASE_WIND_I", structType: "float64"},
+		{match: regexp.MustCompile("ASW_WIND_[0-9]*"), dType: "float64", structField: "ASW_WIND_I", structType: "float64"},
+		{match: regexp.MustCompile("ANE_WIND_[0-9]*"), dType: "float64", structField: "ANE_WIND_I", structType: "float64"},
+		{match: regexp.MustCompile("ANW_WIND_[0-9]*"), dType: "float64", structField: "ANW_WIND_I", structType: "float64"},
+		{match: regexp.MustCompile("ON_TP_[0-9]*"), dType: "float64", structField: "ON_TP_I", structType: "float64"},
+		{match: regexp.MustCompile("ON_[0-9]*"), dType: "float64", structField: "ON_I", structType: "float64"},
+		{match: regexp.MustCompile("OY_TP_[0-9]*"), dType: "float64", structField: "OY_TP_I", structType: "float64"},
+		{match: regexp.MustCompile("OY_[0-9]*"), dType: "float64", structField: "OY_I", structType: "float64"},
+		{match: regexp.MustCompile("PODY_[0-9]*"), dType: "float64", structField: "PODY_I", structType: "float64"},
+		{match: regexp.MustCompile("POFD_[0-9]*"), dType: "float64", structField: "POFD_I", structType: "float64"},
+		{match: regexp.MustCompile("PROB_[0-9]*"), dType: "float64", structField: "PROB_I", structType: "float64"},
+		{match: regexp.MustCompile("RANK_[0-9]*"), dType: "int", structField: "RANK_I", structType: "int"},
+		{match: regexp.MustCompile("REFINEMENT_[0-9]*"), dType: "float64", structField: "REFINEMENT_I", structType: "float64"},
+		{match: regexp.MustCompile("RELP_[0-9]*"), dType: "float64", structField: "RELP_I", structType: "float64"},
+		{match: regexp.MustCompile("THRESH_[0-9]*"), dType: "int", structField: "THRESH_I", structType: "int"},
+		{match: regexp.MustCompile("VALUE_[0-9]*"), dType: "int", structField: "VALUE_I", structType: "int"},
 	}
-	return &patterns
 }
 
 func getColumnLinesAndMapForUrl(fileUrl string) ([]string, map[string]string) {
@@ -947,7 +921,6 @@ func getColumnLinesAndMapForUrl(fileUrl string) ([]string, map[string]string) {
 		// the field names have the same data type all the different structs i.e. columnDef lines.
 		for _, field := range fields {
 			name := strings.ToLower(field)
-			// fieldNameMap[cases.Title(language.English).String(name)] = "UNDEFINED"
 			fieldNameMap[strings.ToUpper(name)] = "UNDEFINED"
 		}
 	}
@@ -977,16 +950,15 @@ func getDataType(name string, metDataTypesLines *map[string]string) (key string,
 		There are some fields that are arrays of values and these are handled differently. The field name is modified to reflect the array of values and the data type is set to the array type.
 		Some interpretations of the patterns depend upon the line type.
 	*/
-	//uName := cases.Title(language.English).String(name)
 	uName := strings.ToUpper(name)
 	// is it exactly the same as a pattern? This is the case for a structure repeating field.
-	for _, v := range *getPatterns() {
+	for _, v := range getPatterns() {
 		if v.match.String() == uName {
 			return v.structField, v.structType
 		}
 	}
 	// does it match a pattern? This is the case for a structure simple field.
-	for _, v := range *getPatterns() {
+	for _, v := range getPatterns() {
 		if v.match.MatchString(uName) {
 			return uName, v.dType
 		}
